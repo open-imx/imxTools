@@ -1,0 +1,66 @@
+[project]
+name = "imxTools"
+description = "....."
+readme = "README.md"
+authors = [
+  { name = "Hazedd", email = "Hazedd@users.noreply.github.com" },
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: End Users/Desktop",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "License :: OSI Approved :: MIT License",
+]
+dynamic = ["version"]
+dependencies = [
+    "imxInsights",
+    "xmlschema",
+    "pandas",
+    "types-lxml",
+    "openpyxl",
+    "kmService",
+]
+requires-python = ">=3.10"
+
+
+[project.urls]
+Source = "https://github.com/open-imx/imxTools"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[dependency-groups]
+dev = [
+    "ty>=0.0.1a11",
+    "ruff==0.12.0",
+    "zizmor==1.9.0",
+    "pytest>=8.4.1",
+    "pytest-asyncio>=1.0.0",
+    "build>=1.2.2.post1",
+    "pre-commit>=4.2.0",
+    "bump-my-version",
+]
+
+gui = [
+    "nicegui",
+]
+
+[tool.setuptools.dynamic]
+version = { attr = "imxTools.__version__" }
+
+[tool.setuptools]
+packages = ["imxTools"]
+package-dir = { "" = "src" }
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+exclude = [".venv", "build", "dist"]
+
+[tool.ty.src]
+root = "."
+exclude = ["tests/", "**/__init__.py"]
