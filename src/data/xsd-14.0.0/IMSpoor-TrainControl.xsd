@@ -1,0 +1,457 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns="http://www.prorail.nl/IMSpoor" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xml="http://www.w3.org/XML/1998/namespace" targetNamespace="http://www.prorail.nl/IMSpoor" elementFormDefault="qualified" attributeFormDefault="unqualified" version="14.0.0">
+	<xs:include schemaLocation="IMSpoor-Groupings.xsd"/>
+	<xs:element name="TrainControl">
+		<xs:annotation>
+			<xs:documentation>Een verzameling van (configuratie)objecten van trein beheersing</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tDesignPetal">
+					<xs:sequence>
+						<xs:element ref="Routes" minOccurs="0"/>
+						<xs:element ref="MovementPlans" minOccurs="0"/>
+						<xs:element ref="FictitiousSignals" minOccurs="0"/>
+						<xs:element ref="PpcAuthorities" minOccurs="0"/>
+						<xs:element ref="TrafficControlAreas" minOccurs="0"/>
+						<xs:element ref="TrafficControlSystems" minOccurs="0"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="PpcAuthorities">
+		<xs:annotation>
+			<xs:documentation>Type voor een verzameling PPLG's</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="PpcAuthority" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="PpcAuthority">
+		<xs:annotation>
+			<xs:documentation>Een PPLG Bedienbevoegdheid legt de bedienbevoegdheden van bijzondere objecten bij een PPLG vast.</xs:documentation>
+			<xs:documentation xml:lang="NL">PPLG Bedienbevoegdheid</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tTrainControlExtension">
+					<xs:sequence>
+						<xs:element name="WorkzoneRefs" type="tUUIDRefList" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Een lijst van PUIC verwijzingen naar werkzones die vanuit de PPLG bediend worden.</xs:documentation>
+								<xs:appinfo>
+									<ObjectTypeRef>Workzone</ObjectTypeRef>
+								</xs:appinfo>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="PpcControlledBridge" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Een verwijzing naar een beweegbare brug waarvan een treindienstleider de toestand moet kunnen inzien.</xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:attribute name="bridgeRef" type="tUUIDRef" use="required">
+									<xs:annotation>
+										<xs:documentation>Puic verwijzing naar een beweegbare brug.</xs:documentation>
+										<xs:appinfo>
+											<ObjectTypeRef>Bridge</ObjectTypeRef>
+										</xs:appinfo>
+									</xs:annotation>
+								</xs:attribute>
+								<xs:attribute name="bridgeNumber" type="tString50">
+									<xs:annotation>
+										<xs:documentation>Het PPLG specifieke brugnummer voor de beweegbare brug.</xs:documentation>
+									</xs:annotation>
+								</xs:attribute>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+					<xs:attribute name="ppcRef" type="tUUIDRef" use="required">
+						<xs:annotation>
+							<xs:documentation>De PUIC-verwijzing naar de PPLG.</xs:documentation>
+							<xs:appinfo>
+								<ObjectTypeRef>Ppc</ObjectTypeRef>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="TrafficControlAreas">
+		<xs:annotation>
+			<xs:documentation>Type voor een verzameling Posten</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="TrafficControlArea" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="TrafficControlArea">
+		<xs:annotation>
+			<xs:documentation>Een bedienpost is een post van waar centraal seinen en wissels worden bediend. Het is opgebouwd uit een verzameling PPLG's, vrije banen en niet bediende dienstregelpunten.</xs:documentation>
+			<xs:documentation xml:lang="NL">VL-Post</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tDemarcationAggregation">
+					<xs:sequence>
+						<xs:element name="PpcRefs" type="tUUIDRefList">
+							<xs:annotation>
+								<xs:documentation>Een lijst PUIC verwijzingen naar PPLG's welke onder de VL-Post vallen</xs:documentation>
+								<xs:appinfo>
+									<ObjectTypeRef>Ppc</ObjectTypeRef>
+								</xs:appinfo>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="UncontrolledOperationalPointRefs" type="tUUIDRefList">
+							<xs:annotation>
+								<xs:documentation>Een lijst PUIC verwijzingen naar niet bediende dienstregelpunten welke onder de VL-Post vallen</xs:documentation>
+								<xs:appinfo>
+									<ObjectTypeRef>OperationalPoint</ObjectTypeRef>
+								</xs:appinfo>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="OpenLineRefs" type="tUUIDRefList">
+							<xs:annotation>
+								<xs:documentation>Een lijst PUIC verwijzingen naar vrijebanen welke onder de VL-Post vallen</xs:documentation>
+								<xs:appinfo>
+									<ObjectTypeRef>OpenLine</ObjectTypeRef>
+								</xs:appinfo>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="MovementPlans">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="MovementPlan" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="MovementPlan">
+		<xs:annotation>
+			<xs:documentation>Plan met toegedeelde en geprioriteerde routes bij een rijweg.</xs:documentation>
+			<xs:documentation xml:lang="NL">Rijwegplan</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tBaseObject">
+					<xs:sequence>
+						<xs:element ref="TrainMovement" minOccurs="1" maxOccurs="unbounded"/>
+					</xs:sequence>
+					<xs:attribute name="ppcRef" type="tUUIDRef">
+						<xs:annotation>
+							<xs:documentation>Een PUIC verwijzing naar het PPLG waarvoor dit rijwegplan is opgesteld.</xs:documentation>
+							<xs:appinfo>
+								<ObjectTypeRef>Ppc</ObjectTypeRef>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="TrainMovement">
+		<xs:annotation>
+			<xs:documentation>Rijweg. Een ontworpen treinbeweging van een trein in het kader van procesleiding</xs:documentation>
+			<xs:documentation xml:lang="NL">Rijweg</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tBaseObject">
+					<xs:sequence>
+						<xs:element ref="PrioritizedRoute" minOccurs="1" maxOccurs="unbounded"/>
+					</xs:sequence>
+					<xs:attribute name="fromSignalRef" type="tUUIDRef" use="required">
+						<xs:annotation>
+							<xs:documentation>Begin-object van de rijweg.</xs:documentation>
+							<xs:appinfo>
+								<ObjectTypeRef>Signal</ObjectTypeRef>
+								<ObjectTypeRef>StopMarkerBoard</ObjectTypeRef>
+								<ObjectTypeRef>Sign</ObjectTypeRef>
+								<ObjectTypeRef>FictitiousSignal</ObjectTypeRef>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="toSignalRef" type="tUUIDRef" use="required">
+						<xs:annotation>
+							<xs:documentation>Eind-object van de rijweg.</xs:documentation>
+							<xs:appinfo>
+								<ObjectTypeRef>Signal</ObjectTypeRef>
+								<ObjectTypeRef>StopMarkerBoard</ObjectTypeRef>
+								<ObjectTypeRef>Sign</ObjectTypeRef>
+								<ObjectTypeRef>BufferStop</ObjectTypeRef>
+								<ObjectTypeRef>FictitiousSignal</ObjectTypeRef>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="fromPpcTrackRef" type="tUUIDRef" use="optional">
+						<xs:annotation>
+							<xs:documentation>begin-spoor van de rijweg.</xs:documentation>
+							<xs:appinfo>
+								<ObjectTypeRef>PpcTrack</ObjectTypeRef>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="toPpcTrackRef" type="tUUIDRef" use="optional">
+						<xs:annotation>
+							<xs:documentation>eind-spoor van de rijweg.</xs:documentation>
+							<xs:appinfo>
+								<ObjectTypeRef>PpcTrack</ObjectTypeRef>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="PrioritizedRoute">
+		<xs:annotation>
+			<xs:documentation>Een route met een dwangnummer</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="routeRef" type="tUUIDRef" use="required">
+				<xs:annotation>
+					<xs:documentation>Een PUIC verwijzing naar een enkelvoudige of samengestelde route.</xs:documentation>
+					<xs:appinfo>
+						<ObjectTypeRef>SingularRoute</ObjectTypeRef>
+						<ObjectTypeRef>CompositeRoute</ObjectTypeRef>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="priority" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>Het dwangnummer van de route.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Routes">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="SingularRoute" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="CompositeRoute" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="CompositeRoute">
+		<xs:annotation>
+			<xs:documentation>Een samengestelde route</xs:documentation>
+			<xs:documentation xml:lang="NL">Samengestelde Route</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tBaseObject">
+					<xs:sequence>
+						<xs:element name="RouteRefs" type="tUUIDRefList">
+							<xs:annotation>
+								<xs:documentation>Een lijst van PUIC referentie naar een of meer enkelvoudige routes of samengestelde routes.</xs:documentation>
+								<xs:appinfo>
+									<ObjectTypeRef>SingularRoute</ObjectTypeRef>
+									<ObjectTypeRef>CompositeRoute</ObjectTypeRef>
+								</xs:appinfo>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SingularRoutePart">
+		<xs:annotation>
+			<xs:documentation>Een deel van een enkelvoudige route dat wordt aangestuurd door exact één treinbeveiligingsadapter.</xs:documentation>
+			<xs:documentation xml:lang="NL">Gesplitste enkelvoudige route</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="startObjectRef" type="tUUIDRef" use="required">
+				<xs:annotation>
+					<xs:documentation>De PUIC verwijzing naar het beginobject van de gesplitste enkelvoudige route.</xs:documentation>
+					<xs:appinfo>
+						<ObjectTypeRef>Signal</ObjectTypeRef>
+						<ObjectTypeRef>StopMarkerBoard</ObjectTypeRef>
+						<ObjectTypeRef>Sign</ObjectTypeRef>
+						<ObjectTypeRef>FictitiousSignal</ObjectTypeRef>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="endObjectRef" type="tUUIDRef" use="required">
+				<xs:annotation>
+					<xs:documentation>De PUIC verwijzing naar het eindobject van de gesplitste enkelvoudige route.</xs:documentation>
+					<xs:appinfo>
+						<ObjectTypeRef>Signal</ObjectTypeRef>
+						<ObjectTypeRef>StopMarkerBoard</ObjectTypeRef>
+						<ObjectTypeRef>Sign</ObjectTypeRef>
+						<ObjectTypeRef>BufferStop</ObjectTypeRef>
+						<ObjectTypeRef>FictitiousSignal</ObjectTypeRef>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SingularRoute">
+		<xs:annotation>
+			<xs:documentation>Een enkelvoudige route zoals ontworpen binnen het domein treinbeheersing</xs:documentation>
+			<xs:documentation xml:lang="NL">EV Route</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tRoute">
+					<xs:sequence>
+						<xs:element ref="SingularRoutePart" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Een lijst van routedelen bij toepassing van een gesplitste enkelvoudige route.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+					<xs:attribute name="hasCargoCriteriumOption" type="tTrueFalseEnum" use="required">
+						<xs:annotation>
+							<xs:documentation>Geeft aan of bij de rijweg een goederen criterium kan worden opgegeven. Dit veld geeft de mogelijkheid om de waarde van de bijbehorende functionele-route aan te scherpen.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="hasNormalOption" type="tTrueFalseEnum" use="required">
+						<xs:annotation>
+							<xs:documentation>Een indicatie of de route normaal instelbaar is. Dit veld geeft de mogelijkheid om de waarde van de bijbehorende functionele-route aan te scherpen.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="hasDriveOnSightOption" type="tTrueFalseEnum" use="required">
+						<xs:annotation>
+							<xs:documentation>Een indicatie of een route met ROZ instelbaar is. Dit veld geeft de mogelijkheid om de waarde van de bijbehorende functionele-route aan te scherpen.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="hasAutomaticControlOption" type="tTrueFalseEnum" use="required">
+						<xs:annotation>
+							<xs:documentation>Een indicatie of de route automatisch instelbaar is.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="hasExtraControlOption" type="tTrueFalseEnum" use="required">
+						<xs:annotation>
+							<xs:documentation>Een indicatie dat de verhindering voor rijweginstelling van het beginsein van de route met een Extra Bediening genegeerd worden</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="isUnsuitedForElectricTraction" type="tTrueFalseEnum" use="required">
+						<xs:annotation>
+							<xs:documentation>Een indicatie dat de route ongeschikt is voor het berijden middels elektrische tractie.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="functionalRouteRef" type="tUUIDRef">
+						<xs:annotation>
+							<xs:documentation>De PUIC verwijzing naar de functionele-route waar de deze enkelvoudigeroute/beheersingsroute op gebaseerd is.</xs:documentation>
+							<xs:appinfo>
+								<ObjectTypeRef>FunctionalRoute</ObjectTypeRef>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="startObjectRef" type="tUUIDRef" use="required">
+						<xs:annotation>
+							<xs:documentation>De PUIC verwijzing naar het beginobject van een EV-route. Dit object kan een Bord, Stop Marker Board, Fictief-sein of Lichtsein zijn</xs:documentation>
+							<xs:appinfo>
+								<ObjectTypeRef>Signal</ObjectTypeRef>
+								<ObjectTypeRef>StopMarkerBoard</ObjectTypeRef>
+								<ObjectTypeRef>Sign</ObjectTypeRef>
+								<ObjectTypeRef>FictitiousSignal</ObjectTypeRef>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="endObjectRef" type="tUUIDRef" use="required">
+						<xs:annotation>
+							<xs:documentation>De PUIC verwijzing naar het eindobject van een EV-route. (Bord, Stop Marker Board, Lichtsein, Fictief-sein of Stootjuk)</xs:documentation>
+							<xs:appinfo>
+								<ObjectTypeRef>Signal</ObjectTypeRef>
+								<ObjectTypeRef>StopMarkerBoard</ObjectTypeRef>
+								<ObjectTypeRef>Sign</ObjectTypeRef>
+								<ObjectTypeRef>BufferStop</ObjectTypeRef>
+								<ObjectTypeRef>FictitiousSignal</ObjectTypeRef>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="FictitiousSignals">
+		<xs:annotation>
+			<xs:documentation>Een verzameling fictieve seinen.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="FictitiousSignal" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="FictitiousSignal">
+		<xs:annotation>
+			<xs:documentation>Een Fictief-Sein is een niet werkelijk bestaand sein, wat wel in de beveiliging is opgenomen, bijvoorbeeld softwarematig.</xs:documentation>
+			<xs:documentation xml:lang="NL">Fictief sein</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tPointTrackAsset">
+					<xs:attribute name="physicalObjectRef" type="tUUIDRef">
+						<xs:annotation>
+							<xs:documentation>Het fysieke sein, bord of stootjuk waaraan het fictieve sein is gekoppeld.</xs:documentation>
+							<xs:appinfo>
+								<ObjectTypeRef>Signal</ObjectTypeRef>
+								<ObjectTypeRef>Sign</ObjectTypeRef>
+								<ObjectTypeRef>BufferStop</ObjectTypeRef>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="rollOnBlockDemarcationRef" type="tUUIDRef">
+						<xs:annotation>
+							<xs:documentation>Een PUIC verwijzing naar de las behorende bij het fictieve sein.</xs:documentation>
+							<xs:appinfo>
+								<ObjectTypeRef>InsulatedJoint</ObjectTypeRef>
+								<ObjectTypeRef>AudioFrequencyJoint</ObjectTypeRef>
+								<ObjectTypeRef>AxleCounterDetectionPoint</ObjectTypeRef>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="TrafficControlSystems">
+		<xs:annotation>
+			<xs:documentation>Een lijst van Traffic Control Systems.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="TrafficControlSystem" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="TrafficControlSystem">
+		<xs:annotation>
+			<xs:documentation>Een Traffic Control System (TCS).</xs:documentation>
+			<xs:documentation xml:lang="NL">Traffic Control System</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tSystemObject">
+					<xs:sequence>
+						<xs:element name="CentralSafetySystemRefs" type="tUUIDRefList">
+							<xs:annotation>
+								<xs:documentation>Een lijst van PUIC verwijzingen naar de CSSen die toestandsmeldingen rapporteren.</xs:documentation>
+								<xs:appinfo>
+									<ObjectTypeRef>CentralSafetySystem</ObjectTypeRef>
+								</xs:appinfo>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="tTrainControlExtension" abstract="true">
+		<xs:annotation>
+			<xs:documentation>Een lege abstractie om aan te geven dat het object alleen aanvullende treinbeheersings-informatie bevat bovenop het 'hoofd-object'.</xs:documentation>
+		</xs:annotation>
+	</xs:complexType>
+</xs:schema>

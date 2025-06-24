@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns="http://www.prorail.nl/IMSpoor" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.prorail.nl/IMSpoor" elementFormDefault="qualified" attributeFormDefault="unqualified" version="12.0.0">
+	<xs:include schemaLocation="IMSpoor-BasicTypes.xsd"/>
+	<xs:element name="Extensions">
+		<xs:annotation>
+			<xs:documentation>Reservering voor optionele uitbreidingen die niet tot de kern van IMSpoor behoren.</xs:documentation>
+			<xs:documentation xml:lang="NL">Extensies</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tDesignPetal">
+					<xs:sequence>
+						<xs:element ref="Extension" minOccurs="0"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Extension">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:any processContents="skip" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

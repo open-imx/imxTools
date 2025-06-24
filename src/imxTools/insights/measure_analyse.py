@@ -16,6 +16,9 @@ from src.imxTools.utils.measure_line import (
 from src.imxTools.utils.helpers import create_timestamp
 
 
+from loguru import logger
+
+
 def _is_valid_geometry(geometry) -> bool:
     return isinstance(geometry, Point | LineString)
 
@@ -86,17 +89,23 @@ def calculate_measurements(imx: ImxRepo) -> list:
     results = []
     measure_lines: dict[str, MeasureLine] = {}
 
+    # todo: we should do this async so we gain some speed
+
     for obj in imx.get_all():
         if not _is_valid_geometry(obj.geometry):
             continue
 
         for ref in obj.refs:
+
             if not _is_rail_connection_ref(ref.field):
                 continue
 
             rail_con = ref.imx_object
             if not rail_con:
+                logger.warning(f'rail connection {ref.field_value} not found for {obj.puic}')
                 continue
+
+            logger.info(f'calculating measure for {obj.puic} {ref.imx_object.puic}')
 
             measure_line = _get_or_create_measure_line(
                 rail_con.puic, rail_con, measure_lines
@@ -236,4 +245,4 @@ def generate_measure_excel(
 
     with pd.ExcelWriter(output_path, engine="openpyxl") as writer:
         df_analyse.to_excel(writer, index=False, sheet_name="measure_check")
-        df_issue_list.to_excel(writer, index=False, sheet_name="issue_list")
+        df_issue_list.to_excel(writer, index=False, sheet_name="revisions")

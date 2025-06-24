@@ -1,0 +1,517 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns="http://www.prorail.nl/IMSpoor" xmlns:gml="http://www.opengis.net/gml" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xml="http://www.w3.org/XML/1998/namespace" targetNamespace="http://www.prorail.nl/IMSpoor" elementFormDefault="qualified" attributeFormDefault="unqualified" version="14.0.0">
+	<xs:include schemaLocation="IMSpoor-BasicTypes.xsd"/>
+	<xs:include schemaLocation="IMSpoor-TrackAssets.xsd"/>
+	<xs:import namespace="http://www.opengis.net/gml" schemaLocation="IMSpoor-gml.xsd"/>
+	<xs:element name="NetworkConfiguration">
+		<xs:annotation>
+			<xs:documentation>Dit bloemblaadje heeft als doel het kunnen vastleggen en uitwisselen van de netwerkconfiguratie tussen systemen en componenten.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tDesignPetal">
+					<xs:sequence>
+						<xs:element ref="SystemNetworkModules" minOccurs="0"/>
+						<xs:element ref="RaStaNetworks" minOccurs="0"/>
+						<xs:element ref="SctpNetworks" minOccurs="0"/>
+						<xs:element ref="PulseOmeisConnections" minOccurs="0"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SystemNetworkModules">
+		<xs:annotation>
+			<xs:documentation>Een lijst van systeem netwerkmodules.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="SystemNetworkModule" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SystemNetworkModule">
+		<xs:annotation>
+			<xs:documentation>Onderdeel van een Systeem dat als eenheid benaderbaar is via een computernetwerk.</xs:documentation>
+			<xs:documentation xml:lang="NL">Systeem netwerkmodule</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tBaseObject">
+					<xs:sequence>
+						<xs:element name="ComputingElement" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Instantie van een systeemmodule die meerdere keren is uitgevoerd omwille van failover en/of consistentie controle.</xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element ref="PhysicalNetworkInterface" maxOccurs="unbounded"/>
+								</xs:sequence>
+								<xs:attribute name="identification" type="tNameString" use="required">
+									<xs:annotation>
+										<xs:documentation>Code die een logische instantie van een computing element van een systeemnetwerkmodule identificeert.</xs:documentation>
+									</xs:annotation>
+								</xs:attribute>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+					<xs:attribute name="defaultRaStaId" type="tNameString" use="optional">
+						<xs:annotation>
+							<xs:documentation>Een code gebruikt als adres voor een logische netwerk module in de communicatie binnen een computernetwerk volgens het Rail Safe Transport Application (RaSTA) protocol.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="systemRef" type="tUUIDRef" use="optional">
+						<xs:annotation>
+							<xs:documentation>Een PUIC verwijzing naar het system dat via de systeem-netwerkmodule communiceert.</xs:documentation>
+							<xs:appinfo>
+								<ObjectTypeRef>*</ObjectTypeRef>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="moduleType" type="tSystemNetworkModuleTypeEnum" use="required">
+						<xs:annotation>
+							<xs:documentation>Typering naar het soort systeem waarmee gecommuniceerd wordt systeem-netwerkmodule.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="euLynxSystemId" type="tNameString" use="optional">
+						<xs:annotation>
+							<xs:documentation>Eulynx Systeemidentificatie.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="LogicalNetworkInterface">
+		<xs:annotation>
+			<xs:documentation>Een abstracte software-entiteit die wordt gebruikt om de configuratie, het beheer en het gebruik van netwerkbronnen op een computer of ander netwerkapparaat te beheren.</xs:documentation>
+			<xs:documentation xml:lang="NL">Logische Netwerkinterface</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tBaseObject">
+					<xs:sequence>
+						<xs:element name="NetworkRoute" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Routeringen anders dan via de gateway.</xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:attribute name="targetIpAddress" type="tIpAddress" use="required">
+									<xs:annotation>
+										<xs:documentation>Doel IP Adres</xs:documentation>
+									</xs:annotation>
+								</xs:attribute>
+								<xs:attribute name="targetSubnetMask" type="tString20" use="optional">
+									<xs:annotation>
+										<xs:documentation>Doel subnetmask.</xs:documentation>
+									</xs:annotation>
+								</xs:attribute>
+								<xs:attribute name="nextHopIpAddress" type="tIpAddress" use="required">
+									<xs:annotation>
+										<xs:documentation>IP Adres waar verkeer naartoe moet worden gerouteerd.</xs:documentation>
+									</xs:annotation>
+								</xs:attribute>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+					<xs:attribute name="ipAddress" type="tIpAddress" use="required">
+						<xs:annotation>
+							<xs:documentation>Een 32 of 128 bits code die binnen een computernetwerk de adressering verzorgt op basis van op het Internet Protocol (IP) naar één fysieke netwerkinterface.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="subnetMask" type="tString20" use="optional">
+						<xs:annotation>
+							<xs:documentation>Numerieke waarde die van een IP adres aangeeft hoe groot het eigen netwerk (het ‘subnet’) is en daarmee ook welke adressen niet tot dit eigen netwerk behoren.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="gateway" type="tIpAddress" use="optional">
+						<xs:annotation>
+							<xs:documentation>IP-Adres dat gebruikt wordt voor de adressering van netwerkcommunicatie die niet bereikbaar is binnen het eigen subnet.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="vlanId" type="xs:nonNegativeInteger" use="optional">
+						<xs:annotation>
+							<xs:documentation>Numerieke identificatie die wordt gebruikt om virtuele LAN's (Virtual Local Area Networks) te onderscheiden binnen een fysiek netwerk.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="qosProfile" type="tString50" use="optional">
+						<xs:annotation>
+							<xs:documentation>Quality of Service Profile: Set vooraf gedefinieerde regels en parameters die bepalen hoe netwerkverkeer wordt geprioriteerd en beheerd.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="PhysicalNetworkInterface">
+		<xs:annotation>
+			<xs:documentation>Een fysieke netwerkinterface is een hardwarecomponent in een computer of ander apparaat die de verbinding mogelijk maakt tussen dat apparaat en een netwerk.</xs:documentation>
+			<xs:documentation xml:lang="NL">Fysieke Netwerkinterface</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="LogicalNetworkInterface" minOccurs="1" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="label" type="tNameString" use="required">
+				<xs:annotation>
+					<xs:documentation>Code die een fysieke netwerkinterface van een computing element identificeert.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SctpNetworks">
+		<xs:annotation>
+			<xs:documentation>Een lijst van SCTP-Netwerken</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="SctpNetwork" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SctpNetwork">
+		<xs:annotation>
+			<xs:documentation>Logische verzameling van systeem-netwerkmodules waartussen SCTP-verbindingen tot stand kunnen worden gebracht.</xs:documentation>
+			<xs:documentation xml:lang="NL">SCTP Netwerk</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tBaseObject">
+					<xs:sequence>
+						<xs:element ref="SctpConnection" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SctpConnection">
+		<xs:annotation>
+			<xs:documentation>Verbinding tussen een systeemmodule en een systeem op basis van het SCTP protocol.</xs:documentation>
+			<xs:documentation xml:lang="NL">SCTP-Verbinding</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="SctpChannel" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>Netwerkinterfaces waar de SCTP-verbinding gebruikt van kan maken.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:attribute name="label" type="tNameString" use="required">
+							<xs:annotation>
+								<xs:documentation>Aanduiding van het Netwerkinterface Kanaal</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="logicalNetworkInterfaceRef" type="tUUIDRef" use="required">
+							<xs:annotation>
+								<xs:documentation>PUIC verwijzing naar een Logische Netwerkinterface.</xs:documentation>
+								<xs:appinfo>
+									<ObjectTypeRef>LogicalNetworkInterface</ObjectTypeRef>
+								</xs:appinfo>
+							</xs:annotation>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name="sctpPortNumber" type="xs:nonNegativeInteger" use="required">
+				<xs:annotation>
+					<xs:documentation>16-bits code om SCTP-communicatiestromen te onderscheiden en te routeren naar de juiste toepassingen op de bestemmingsserver.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="clientSystemNetworkModuleRef" type="tUUIDRef" use="required">
+				<xs:annotation>
+					<xs:documentation>Een PUIC verwijzing naar de systeem-netwerkmodule van het systeem waartussen de SCTP-verbinding wordt gelegd.</xs:documentation>
+					<xs:appinfo>
+						<ObjectTypeRef>SystemNetworkModule</ObjectTypeRef>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="serverSystemNetworkModuleRef" type="tUUIDRef" use="required">
+				<xs:annotation>
+					<xs:documentation>Een PUIC verwijzing naar de systeem-netwerkmodule van de server.</xs:documentation>
+					<xs:appinfo>
+						<ObjectTypeRef>SystemNetworkModule</ObjectTypeRef>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="RaStaNetworks">
+		<xs:annotation>
+			<xs:documentation>Een lijst van RaSTA Netwerken</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="RaStaNetwork" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="RaStaNetwork">
+		<xs:annotation>
+			<xs:documentation>Logische verzameling van systeem-netwerkmodules waartussen RaSTA-verbindingen tot stand kunnen worden gebracht.</xs:documentation>
+			<xs:documentation xml:lang="NL">RaSTA Netwerk</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tBaseObject">
+					<xs:sequence>
+						<xs:element ref="RaStaConnection" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+					<xs:attribute name="md4SafetyCode" type="tString50" use="optional">
+						<xs:annotation>
+							<xs:documentation>Code op basis van MD4-hashing die gebruikt wordt voor integriteit en de authenticiteit van de berichten te beveiligen.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="RaStaConnection">
+		<xs:annotation>
+			<xs:documentation>Verbinding tussen twee systeemmodules op basis van het RaSTA protocol.</xs:documentation>
+			<xs:documentation xml:lang="NL">RaSTA-Verbinding</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="RaStaChannel" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>Gedefinieerde set van twee logische netwerkinterfaces die gebruikt kan worden voor de adressering van een verbinding tussen twee systeem-netwerkmodules.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:attribute name="label" type="tNameString" use="required">
+							<xs:annotation>
+								<xs:documentation>Aanduiding van het Netwerkinterface Kanaal</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="fromLogicalNetworkInterfaceRef" type="tUUIDRef" use="required">
+							<xs:annotation>
+								<xs:documentation>PUIC verwijzing naar een Logische Netwerkinterface.</xs:documentation>
+								<xs:appinfo>
+									<ObjectTypeRef>LogicalNetworkInterface</ObjectTypeRef>
+								</xs:appinfo>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="toLogicalNetworkInterfaceRef" type="tUUIDRef" use="required">
+							<xs:annotation>
+								<xs:documentation>PUIC verwijzing naar een Logische Netwerkinterface.</xs:documentation>
+								<xs:appinfo>
+									<ObjectTypeRef>LogicalNetworkInterface</ObjectTypeRef>
+								</xs:appinfo>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="udpPort" type="xs:nonNegativeInteger" use="optional">
+							<xs:annotation>
+								<xs:documentation>UDP portnummer van het Netwerkinterface Kanaal</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name="raStaIdA" type="tNameString" use="optional">
+				<xs:annotation>
+					<xs:documentation>Unieke identificatie van een RaSTA-eindpunt.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="raStaIdB" type="tNameString" use="optional">
+				<xs:annotation>
+					<xs:documentation>Unieke identificatie van een RaSTA-eindpunt.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="systemNetworkModuleARef" type="tUUIDRef" use="required">
+				<xs:annotation>
+					<xs:documentation>PUIC verwijzing naar een systeem-netwerkmodule.</xs:documentation>
+					<xs:appinfo>
+						<ObjectTypeRef>SystemNetworkModule</ObjectTypeRef>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="systemNetworkModuleBRef" type="tUUIDRef" use="required">
+				<xs:annotation>
+					<xs:documentation>PUIC verwijzing naar een systeem-netwerkmodule.</xs:documentation>
+					<xs:appinfo>
+						<ObjectTypeRef>SystemNetworkModule</ObjectTypeRef>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="PulseOmeisConnections">
+		<xs:annotation>
+			<xs:documentation>Een lijst van Pulse-Omeis verbindingsconfiguraties.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="PulseOmeisConnection" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="PulseOmeisConnection">
+		<xs:annotation>
+			<xs:documentation>De gegevens om de verbinding tussen PULSE en/of OMEIS te maken</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tBaseObject">
+					<xs:attribute name="centralSafetySystemRef" type="tUUIDRef" use="required">
+						<xs:annotation>
+							<xs:documentation>Een PUIC verwijzing naar het betreffende CSS.</xs:documentation>
+							<xs:appinfo>
+								<ObjectTypeRef>CentralSafetySystem</ObjectTypeRef>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="uploadServer" type="tWebAddress" use="required">
+						<xs:annotation>
+							<xs:documentation>Het webadres van de uploadserver</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="isSecureFtp" type="tTrueFalseEnum" use="required">
+						<xs:annotation>
+							<xs:documentation>Indicatie of de communicatie via een beveiligde FTP gaat.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:simpleType name="tSystemNetworkModuleTypeEnum">
+		<xs:annotation>
+			<xs:documentation>Enumeratie van systeemtypes waarvoor een Systeem Netwerkmodule kan worden toegepast.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Unknown">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Onbekend</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Interlocking">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Interlocking</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ObjectController">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Object Controller</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="PULSE">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Maintenance Module (PULSE)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="GraphicalOperation">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Graphical Operation</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ASTRIS">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">ASTRIS</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ExternalNTPServer">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">External NTP Server</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ExternalLDAPServer">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">External LDAP Server</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ETIS">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">ETIS</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="PKI">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">PKI</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="KMC">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">KMC</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="RBCCore">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">RBC Core</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="RBCOperationAndMaintenanceServer">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">RBC Operation and Maintenance Server</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="RBCTrustedComputingBase">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">RBC Trusted Computing Base</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="RBCProtocolConvertUnit">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">RBC Protocol Convert Unit</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="OBSERVER">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">OBSERVER</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="RBCRadioCommunicationServer">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">RBC Radio Communication Server</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="CSSLDAPServer">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">CSS LDAP Server</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="PMSandOrOMEIS">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">PMS en/of OMEIS</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AxleCounterUnit">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Assentelunit</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Simulation">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Simulation</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DataLogger">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Data Logger</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="SecurityOperationCenter">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Security Operation Center</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ServerCluster">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Server Cluster</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="tIpAddress">
+		<xs:annotation>
+			<xs:documentation>Een 32 of 128 bits code die binnen een computernetwerk de adressering verzorgt op basis van op het Internet Protocol (IP) naar één logische netwerkinterface.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="(25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})(.(25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})){3}"/>
+			<xs:pattern value="(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="tWebAddress">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="256"/>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

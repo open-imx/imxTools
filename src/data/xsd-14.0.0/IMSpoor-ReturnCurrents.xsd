@@ -1,0 +1,683 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns="http://www.prorail.nl/IMSpoor" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xml="http://www.w3.org/XML/1998/namespace" targetNamespace="http://www.prorail.nl/IMSpoor" elementFormDefault="qualified" attributeFormDefault="unqualified" version="14.0.0">
+	<xs:include schemaLocation="IMSpoor-Infra.xsd"/>
+	<xs:include schemaLocation="IMSpoor-Groupings.xsd"/>
+	<xs:element name="ReturnCurrents">
+		<xs:annotation>
+			<xs:documentation>Root element voor de beschrijving van OR.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:all>
+				<xs:element ref="ReturnCurrentTrackCircuits" minOccurs="0"/>
+				<xs:element ref="RelayConnectionCables" minOccurs="0"/>
+				<xs:element ref="PowerConnectionCables" minOccurs="0"/>
+				<xs:element ref="CathodicProtectionCables" minOccurs="0"/>
+				<xs:element ref="ReturnCurrentCables" minOccurs="0"/>
+				<xs:element ref="SerialCables" minOccurs="0"/>
+				<xs:element ref="BridgeSwitches" minOccurs="0"/>
+				<xs:element ref="PowerSupplyIsolators" minOccurs="0"/>
+				<xs:element ref="AtbEgLoopCableConnections" minOccurs="0"/>
+			</xs:all>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ReturnCurrentTrackCircuits">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ReturnCurrentTrackCircuit" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ReturnCurrentTrackCircuit">
+		<xs:annotation>
+			<xs:documentation>Aanvullende informatie bij een spoorstroomloop-sectie voor toepassing bij OR</xs:documentation>
+			<xs:documentation xml:lang="NL">OR Spoorstroomloop-Sectie</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tReturnCurrentsExtension">
+					<xs:sequence>
+						<xs:element ref="InsulatedRail" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>De geïsoleerde spoorstaven behorende bij de sectie.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="CableRefs" type="tUUIDRefList" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Een lijst van PUIC verwijzingen naar de kabel die bij spoorstroomloop-sectie horen (ATB, trafo, relais, BRD enz)</xs:documentation>
+								<xs:appinfo>
+									<ObjectTypeRef>RelayConnectionCable</ObjectTypeRef>
+									<ObjectTypeRef>PowerConnectionCable</ObjectTypeRef>
+									<ObjectTypeRef>SerialCable</ObjectTypeRef>
+								</xs:appinfo>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+					<xs:attribute name="trackCircuitRef" type="tUUIDRef">
+						<xs:annotation>
+							<xs:documentation>PUIC verwijzing naar de spoorstroomloop-sectie</xs:documentation>
+							<xs:appinfo>
+								<ObjectTypeRef>TrackCircuit</ObjectTypeRef>
+								<ObjectTypeRef>AfSection</ObjectTypeRef>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="InsulatedRail">
+		<xs:annotation>
+			<xs:documentation>Geïsoleerde Spoorstaaf</xs:documentation>
+			<xs:documentation xml:lang="NL">Geïsoleerde Spoorstaaf</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="RailFragments"/>
+				<xs:element ref="InsulatedRailBoundary" minOccurs="2" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="polarity" type="tPolarityEnum" use="required">
+				<xs:annotation>
+					<xs:documentation>Polariteit van de geïsoleerde spoorstaaf. De lijst met opties is voorgedefiniëerd.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="InsulatedRailBoundary">
+		<xs:annotation>
+			<xs:documentation>Geïsoleerde Spoorstaaf Begrenzer</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="jointRef" type="tUUIDRef" use="required">
+				<xs:annotation>
+					<xs:documentation>PUIC verwijzing de ES-las.</xs:documentation>
+					<xs:appinfo>
+						<ObjectTypeRef>InsulatedJoint</ObjectTypeRef>
+						<ObjectTypeRef>Joint</ObjectTypeRef>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="direction" type="tFunctionalDirectionEnum" use="required">
+				<xs:annotation>
+					<xs:documentation>Richting van geïsoleerde spoorstaaf begrenzer. De richting wijst altijd 'naar binnen'.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="PassageSide">
+		<xs:annotation>
+			<xs:documentation>Wissel of Kruising Been zijde</xs:documentation>
+			<xs:documentation xml:lang="NL">Wissel of Kruising Been zijde</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="passageRef" type="tUUIDRef" use="required">
+				<xs:annotation>
+					<xs:documentation>PUIC verwijzing naar het been.</xs:documentation>
+					<xs:appinfo>
+						<ObjectTypeRef>Passage</ObjectTypeRef>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="rail" type="tRailEnum" use="required">
+				<xs:annotation>
+					<xs:documentation>Geeft de zijde aan van het wissel of kruisbeen.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="RailFragment">
+		<xs:annotation>
+			<xs:documentation>Een deel van een functionele-spoortak aan een specifieke zijde.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tRailFragment"/>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="RailFragments">
+		<xs:annotation>
+			<xs:documentation>Type voor een set van rail-fragmenten. Een wissel of kruisbeen kan ook als fragment gebruikt.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:choice maxOccurs="unbounded">
+				<xs:element ref="RailFragment"/>
+				<xs:element ref="PassageSide"/>
+			</xs:choice>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="RelayConnectionCables">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="RelayConnectionCable" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="RelayConnectionCable">
+		<xs:annotation>
+			<xs:documentation>Relais-Kabelverbinding tussen een plek op het spoor nabij een ES-las en een technische ruimte/kast.</xs:documentation>
+			<xs:documentation xml:lang="NL">Relais-Kabelverbinding</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tCableRailEquipment">
+					<xs:sequence>
+						<xs:element name="RelayConnectionCableFunction" type="tRelayConnectionCableFunctionEnum" minOccurs="1" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Functies van de relais-kabel; BRD, Treindetectie en ATB. Een kabel kan meer dan 1 functie hebben.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="PowerConnectionCables">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="PowerConnectionCable" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="PowerConnectionCable">
+		<xs:annotation>
+			<xs:documentation>Trafo-Kabelverbinding tussen een plek op het spoor nabij een ES-las en een technische ruimte/kast.</xs:documentation>
+			<xs:documentation xml:lang="NL">Trafo-Kabelverbinding</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tCableRailEquipment">
+					<xs:sequence>
+						<xs:element name="PowerConnectionCableFunction" type="tPowerConnectionCableFunctionEnum" minOccurs="1" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Functies van de trafo-kabel; Treindetectie, ATB. Een kabel kan meer dan 1 functie hebben.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="CathodicProtectionCables">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="CathodicProtectionCable" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="CathodicProtectionCable">
+		<xs:annotation>
+			<xs:documentation>Kabelverbinding naar een kathodische beschermingskast en het spoor.</xs:documentation>
+			<xs:documentation xml:lang="NL">Kabelverbinding</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tCableConnection">
+					<xs:sequence>
+						<xs:element ref="RailCableConnection">
+							<xs:annotation>
+								<xs:documentation>De aansluiting aan het spoor</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+					<xs:attribute name="housingRef" type="tUUIDRef" use="required">
+						<xs:annotation>
+							<xs:documentation>PUIC verwijzing naar technische ruimte of installatiekast waar de kabel mee verbonden is.</xs:documentation>
+							<xs:appinfo>
+								<ObjectTypeRef>EquipmentRoom</ObjectTypeRef>
+								<ObjectTypeRef>InstallationCabinet</ObjectTypeRef>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ReturnCurrentCables">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ReturnCurrentCable" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ReturnCurrentCable">
+		<xs:annotation>
+			<xs:documentation>Retourverbinding: kabelverbinding die nodig is om de retourstroom terug te leiden naar een Onderstation</xs:documentation>
+			<xs:documentation xml:lang="NL">Retourverbinding</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tCableConnection">
+					<xs:sequence>
+						<xs:element ref="RailCableConnection" maxOccurs="2">
+							<xs:annotation>
+								<xs:documentation>De aansluiting(en) aan het spoor</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element ref="ParallelCableFragment" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Een lijst van langs-verbindingen die de kabelroute beschrijven. De volgorde van de elementen is significant</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+					<xs:attribute name="bridgeSwitchRef" type="tUUIDRef">
+						<xs:annotation>
+							<xs:documentation>PUIC verwijzing naar brugschakelaar waar de retourverbinding op aangesloten is.</xs:documentation>
+							<xs:appinfo>
+								<ObjectTypeRef>BridgeSwitch</ObjectTypeRef>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="railCoilConnectionRef" type="tUUIDRef">
+						<xs:annotation>
+							<xs:documentation>PUIC verwijzing naar railspoel waar de retourverbinding op aangesloten is.</xs:documentation>
+							<xs:appinfo>
+								<ObjectTypeRef>RailCoil</ObjectTypeRef>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="hasExactLocation" type="tTrueFalseEnum" use="required">
+						<xs:annotation>
+							<xs:documentation>Indicatie of exacte ligging van de kabel is vastgelegd</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="AtbEgLoopCableConnections">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="AtbEgLoopCableConnection" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="AtbEgLoopCableConnection">
+		<xs:annotation>
+			<xs:documentation>De verbinding van de kast naar de lus. De lus zelf is ook een kabel maar de ligging daarvan wordt afgedekt in de ligging van het object AtbEgLoop.</xs:documentation>
+			<xs:documentation xml:lang="NL">Kabelverbinding voor ATB-EG Lus</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tCableConnection">
+					<xs:sequence>
+						<xs:element name="BridgeSwitchRefs" type="tUUIDRefList" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Een lijst met PUIC verwijzingen (maximaal 2) naar de brugschakelaars waar de ATB-EG Lus op aangesloten is.</xs:documentation>
+								<xs:appinfo>
+									<ObjectTypeRef>BridgeSwitch</ObjectTypeRef>
+								</xs:appinfo>
+							</xs:annotation>
+						</xs:element>
+						<xs:element ref="ParallelCableFragment" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Een lijst van langs-verbindingen die de kabelroute beschrijven. De volgorde van de elementen is significant</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+					<xs:attribute name="housingRef" type="tUUIDRef" use="required">
+						<xs:annotation>
+							<xs:documentation>PUIC verwijzing naar technische ruimte of installatiekast (met daarin een relais) waar de lus mee verbonden is.</xs:documentation>
+							<xs:appinfo>
+								<ObjectTypeRef>EquipmentRoom</ObjectTypeRef>
+								<ObjectTypeRef>InstallationCabinet</ObjectTypeRef>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="atbEgLoopRef" type="tUUIDRef">
+						<xs:annotation>
+							<xs:documentation>PUIC verwijzing naar de functieplaats van de ATB-EG-Lus</xs:documentation>
+							<xs:appinfo>
+								<ObjectTypeRef>AtbEgLoop</ObjectTypeRef>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="hasExactLocation" type="tTrueFalseEnum" use="required">
+						<xs:annotation>
+							<xs:documentation>Indicatie of exacte ligging van de kabel is vastgelegd</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SerialCables">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="SerialCable" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SerialCable">
+		<xs:annotation>
+			<xs:documentation>Serieverbinding: Kabelverbinding die nodig is voor het sluiten van de stroomkring van de spoorstroomloop.</xs:documentation>
+			<xs:documentation xml:lang="NL">Serieverbinding</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tCableConnection">
+					<xs:sequence>
+						<xs:element ref="RailCableConnection" minOccurs="2" maxOccurs="2">
+							<xs:annotation>
+								<xs:documentation>De locaties in het spoor waar de uiteinden van de kabel zijn gemonteerd</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element ref="ParallelCableFragment" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Een lijst van langs-verbindingen die de kabelroute beschrijven. De volgorde van de elementen is significant</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="BridgeSwitches">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="BridgeSwitch" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="BridgeSwitch">
+		<xs:annotation>
+			<xs:documentation>Brugschakelaar</xs:documentation>
+			<xs:documentation xml:lang="NL">Brugschakelaar</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tLineObject">
+					<xs:attribute name="bridgeTransitionRef" type="tUUIDRef" use="required">
+						<xs:annotation>
+							<xs:documentation>PUIC verwijzing naar de brugovergang die zorgt voor de stroomverbinding tussen de kabelverbindingen aan de verschillende kanten van de brugschakelaar.</xs:documentation>
+							<xs:appinfo>
+								<ObjectTypeRef>BridgeTransition</ObjectTypeRef>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="PowerSupplyIsolators">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="PowerSupplyIsolator" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="PowerSupplyIsolator">
+		<xs:annotation>
+			<xs:documentation>Voedingsscheiding</xs:documentation>
+			<xs:documentation xml:lang="NL">Voedingsscheiding</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tReturnCurrentsExtension">
+					<xs:attribute name="insulatedJointRef" type="tUUIDRef" use="required">
+						<xs:annotation>
+							<xs:documentation>PUIC verwijzing naar de ES-las die de secties, die gevoed worden door verschillende voedingsbronnen, scheidt.</xs:documentation>
+							<xs:appinfo>
+								<ObjectTypeRef>InsulatedJoint</ObjectTypeRef>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="isSwitchable" type="tTrueFalseEnum" use="required">
+						<xs:annotation>
+							<xs:documentation>Indicatie of voedingsscheiding schakelbaar is.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ParallelCableFragment">
+		<xs:annotation>
+			<xs:documentation>Een langs-verbinding is een (deel van een) kabelverbinding welke parallel langs een spoorstaaf ligt.</xs:documentation>
+			<xs:documentation xml:lang="NL">Langs-verbinding</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tRailFragment"/>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="InsulatedJointConnection">
+		<xs:annotation>
+			<xs:documentation>Plaats van een kabelaansluiting voor of voorbij de ES-las, beschouwd vanaf ES-las, ten opzichte van de normaalrichting van de functionele-spoortak.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="insulatedJointRef" type="tUUIDRef" use="required">
+				<xs:annotation>
+					<xs:documentation>PUIC verwijzing naar de ES-las waar de kabel mee verbonden is.</xs:documentation>
+					<xs:appinfo>
+						<ObjectTypeRef>InsulatedJoint</ObjectTypeRef>
+						<ObjectTypeRef>Joint</ObjectTypeRef>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="direction" type="tFunctionalDirectionEnum" use="required">
+				<xs:annotation>
+					<xs:documentation>De richting (beschouwd vanaf ES-las) ten opzichte van de normaalrichting van de functionele-spoortak.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="rail" type="tRailEnum" use="required">
+				<xs:annotation>
+					<xs:documentation>Indicatie aan welke spoorstaaf de kabel is aangesloten.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="RailCableConnection">
+		<xs:annotation>
+			<xs:documentation>Plaats van een kabelaansluiting op de functionele-spoortak.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:annotation>
+				<xs:documentation>Positie op/bij spoortak en/of spoorstaaf</xs:documentation>
+			</xs:annotation>
+			<xs:attribute name="railConnectionRef" type="tUUIDRef" use="required">
+				<xs:annotation>
+					<xs:documentation>PUIC-verwijzing naar de functionele spoortak waarop een object wordt geprojecteerd.</xs:documentation>
+					<xs:appinfo>
+						<ObjectTypeRef>RailConnection</ObjectTypeRef>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="atMeasure" type="xs:double">
+				<xs:annotation>
+					<xs:documentation>De positie van het object op de functionele-spoortak. Het aantal meters vanaf het begin van de lijn.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="rail" type="tRailEnum" use="required">
+				<xs:annotation>
+					<xs:documentation>Indicatie aan welke kant van de spoortak het object is gepositioneerd.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<!-- complexTypes -->
+	<xs:complexType name="tCableRailEquipment" abstract="true">
+		<xs:annotation>
+			<xs:documentation>Kabelverbinding tussen een plek op het spoor nabij een ES-las en een technische ruimte/kast.</xs:documentation>
+			<xs:documentation xml:lang="NL">Kabelverbinding</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="tCableConnection">
+				<xs:sequence>
+					<xs:element ref="InsulatedJointConnection">
+						<xs:annotation>
+							<xs:documentation>De locatie waar de kabelverbinding aan het spoor is verbonden.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+				<xs:attribute name="housingRef" type="tUUIDRef" use="required">
+					<xs:annotation>
+						<xs:documentation>PUIC verwijzing naar technische ruimte of installatiekast waar de kabel mee verbonden is.</xs:documentation>
+						<xs:appinfo>
+							<ObjectTypeRef>EquipmentRoom</ObjectTypeRef>
+							<ObjectTypeRef>InstallationCabinet</ObjectTypeRef>
+						</xs:appinfo>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="tRailFragment" abstract="true">
+		<xs:annotation>
+			<xs:documentation>Type voor een rail fragment.</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="railConnectionRef" type="tUUIDRef" use="required">
+			<xs:annotation>
+				<xs:documentation>PUIC-verwijzing naar de functionele spoortak.</xs:documentation>
+				<xs:appinfo>
+					<ObjectTypeRef>RailConnection</ObjectTypeRef>
+				</xs:appinfo>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="fromMeasure" type="xs:double" use="required">
+			<xs:annotation>
+				<xs:documentation>De positie van het begin van het rail-fragment op de functionele-spoortak. Het aantal meters vanaf het begin van de functionele-spoortak.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="toMeasure" type="xs:double" use="required">
+			<xs:annotation>
+				<xs:documentation>De positie van het einde van het rail-fragment op de functionele-spoortak. Het aantal meters vanaf het begin van de functionele-spoortak.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="rail" type="tRailEnum" use="required">
+			<xs:annotation>
+				<xs:documentation>Geeft de zijde aan van de functionele-spoortak.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="tCableConnection" abstract="true">
+		<xs:annotation>
+			<xs:documentation>Generiek type voor een kabelverbinding ten behoeve van OR.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="tBaseObject">
+				<xs:sequence>
+					<xs:element name="GeographicLocation" type="tLine">
+						<xs:annotation>
+							<xs:documentation>De exacte geografisch ligging van de kabel</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+				<xs:attribute name="cableType" type="tCableTypeEnum" use="required">
+					<xs:annotation>
+						<xs:documentation>Kabeltype. De lijst van opties is voorgedefiniëerd.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="numberOfCables" type="xs:int" use="required">
+					<xs:annotation>
+						<xs:documentation>Aantal kabels.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="tReturnCurrentsExtension" abstract="true">
+		<xs:annotation>
+			<xs:documentation>Een lege abstractie om aan te geven dat het object alleen aanvullende OR-informatie bevat bovenop het 'hoofd-object'.</xs:documentation>
+		</xs:annotation>
+	</xs:complexType>
+	<!-- simpleTypes -->
+	<xs:simpleType name="tCableTypeEnum">
+		<xs:annotation>
+			<xs:documentation>Mogelijke kabeltypen</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Unknown">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Onbekend</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Mm16x2">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">2 x 16 mm2</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Mm2.5x2">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">2 x 2.5 mm2</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Mm6x2">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">2 x 6 mm2</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="tPolarityEnum">
+		<xs:annotation>
+			<xs:documentation>Polariteit</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Unknown">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Onbekend</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Positive">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Positief</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Negative">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Negatief</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="tRelayConnectionCableFunctionEnum">
+		<xs:annotation>
+			<xs:documentation>Mogelijke functies van relais-kabelverbindingen</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Unknown">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Onbekend</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="BRD">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Broken Rail Detection</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="TVD">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Sectie bezetting detectie</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ATP">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">ATB: Automatische Trein Beïnvloeding</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="tPowerConnectionCableFunctionEnum">
+		<xs:annotation>
+			<xs:documentation>Mogelijke functies van trafo-kabelverbindingen</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Unknown">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Onbekend</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="TVD">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Sectie bezetting detectie</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ATP">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">ATB: Automatische Trein Beïnvloeding</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns="http://www.prorail.nl/IMSpoor" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.prorail.nl/IMSpoor" elementFormDefault="qualified" attributeFormDefault="unqualified" version="12.0.0">
+	<xs:include schemaLocation="IMSpoor-BasicTypes.xsd"/>
+	<xs:element name="InstallationDesign">
+		<xs:annotation>
+			<xs:documentation>Modeldeel voor het vastleggen van informatie rondom het SeinWezen Installatie Dossier (SWID)</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tDesignPetal">
+					<xs:sequence>
+						<xs:element ref="ObjectControllers" minOccurs="0"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ObjectControllers">
+		<xs:annotation>
+			<xs:documentation>Een lijst van Object Controllers</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ObjectController" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="InterfaceControlBox">
+		<xs:annotation>
+			<xs:documentation>Onderdeel van een object-controller dat de communicatie verzorgt tussen de object-controller en een aangesloten infra-object.</xs:documentation>
+			<xs:documentation xml:lang="NL">Interface Control Box</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tBaseObject">
+					<xs:sequence>
+						<xs:element name="CssControlledObjectConnection" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Aansluiting van een infra-object op een ICB voor de aansturing of melding van één functie.</xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="Pin" maxOccurs="unbounded">
+										<xs:complexType>
+											<xs:sequence>
+												<xs:element name="RepeatFunction" minOccurs="0" maxOccurs="unbounded">
+													<xs:annotation>
+														<xs:documentation>Een verwijzing naar een andere pin voor het herhalen van het signaal.</xs:documentation>
+													</xs:annotation>
+													<xs:complexType>
+														<xs:attribute name="interfaceControlBoxRef" type="tUUIDRef" use="required">
+															<xs:annotation>
+																<xs:documentation>Een PUIC verwijzing naar andere ICB</xs:documentation>
+																<xs:appinfo>
+																	<ObjectTypeRef>InterfaceControlBox</ObjectTypeRef>
+																</xs:appinfo>
+															</xs:annotation>
+														</xs:attribute>
+														<xs:attribute name="pinNumber" type="tNameString" use="required">
+															<xs:annotation>
+																<xs:documentation>Een verwijzing naar de andere pin.</xs:documentation>
+															</xs:annotation>
+														</xs:attribute>
+														<xs:attribute name="isInverted" type="tTrueFalseEnum" use="required">
+															<xs:annotation>
+																<xs:documentation>Indicatie of het signaal naar de andere pin geïnverteerd wordt doorgegeven.</xs:documentation>
+															</xs:annotation>
+														</xs:attribute>
+													</xs:complexType>
+												</xs:element>
+											</xs:sequence>
+											<xs:attribute name="pinNumber" type="tNameString" use="required">
+												<xs:annotation>
+													<xs:documentation>Het pinnummer op de ICB.</xs:documentation>
+												</xs:annotation>
+											</xs:attribute>
+											<xs:attribute name="description" type="tNameString" use="required">
+												<xs:annotation>
+													<xs:documentation>De aansluitbeschrijving van de pin.</xs:documentation>
+												</xs:annotation>
+											</xs:attribute>
+										</xs:complexType>
+									</xs:element>
+								</xs:sequence>
+								<xs:attribute name="objectRef" type="tUUIDRef" use="required">
+									<xs:annotation>
+										<xs:documentation>Een PUIC verwijzing naar het infra object welke is aangesloten op de ICB</xs:documentation>
+										<xs:appinfo>
+											<ObjectTypeRef>*</ObjectTypeRef>
+										</xs:appinfo>
+									</xs:annotation>
+								</xs:attribute>
+								<xs:attribute name="functionName" type="tString100" use="required">
+									<xs:annotation>
+										<xs:documentation>De naam van de functie die via deze aansluiting wordt aangestuurd/gelezen</xs:documentation>
+									</xs:annotation>
+								</xs:attribute>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+					<xs:attribute name="backplaneLocation" type="xs:nonNegativeInteger" use="required">
+						<xs:annotation>
+							<xs:documentation>Aanduiding van een slot waarin een insteekkaart gestoken kan worden binnen een (moeder)bord van een apparaat.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="supplierType" type="tSupplierTypeEnum" use="required">
+						<xs:annotation>
+							<xs:documentation>Het ICB-type op basis van de twee IO boards die hij bevat.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="baseInterfaceControlBoxRef" type="tUUIDRef" use="optional">
+						<xs:annotation>
+							<xs:documentation>Een PUIC verwijzing naar de basis ICB voor functies die door meerdere ICB worden uitgevoerd. Deze ICB is volgend aan de Basis ICB.</xs:documentation>
+							<xs:appinfo>
+								<ObjectTypeRef>InterfaceControlBox</ObjectTypeRef>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ObjectController">
+		<xs:annotation>
+			<xs:documentation>Een systeem binnen ERTMS dat zorg draagt voor het overbrengen van statusmeldingen tussen infra objecten en de interlocking/CSS alsmede het omzetten van interlocking/CSS opdrachten naar aanstuur-opdrachten voor infra-objecten.</xs:documentation>
+			<xs:documentation xml:lang="NL">Object-Controller</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tPointObject">
+					<xs:sequence>
+						<xs:element ref="InterfaceControlBox" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+					<xs:attribute name="objectControllerCabinetRef" type="tUUIDRef" use="required">
+						<xs:annotation>
+							<xs:documentation>Een PUIC verwijzing naar de OCK waarin de ObjectController gemonteerd wordt.</xs:documentation>
+							<xs:appinfo>
+								<ObjectTypeRef>ObjectControllerCabinet</ObjectTypeRef>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="objectControllerType" type="tObjectControllerTypeEnum" use="required">
+						<xs:annotation>
+							<xs:documentation>Het functie-type van de Object-controller</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:simpleType name="tSupplierTypeEnum">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Unknown">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Onbekend</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="InputOutput">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Input + Output</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="InputInput">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Input + Input</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="OutputOutput">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Output + Output</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="OutputBalise">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Output + Balise</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="LS">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Lichtsein</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="IOHighPower">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">IO High Power</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="IOLowPower">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">IO Low Power</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="I2">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">I2</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="O2">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">O2</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="tObjectControllerTypeEnum">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Unknown">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Onbekend</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Point">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Aansturing van wissels.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="LS">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Aansturing en vermeldingen van lichtseinen.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="IO">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Aansturing en vermeldingen van overige infra objecten.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>
