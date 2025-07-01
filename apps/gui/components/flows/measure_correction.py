@@ -1,6 +1,5 @@
 import asyncio
 import json
-import logging
 import shutil
 import tempfile
 import zipfile
@@ -18,7 +17,6 @@ from insights.measure_analyse import generate_measure_excel
 from revision.process_revision import process_imx_revisions
 from utils.helpers import load_imxinsights_container_or_file, create_timestamp
 
-logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -30,6 +28,7 @@ class MeasureCorrectionState:
     processed_imx: Path | None = None
     gr_json_file_path: Path | None = None
     revisions_excel_upload_widget: Path | None = None
+    time_stamp: str | None = None
 
 
 class MeasureCorrectionTool:
@@ -135,7 +134,7 @@ class MeasureCorrectionTool:
     def _build_check_result_step(self):
         with ui.step(self.CHECK_RESULT_STEP).classes('font-bold'):
             ui.label('The IMX file has been updated.').classes('text-xl font-semibold text-primary')
-            ui.button('Download revision zip', icon='download', on_click=self._on_download_log).props('outline')
+            ui.button('Download revision zip', icon='download', on_click=self._on_download_result).props('outline')
 
             with ui.row():
                 self.diff_button = ui.button('Create And Download Diff Report', icon='download', on_click=self._on_generate_diff).props('outline')
@@ -150,7 +149,8 @@ class MeasureCorrectionTool:
         return ui.upload(
             label=label,
             auto_upload=True,
-            on_upload=on_upload
+            on_upload=on_upload,
+            max_files=1
         ).classes("w-full").style("flex: 1")
 
     def end_and_reset_stepper(self):
@@ -179,11 +179,13 @@ class MeasureCorrectionTool:
         self._notify(f'Uploaded revisions Excel: {event.name}')
 
     def _on_download_revisions(self):
-        ui.download(self.state.measure_excel_file, filename=self.state.measure_excel_file.name)
+        base_name = self.state.imx_file_path.stem
+        ui.download(self.state.measure_excel_file, filename=f"{base_name}-{self.state.time_stamp}-revision.xlsx")
         self._notify("Download started (revisions)")
 
-    def _on_download_log(self):
-        ui.download(self.state.revision_log_zip, filename=self.state.revision_log_zip.name)
+    def _on_download_result(self):
+        base_name = self.state.imx_file_path.stem
+        ui.download(self.state.revision_log_zip, filename=f"{base_name}-{self.state.time_stamp}-processed.zip")
         self._notify("Download started (revision log)")
 
     async def _on_generate_diff(self):
@@ -206,8 +208,8 @@ class MeasureCorrectionTool:
                 False,
                 False,
             )
-
-            zip_name = f"diff_{create_timestamp()}.zip"
+            base_name = self.state.imx_file_path.stem
+            zip_name = f"{base_name}-{self.state.time_stamp}-diff.zip"
             zip_path = Path(tempfile.gettempdir()) / zip_name
             with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
                 for file in output_path.rglob("*"):
@@ -216,13 +218,13 @@ class MeasureCorrectionTool:
             ui.download(zip_path, filename=zip_name)
             self._notify("Diff report ready!", type_="positive")
         except Exception as e:
-            logger.exception(e)
             self._notify(f"Error generating diff: {e}", type_="negative")
         finally:
             self.diff_spinner.visible = False
             self.diff_button.enable()
 
     async def run_measure_check(self):
+        self.state.time_stamp = create_timestamp()
         self.upload_spinner.visible = True
         self.analyze_measures_button.disable()
         try:
@@ -247,7 +249,6 @@ class MeasureCorrectionTool:
 
             self.stepper.next()
         except Exception as e:
-            logger.exception(e)
             self._notify(f"Error during measure check: {e}", type_="negative")
         finally:
             self.upload_spinner.visible = False
@@ -290,7 +291,6 @@ class MeasureCorrectionTool:
 
             self.stepper.next()
         except Exception as e:
-            logger.exception(e)
             self._notify(f"Error processing revisions: {e}", type_="negative")
         finally:
             self.review_spinner.visible = False
@@ -340,9 +340,8 @@ class MeasureCorrectionTool:
         for dir_path in self._temp_dirs:
             try:
                 shutil.rmtree(dir_path)
-                logger.info(f"Cleaned temp dir: {dir_path}")
             except Exception as e:
-                logger.warning(f"Could not remove temp dir {dir_path}: {e}")
+                raise e
 
     def _notify(self, message: str, type_: str = 'info'):
         ui.notify(message, type=type_)
