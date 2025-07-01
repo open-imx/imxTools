@@ -1,17 +1,20 @@
 import asyncio
+import json
 import shutil
 import tempfile
+import zipfile
 from pathlib import Path
 
 from imxInsights.file.singleFileImx.imxSituationEnum import ImxSituationEnum
 from nicegui import ui
+from openpyxl import load_workbook
 
 from apps.gui.helpers.io import spooled_file_to_temp_file
 from insights.diff_and_population import write_diff_output_files
 from insights.measure_analyse import generate_measure_excel
 from revision.input_validation import validate_process_input
 from revision.process_revision import process_imx_revisions
-from utils.helpers import load_imxinsights_container_or_file
+from utils.helpers import load_imxinsights_container_or_file, create_timestamp
 
 
 class MeasureCorrectionTool:
@@ -39,8 +42,6 @@ class MeasureCorrectionTool:
                 self._build_upload_step()
                 self._build_review_step()
                 self._build_check_result_step()
-                self._build_diff_step()
-                # self._build_download_step()
 
     def _build_upload_step(self):
         with ui.step('Upload Required and Optional Files').classes('font-bold'):
@@ -62,9 +63,9 @@ class MeasureCorrectionTool:
 
             ui.separator()
 
-            ui.label("Optional").classes("italic").visible = False
+            ui.label("Optional").classes("italic").visible = True
             with ui.card().classes("w-full") as json_card:
-                json_card.visible = False
+                json_card.visible = True
                 ui.label("The Naiade JSON file to exclude 'context area' objects.")
                 ui.label(
                     "When this file is uploaded only 'work area', 'user area', and 'new' objects will be flagged to be corrected."
@@ -88,6 +89,10 @@ class MeasureCorrectionTool:
                     on_click=self.run_measure_check
                 )
                 self.analyze_measures_button.disable()
+
+                self.upload_spinner = ui.spinner(size='lg').classes()
+                self.upload_spinner.visible = False
+
 
     def _build_review_step(self):
         with ui.step('Review and Flag Revisions').classes('font-bold'):
@@ -114,37 +119,41 @@ class MeasureCorrectionTool:
             ).classes("w-full").style("flex: 1")
 
             with ui.stepper_navigation():
-                ui.button('Process Revisions', on_click=self._process_revisions)
-                ui.button('Back', on_click=self.stepper.previous).props('flat')
+                self.process_revisions_button = ui.button('Process Revisions', on_click=self._process_revisions)
+                self.process_revisions_back = ui.button('Back', on_click=self.stepper.previous).props('flat')
+                self.review_spinner = ui.spinner(size='lg').classes()
+                self.review_spinner.visible = False
 
     def _build_check_result_step(self):
         with ui.step('Check Revision Results').classes('font-bold'):
             ui.label('The IMX file has been updated.').classes('text-xl font-semibold text-primary')
 
-            ui.button('Download revision log', icon='download', on_click=self._on_download_log).props('outline')
-
-            ui.label('Check if all revisions have been processed. If not, you can make adjustments and reprocess by going one step back.') \
-                .classes('text-sm')
-
-            with ui.stepper_navigation():
-                ui.button('Next', on_click=self.stepper.next)
-                ui.button('Back', on_click=self.stepper.previous).props('flat')
-
-    def _build_diff_step(self):
-        with ui.step('Optional: generate a diff report to review the changes.').classes('font-bold'):
-            ui.button('Create Diff Report', icon='download', on_click=self._on_generate_diff).props('outline')
+            ui.button('Download revision zip', icon='download', on_click=self._on_download_log).props('outline')
+            with ui.row():
+                self.diff_button = ui.button('Create Diff Report', icon='download', on_click=self._on_generate_diff).props('outline')
+                self.diff_spinner = ui.spinner(size='lg').classes()
+                self.diff_spinner.visible = False
 
             with ui.stepper_navigation():
-                ui.button('Next', on_click=self.stepper.next)
+                ui.button('Finish', on_click=self._on_finish).props('flat')
                 ui.button('Back', on_click=self.stepper.previous).props('flat')
 
-    def _build_download_step(self):
-        with ui.step('Download results').classes('font-bold'):
-            ui.label('The ZIP file includes: measure analysis, revision log, revised IMX file, and optionally the diff report.')
+    def end_and_reset_stepper(self) -> None:
+        self.stepper.set_value('Upload Required and Optional Files')
+        self.imx_upload_widget.reset()
+        self.gr_json_upload_widget.reset()
+        self.exclude_context_checkbox = False
+        self.gr_json_upload_widget = None
+        self.revisions_excel_upload_widget = None
+        self.imx_file_path = None
+        self.loaded_imx_data = None
+        self.measure_excel_file = None
+        self.revision_log_zip = None
 
-            with ui.stepper_navigation():
-                ui.button('Done', on_click=lambda: ui.notify('Yay!', type='positive'))
-                ui.button('Back', on_click=self.stepper.previous).props('flat')
+
+    def _on_finish(self):
+        self.end_and_reset_stepper()
+        ui.notify('Process has been reset.', type='positive')
 
     def _on_imx_upload(self, event):
         ui.notify(f'Uploaded IMX: {event.name}')
@@ -153,6 +162,7 @@ class MeasureCorrectionTool:
 
     def _on_json_upload(self, event):
         ui.notify(f'Uploaded JSON: {event.name}')
+        self.gr_json_file_path = spooled_file_to_temp_file(event)
         self.exclude_context_checkbox.enable()
 
     def _on_revision_upload(self, event):
@@ -167,44 +177,142 @@ class MeasureCorrectionTool:
         ui.download(self.revision_log_zip, filename=self.revision_log_zip.name)
         ui.notify("Download started (revision log)")
 
-    def _on_generate_diff(self):
-        # todo
-        ui.notify("Download started (diff)")
+    async def _on_generate_diff(self):
+        self.diff_button.disable()
+        self.diff_spinner.visible = True
+        try:
+            with tempfile.TemporaryDirectory() as temp_dir:
+                output_path = Path(temp_dir) / "output"
+                output_path.mkdir(parents=True, exist_ok=True)
+
+                # we should only do input and processed file!!
+
+                await asyncio.to_thread(
+                    write_diff_output_files,
+                    self.loaded_imx_data.path,
+                    self.processed_imx,
+                    output_path,
+                    ImxSituationEnum.NewSituation,
+                    ImxSituationEnum.NewSituation,
+                    False,
+                    False,
+                )
+
+                zip_name = f"diff_{create_timestamp()}.zip"
+                zip_path = Path(tempfile.gettempdir()) / zip_name
+                with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
+                    for file in output_path.rglob("*"):
+                        zipf.write(file, file.relative_to(output_path))
+
+                ui.download(zip_path, filename=zip_name)
+                ui.notify("Diff report ready!", type="positive")
+                ui.notify("Download started (diff)")
+        finally:
+            self.diff_spinner.visible = False
+            self.diff_button.enable()
 
     async def run_measure_check(self):
-        threshold = self.threshold_input_field.value
+        self.upload_spinner.visible = True
+        self.analyze_measures_button.disable()
+        try:
+            threshold = self.threshold_input_field.value
 
-        self.loaded_imx_data = await asyncio.to_thread(
-            load_imxinsights_container_or_file, self.imx_file_path, ImxSituationEnum.NewSituation
-        )
-        self.measure_excel_file = (
-            Path(tempfile.gettempdir()) / f"measure_output_{self.imx_file_path.stem}.xlsx"
-        )
-        if self.measure_excel_file.exists():
-            self.measure_excel_file.unlink()
+            self.loaded_imx_data = await asyncio.to_thread(
+                load_imxinsights_container_or_file, self.imx_file_path, ImxSituationEnum.NewSituation
+            )
+            self.measure_excel_file = (
+                Path(tempfile.gettempdir()) / f"measure_output_{self.imx_file_path.stem}.xlsx"
+            )
+            if self.measure_excel_file.exists():
+                self.measure_excel_file.unlink()
 
-        await asyncio.to_thread(
-            generate_measure_excel,
-            self.loaded_imx_data,
-            self.measure_excel_file,
-            threshold if threshold else None,
-        )
-        self.stepper.next()
+            await asyncio.to_thread(
+                generate_measure_excel,
+                self.loaded_imx_data,
+                self.measure_excel_file,
+                threshold if threshold else None,
+            )
+
+            if self.gr_json_file_path:
+                puics_false = []
+                puics_true = []
+
+                with open(self.gr_json_file_path, 'r', encoding='utf-8') as file:
+                    data = json.load(file)
+                    print()
+                    for item in data['ContextArea']:
+                        puics_false.append(item["Puic"])
+
+                    if self.exclude_context_checkbox.value:
+                        for item in data['WorkArea']:
+                            puics_true.append(item["Puic"])
+                        for item in data['UserArea']:
+                            puics_true.append(item["Puic"])
+
+                # process
+                wb = load_workbook(self.measure_excel_file)
+                ws = wb["revisions"]
+                header = [cell.value for cell in next(ws.iter_rows(min_row=1, max_row=1))]
+                object_puic_col = header.index("object_puic") + 1
+                will_be_processed_col = header.index("will_be_processed") + 1
+                revision_reasoning_col = header.index("revision_reasoning") + 1
+
+                for row in ws.iter_rows(min_row=2, max_row=ws.max_row):
+                    puic_value = row[object_puic_col - 1].value
+                    if puic_value in puics_true:
+                        row[will_be_processed_col - 1].value = True
+                        row[revision_reasoning_col - 1].value = "Not a ContextArea object"
+                    elif puic_value in puics_false:
+                        row[will_be_processed_col - 1].value = False
+                        row[revision_reasoning_col - 1].value = "ContextArea objects can be corrected"
+                wb.save(self.measure_excel_file)
+
+            self.stepper.next()
+
+        finally:
+            self.upload_spinner.visible = False
+            self.analyze_measures_button.enable()
 
     async def _process_revisions(self):
-        tmpdir = tempfile.TemporaryDirectory()
-        out_path = Path(tmpdir.name)
+        self.review_spinner.visible = True
+        self.process_revisions_button.disable()
+        self.process_revisions_back.disable()
 
-        await asyncio.to_thread(
-            process_imx_revisions, self.loaded_imx_data.path, self.revisions_excel_upload_widget, out_path
-        )
+        try:
+            tmpdir = tempfile.TemporaryDirectory()
+            out_path = Path(tmpdir.name)
 
-        zip_path = out_path.with_suffix(".zip")
-        shutil.make_archive(zip_path.with_suffix(""), "zip", out_path)
-        ui.notify("Revisions applied successfully!", type="positive")
-        self.revision_log_zip = zip_path
+            await asyncio.to_thread(
+                process_imx_revisions, self.loaded_imx_data.path, self.revisions_excel_upload_widget, out_path
+            )
+            path_to_get_from_zip = self.imx_file_path
 
-        self.stepper.next()
+            zip_path = out_path.with_suffix(".zip")
+            shutil.make_archive(zip_path.with_suffix(""), "zip", out_path)
+
+            with zipfile.ZipFile(zip_path) as zf:
+
+                p = Path(path_to_get_from_zip.name)
+                internal_name = p.with_name(f"{p.stem}-processed{p.suffix}")
+
+                if internal_name.name in zf.namelist():
+                    temp_dir = tempfile.mkdtemp()
+                    self._temp_dir = temp_dir  # store so you can clean it up later if needed
+                    zf.extract(f"{internal_name}", path=temp_dir)
+                    extracted_file = Path(temp_dir) / internal_name
+                    self.processed_imx = extracted_file.resolve()
+                else:
+                    raise FileNotFoundError(f"{internal_name} not found in {zip_path}")
+
+            ui.notify("Revisions applied successfully!", type="positive")
+            self.revision_log_zip = zip_path
+
+            self.stepper.next()
+
+        finally:
+            self.review_spinner.visible = False
+            self.process_revisions_button.enable()
+            self.process_revisions_back.enable()
 
     def _clear_imx_data(self):
         self.analyze_measures_button.disable()
@@ -218,4 +326,5 @@ class MeasureCorrectionTool:
 
 with ui.column().classes("w-full"):
     MeasureCorrectionTool(container=ui.card().classes("p-4 w-full"))
+
 ui.run()
