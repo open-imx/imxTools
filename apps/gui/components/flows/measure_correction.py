@@ -346,8 +346,3 @@ class MeasureCorrectionTool:
     def _notify(self, message: str, type_: str = 'info'):
         ui.notify(message, type=type_)
 
-
-with ui.column().classes("w-full"):
-    MeasureCorrectionTool(container=ui.card().classes("p-4 w-full"))
-
-ui.run()

@@ -219,23 +219,21 @@ def _prepare_paths(
 
 
 def _prepare_dataframe(excel_path: Path) -> pd.DataFrame:
-    df = (
-        pd.read_excel(
-            excel_path,
-            sheet_name="revisions",
-            na_values="",
-            keep_default_na=False,
-            dtype=str,
-        )
-        .fillna("")
-        .apply(lambda col: col.map(lambda v: v.strip() if isinstance(v, str) else v))
+    df = pd.read_excel(
+        excel_path,
+        sheet_name="revisions",
+        na_values="",
+        keep_default_na=False,
+        dtype=str,
     )
+
+    df = df.apply(lambda col: col.map(lambda v: v.strip() if isinstance(v, str) else ""))
 
     header_map = RevisionColumns.description_to_header()
     df.rename(columns=header_map, inplace=True)
 
     proc_col = RevisionColumns.will_be_processed.name
-    df[proc_col] = df[proc_col].map({"True": True, "False": False})
+    df[proc_col] = df[proc_col].map({"True": True, "False": False, "": False})
 
     validate_input_excel_content(df)
 
