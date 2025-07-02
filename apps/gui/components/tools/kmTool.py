@@ -2,6 +2,7 @@ import asyncio
 import json
 import re
 import tempfile
+from functools import partial
 
 from nicegui import ui
 from nicegui.element import Element
@@ -77,15 +78,17 @@ class KmResponseCard:
         self.input_xy = input_xy
         self.on_download = on_download
         self.on_close = on_close
-        self.name = f"Result #{self.index}"  # Initial name is the index
-        self.content = None
+        self.name = f"Result #{self.index}"
+        self.card = None
         self.map_card = None
 
     def build(self):
-        self.card = ui.card().classes("p-2 shadow w-72 relative h-full")
-
+        self.card = ui.card().classes("p-2 shadow w-72 flex-none relative")
         with self.card:
-            ui.button(icon='close', on_click=self.on_close).props("flat round dense").classes("absolute top-1 right-1")
+            ui.button(
+                icon='close',
+                on_click=self.on_close
+            ).props("flat round dense").classes("absolute top-1 right-1 z-10")
 
             with ui.column().classes("w-full gap-0"):
                 self.name_input = ui.input(
@@ -102,13 +105,16 @@ class KmResponseCard:
                         ui.label(f"{res.display}").classes("font-semibold text-xl m-0")
                 ui.label(f"Input: {self.input_xy}").classes("text-xs text-gray-600 m-0")
 
-            self.map_card = MapCard(center=[53.2107, 6.5636], zoom=15)
-            self.map_card.add_geojson(self.geojson)
+
+
+            with ui.element('div').classes('w-full h-48'):
+                self.map_card = MapCard(center=[53.2107, 6.5636], zoom=15)
+                self.map_card.add_geojson(self.geojson)
+
+        return self.card
 
     def on_name_change(self):
         self.name = self.name_input.value
-
-
 
 
 class KmTool:
@@ -155,7 +161,10 @@ class KmTool:
                 with ui.column().classes("w-2/3 p-4 flex flex-col flex-1 h-full"):
                     self.input_map_card = MapCard(center=[53.2107, 6.5636], zoom=8, on_map_click=self.on_map_click)
 
-            self.result_area = ui.row().classes("mt-6 w-full flex flex-wrap gap-4 h-full overflow-auto")
+            # ✅ Result area as a row for horizontal flow with wrap
+            self.result_area = ui.row().classes(
+                "mt-6 w-full flex-wrap content-start gap-4 overflow-auto max-h-[80vh]"
+            )
 
         self.sync_all_fields()
 
@@ -275,18 +284,22 @@ class KmTool:
 
         ui.download(tmp_path, filename="point.geojson")
 
+    def close_card(self, card):
+        if card.card:
+            card.card.delete()
+        if card in self.response_cards:
+            self.response_cards.remove(card)
+
     async def run_km_lookup(self):
         try:
             self.result = await self.resolve_km_from_point(self.rd_point)
             geojson = json.loads(self.result.geojson_string())
             input_xy = self.format_point_xystring(self.rd_point)
 
+            self.input_map_card.add_geojson(geojson)
+
             def on_download():
                 asyncio.create_task(self.download_geojson())
-
-            def on_close(card):
-                self.result_area.remove(card.card)
-                self.response_cards.remove(card)
 
             card = KmResponseCard(
                 index=len(self.response_cards) + 1,
@@ -294,17 +307,15 @@ class KmTool:
                 geojson=geojson,
                 input_xy=input_xy,
                 on_download=on_download,
-                on_close=lambda: on_close(card)
+                on_close=None  # patch below
             )
+
+            card.on_close = partial(self.close_card, card)
+
             self.response_cards.append(card)
 
-            # ✅ Build inside the slot:
             with self.result_area:
                 card.build()
 
         except Exception as e:
-            with self.result_area:
-                ui.notify(f"Error: {e}", type="negative")
-
-# Example usage:
-# KmTool(ui.column())
+            ui.notify(f"Error: {e}", type="negative")
