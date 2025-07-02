@@ -71,13 +71,14 @@ class MapCard:
 
 
 class KmResponseCard:
-    def __init__(self, index, km_measures, geojson, input_xy, on_download, on_close):
+    def __init__(self, index, km_measures, geojson, input_xy, on_download, on_close, on_go_to):
         self.index = index
         self.km_measures = km_measures
         self.geojson = geojson
         self.input_xy = input_xy
         self.on_download = on_download
         self.on_close = on_close
+        self.on_go_to = on_go_to
         self.name = f"Result #{self.index}"
         self.card = None
         self.map_card = None
@@ -85,10 +86,17 @@ class KmResponseCard:
     def build(self):
         self.card = ui.card().classes("p-2 shadow w-72 flex-none relative")
         with self.card:
+            # ✅ Close button (right side)
             ui.button(
                 icon='close',
                 on_click=self.on_close
             ).props("flat round dense").classes("absolute top-1 right-1 z-10")
+
+            # ✅ Aim icon to the LEFT of close, with small gap
+            ui.button(
+                icon='my_location',
+                on_click=self.on_go_to
+            ).props("flat round dense").classes("absolute top-1 right-10 z-10")
 
             with ui.column().classes("w-full gap-0"):
                 self.name_input = ui.input(
@@ -105,8 +113,6 @@ class KmResponseCard:
                         ui.label(f"{res.display}").classes("font-semibold text-xl m-0")
                 ui.label(f"Input: {self.input_xy}").classes("text-xs text-gray-600 m-0")
 
-
-
             with ui.element('div').classes('w-full h-48'):
                 self.map_card = MapCard(center=[53.2107, 6.5636], zoom=15)
                 self.map_card.add_geojson(self.geojson)
@@ -115,7 +121,6 @@ class KmResponseCard:
 
     def on_name_change(self):
         self.name = self.name_input.value
-
 
 class KmTool:
     def __init__(self, container: Element):
@@ -128,7 +133,8 @@ class KmTool:
         with container:
             with ui.row().classes("w-full flex flex-nowrap"):
                 with ui.column().classes("w-1/3 p-4 flex-none"):
-                    ui.label("Enter Coordinates").classes("text-md font-bold")
+                    # ui.label("Enter Coordinates").classes("text-md font-bold")
+                    self.km_label = ui.label("").classes("text-xxl text-green-700 font-semibold p-o m-0")
 
                     with ui.row():
                         self.x_input = ui.number(
@@ -159,14 +165,16 @@ class KmTool:
                     )
 
                 with ui.column().classes("w-2/3 p-4 flex flex-col flex-1 h-full"):
-                    self.input_map_card = MapCard(center=[53.2107, 6.5636], zoom=8, on_map_click=self.on_map_click)
+                    self.input_map_card = MapCard(center=[53.2107, 6.5636], zoom=12, on_map_click=self.on_map_click)
 
-            # ✅ Result area as a row for horizontal flow with wrap
+            with ui.row().classes('h-4'):
+                ui.label("").props('inner-html')
+
             self.result_area = ui.row().classes(
                 "mt-6 w-full flex-wrap content-start gap-4 overflow-auto max-h-[80vh]"
             )
 
-        self.sync_all_fields()
+        self.sync_all_fields(run_lookup=False)
 
     async def resolve_km_from_point(self, point: Point):
         return get_km_service().get_km(point.x, point.y)
@@ -184,7 +192,7 @@ class KmTool:
         else:
             return f"<gml:coordinates>{point.x:.3f},{point.y:.3f}</gml:coordinates>"
 
-    def sync_all_fields(self):
+    def sync_all_fields(self, run_lookup=True):
         self.is_syncing = True
 
         rd_point = self.rd_point
@@ -202,9 +210,14 @@ class KmTool:
         lon, lat = rd2wgs.transform(rd_point.x, rd_point.y)
         self.input_map_card.update_marker(lat, lon)
 
+        # ✅ Clear KM value when syncing without lookup
+        if not run_lookup:
+            self.km_label.text = ""
+
         self.is_syncing = False
 
-        asyncio.create_task(self.run_km_lookup())
+        if run_lookup:
+            asyncio.create_task(self.run_km_lookup())
 
     def on_mode_change(self):
         self.use_wgs = self.mode_checkbox.value
@@ -290,6 +303,13 @@ class KmTool:
         if card in self.response_cards:
             self.response_cards.remove(card)
 
+    def go_to_result_point(self, point: Point):
+        self.rd_point = point
+        lon, lat = rd2wgs.transform(point.x, point.y)
+        self.input_map_card.map.set_center((lat, lon))
+        self.input_map_card.update_marker(lat, lon)
+        self.sync_all_fields(run_lookup=False)
+
     async def run_km_lookup(self):
         try:
             self.result = await self.resolve_km_from_point(self.rd_point)
@@ -297,6 +317,12 @@ class KmTool:
             input_xy = self.format_point_xystring(self.rd_point)
 
             self.input_map_card.add_geojson(geojson)
+
+            # ✅ Update live KM display
+            if self.result and self.result.km_measures:
+                self.km_label.text = f"KM: {self.result.km_measures[0].display}"
+            else:
+                self.km_label.text = "KM: -"
 
             def on_download():
                 asyncio.create_task(self.download_geojson())
@@ -307,10 +333,12 @@ class KmTool:
                 geojson=geojson,
                 input_xy=input_xy,
                 on_download=on_download,
-                on_close=None  # patch below
+                on_close=None,
+                on_go_to=None
             )
 
             card.on_close = partial(self.close_card, card)
+            card.on_go_to = partial(self.go_to_result_point, self.rd_point)
 
             self.response_cards.append(card)
 
@@ -319,3 +347,4 @@ class KmTool:
 
         except Exception as e:
             ui.notify(f"Error: {e}", type="negative")
+

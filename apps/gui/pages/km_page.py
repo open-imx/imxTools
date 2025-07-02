@@ -1,4 +1,5 @@
-from nicegui import ui
+from nicegui import ui, context
+
 from nicegui.element import Element
 
 from apps.gui.components.tools.kmTool import KmTool
@@ -34,7 +35,6 @@ class KmPage:
         - The map marker updates automatically when you change coordinates.
         - The tool converts between RD and WGS84 automatically as needed.
         - Click **Resolve KM** again any time you adjust the location.
-
         """
 
         def build_content(container: Element):
@@ -46,10 +46,19 @@ class KmPage:
                 help_text=help_text,
                 content_builder=build_content,
             )
+
         else:
-            ui.label("❌ KM Service is not running. Please start the service. Currently this will freeze the app totaly!")
-            ui.button("Start KM service", on_click=start_km_service)
+            ui.label("❌ KM Service is not running. Please start the service.")
+            with ui.row().classes('items-center gap-4'):
+                start_button = ui.button("Start KM service")
+                spinner = ui.spinner(size='lg').props('color=primary').classes('hidden')
+
+            async def handle_start():
+                start_button.disable()
+                spinner.classes(remove='hidden')
+
+                await start_km_service()
 
 
 
-
+            start_button.on('click', handle_start)
