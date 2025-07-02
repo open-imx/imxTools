@@ -16,8 +16,9 @@ wgs2rd = Transformer.from_crs("EPSG:4326", "EPSG:28992", always_xy=True)
 
 
 class MapCard:
-    def __init__(self, center, zoom=8, on_map_click=None):
-        self.map = ui.leaflet(center=center, zoom=zoom).classes("w-full h-64")
+    def __init__(self, center, zoom=15, on_map_click=None):
+        self.zoom_lvl = zoom
+        self.map = ui.leaflet(center=center, zoom=zoom).classes("w-full h-full flex-1")
         if on_map_click:
             self.map.on('map-click', on_map_click)
         self.marker = None
@@ -41,21 +42,21 @@ class MapCard:
 
             if geom['type'] == 'Point':
                 latlng = (coords[1], coords[0])
-                layer = self.map.generic_layer(name='circle', args=[latlng, {'radius': 200, 'color': 'blue'}])
+                layer = self.map.generic_layer(name='circle', args=[latlng, {'radius': 2, 'color': 'red'}])
                 self.map.set_center(latlng)
-                self.map.set_zoom(17)
+                self.map.set_zoom(self.zoom_lvl)
 
             elif geom['type'] == 'LineString':
                 latlngs = [(c[1], c[0]) for c in coords]
                 layer = self.map.generic_layer(name='polyline', args=[latlngs, {'color': 'green'}])
                 self.map.set_center(latlngs[len(latlngs)//2])
-                self.map.set_zoom(17)
+                self.map.set_zoom(self.zoom_lvl)
 
             elif geom['type'] == 'Polygon':
                 latlngs = [(c[1], c[0]) for c in coords[0]]
                 layer = self.map.generic_layer(name='polygon', args=[latlngs, {'color': 'red', 'fillOpacity': 0.5}])
                 self.map.set_center(latlngs[0])
-                self.map.set_zoom(17)
+                self.map.set_zoom(self.zoom_lvl)
 
             else:
                 continue
@@ -76,44 +77,37 @@ class KmResponseCard:
         self.input_xy = input_xy
         self.on_download = on_download
         self.on_close = on_close
-        self.name = ""
+        self.name = f"Result #{self.index}"  # Initial name is the index
         self.content = None
         self.map_card = None
 
     def build(self):
-        self.card = ui.card().classes("p-4 shadow-md w-80 relative")  # fixed width helps grid look nice
+        self.card = ui.card().classes("p-2 shadow w-72 relative h-full")
+
         with self.card:
-            ui.button(icon='close', on_click=self.on_close).props("flat round dense").classes("absolute top-2 right-2")
+            ui.button(icon='close', on_click=self.on_close).props("flat round dense").classes("absolute top-1 right-1")
 
-            ui.label(f"Result #{self.index}").classes("text-xs text-gray-500")
-            ui.label(f"Input XY: {self.input_xy}").classes("text-xs text-gray-600")
+            with ui.column().classes("w-full gap-0"):
+                self.name_input = ui.input(
+                    label="Name",
+                    value=self.name,
+                    placeholder="Enter name...",
+                    on_change=self.on_name_change
+                ).classes("w-full m-0 text-sm")
 
-            # Add input for custom name
-            self.name_input = ui.input(
-                label="Name",
-                placeholder="Enter name...",
-                on_change=self.on_name_change
-            ).classes("w-full mb-2")
+                if not self.km_measures:
+                    ui.label("No KM values found.").classes("text-red-500 text-xs m-0")
+                else:
+                    for res in self.km_measures:
+                        ui.label(f"{res.display}").classes("font-semibold text-xl m-0")
+                ui.label(f"Input: {self.input_xy}").classes("text-xs text-gray-600 m-0")
 
-            self.content = ui.column().classes("w-full")
-
-            if not self.km_measures:
-                ui.label("No KM values found.").classes("text-red-500")
-            else:
-                for res in self.km_measures:
-                    ui.label(f"{res.display}").classes("font-bold text-lg")
-
-            self.map_card = MapCard(center=[53.2107, 6.5636], zoom=8)
+            self.map_card = MapCard(center=[53.2107, 6.5636], zoom=15)
             self.map_card.add_geojson(self.geojson)
-
-            # if self.km_measures:
-            #     ui.button(
-            #         "Download GeoJSON",
-            #         on_click=self.on_download
-            #     ).classes("mt-4 btn-primary")
 
     def on_name_change(self):
         self.name = self.name_input.value
+
 
 
 
@@ -161,7 +155,7 @@ class KmTool:
                 with ui.column().classes("w-2/3 p-4 flex flex-col flex-1 h-full"):
                     self.input_map_card = MapCard(center=[53.2107, 6.5636], zoom=8, on_map_click=self.on_map_click)
 
-            self.result_area = ui.row().classes("mt-6 w-full flex flex-wrap gap-4")
+            self.result_area = ui.row().classes("mt-6 w-full flex flex-wrap gap-4 h-full overflow-auto")
 
         self.sync_all_fields()
 

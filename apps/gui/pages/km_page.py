@@ -47,8 +47,8 @@ class KmPage:
                 content_builder=build_content,
             )
         else:
-            ui.label("❌ KM Service is not running. Please start the service.")
-            ui.button("Start KM service, this can block interaction whit the ui!", on_click=start_km_service)
+            ui.label("❌ KM Service is not running. Please start the service. Currently this will freeze the app totaly!")
+            ui.button("Start KM service", on_click=start_km_service)
 
 
 

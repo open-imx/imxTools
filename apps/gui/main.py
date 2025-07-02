@@ -38,6 +38,9 @@ def layout():
                 ui.link("💬 Comments", target="/comments")
                 ui.link("📍 KM Lookup", target="/km")
 
+    with ui.footer().style('background-color: #3874c8'):
+        ui.label('FOOTER')
+
 
 @ui.page("/")
 def home_page():
