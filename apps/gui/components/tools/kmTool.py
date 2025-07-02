@@ -114,6 +114,8 @@ class KmResponseCard:
                 ui.label(f"Input: {self.input_xy}").classes("text-xs text-gray-600 m-0")
 
             with ui.element('div').classes('w-full h-48'):
+
+                # TODO: this should be the input so we do not zoom to groningen :)
                 self.map_card = MapCard(center=[53.2107, 6.5636], zoom=15)
                 self.map_card.add_geojson(self.geojson)
 
@@ -134,7 +136,7 @@ class KmTool:
             with ui.row().classes("w-full flex flex-nowrap"):
                 with ui.column().classes("w-1/3 p-4 flex-none"):
                     # ui.label("Enter Coordinates").classes("text-md font-bold")
-                    self.km_label = ui.label("").classes("text-xxl text-green-700 font-semibold p-o m-0")
+                    self.km_label = ui.label("").classes("text-xl text-green-700 font-semibold p-o m-0")
 
                     with ui.row():
                         self.x_input = ui.number(
