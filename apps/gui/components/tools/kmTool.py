@@ -10,9 +10,111 @@ from pyproj import Transformer
 
 from apps.gui.helpers.km_service_manager import get_km_service
 
-# Use RD Amersfoort (EPSG:28992) <-> WGS84 (EPSG:4326)
+# RD Amersfoort <-> WGS84 transformers
 rd2wgs = Transformer.from_crs("EPSG:28992", "EPSG:4326", always_xy=True)
 wgs2rd = Transformer.from_crs("EPSG:4326", "EPSG:28992", always_xy=True)
+
+
+class MapCard:
+    def __init__(self, center, zoom=8, on_map_click=None):
+        self.map = ui.leaflet(center=center, zoom=zoom).classes("w-full h-64")
+        if on_map_click:
+            self.map.on('map-click', on_map_click)
+        self.marker = None
+        self.geojson_layers = []
+
+    def update_marker(self, lat, lon):
+        if self.marker:
+            self.map.remove_layer(self.marker)
+        self.marker = self.map.marker(latlng=(lat, lon))
+
+    def add_geojson(self, geojson: dict):
+        self.clear_geojson()
+
+        features = geojson['features']
+        if not features:
+            return
+
+        for feature in features:
+            geom = feature['geometry']
+            coords = geom['coordinates']
+
+            if geom['type'] == 'Point':
+                latlng = (coords[1], coords[0])
+                layer = self.map.generic_layer(name='circle', args=[latlng, {'radius': 200, 'color': 'blue'}])
+                self.map.set_center(latlng)
+                self.map.set_zoom(17)
+
+            elif geom['type'] == 'LineString':
+                latlngs = [(c[1], c[0]) for c in coords]
+                layer = self.map.generic_layer(name='polyline', args=[latlngs, {'color': 'green'}])
+                self.map.set_center(latlngs[len(latlngs)//2])
+                self.map.set_zoom(17)
+
+            elif geom['type'] == 'Polygon':
+                latlngs = [(c[1], c[0]) for c in coords[0]]
+                layer = self.map.generic_layer(name='polygon', args=[latlngs, {'color': 'red', 'fillOpacity': 0.5}])
+                self.map.set_center(latlngs[0])
+                self.map.set_zoom(17)
+
+            else:
+                continue
+
+            self.geojson_layers.append(layer)
+
+    def clear_geojson(self):
+        for layer in self.geojson_layers:
+            self.map.remove_layer(layer)
+        self.geojson_layers.clear()
+
+
+class KmResponseCard:
+    def __init__(self, index, km_measures, geojson, input_xy, on_download, on_close):
+        self.index = index
+        self.km_measures = km_measures
+        self.geojson = geojson
+        self.input_xy = input_xy
+        self.on_download = on_download
+        self.on_close = on_close
+        self.name = ""
+        self.content = None
+        self.map_card = None
+
+    def build(self):
+        self.card = ui.card().classes("p-4 shadow-md w-80 relative")  # fixed width helps grid look nice
+        with self.card:
+            ui.button(icon='close', on_click=self.on_close).props("flat round dense").classes("absolute top-2 right-2")
+
+            ui.label(f"Result #{self.index}").classes("text-xs text-gray-500")
+            ui.label(f"Input XY: {self.input_xy}").classes("text-xs text-gray-600")
+
+            # Add input for custom name
+            self.name_input = ui.input(
+                label="Name",
+                placeholder="Enter name...",
+                on_change=self.on_name_change
+            ).classes("w-full mb-2")
+
+            self.content = ui.column().classes("w-full")
+
+            if not self.km_measures:
+                ui.label("No KM values found.").classes("text-red-500")
+            else:
+                for res in self.km_measures:
+                    ui.label(f"{res.display}").classes("font-bold text-lg")
+
+            self.map_card = MapCard(center=[53.2107, 6.5636], zoom=8)
+            self.map_card.add_geojson(self.geojson)
+
+            # if self.km_measures:
+            #     ui.button(
+            #         "Download GeoJSON",
+            #         on_click=self.on_download
+            #     ).classes("mt-4 btn-primary")
+
+    def on_name_change(self):
+        self.name = self.name_input.value
+
 
 
 class KmTool:
@@ -21,6 +123,7 @@ class KmTool:
         self.use_wgs = False
         self.rd_point = Point(233592, 581094)
         self.result = None
+        self.response_cards = []
 
         with container:
             with ui.row().classes("w-full flex flex-nowrap"):
@@ -33,7 +136,6 @@ class KmTool:
                             on_change=self.on_xy_change,
                             step=0.0001,
                         )
-
                         self.y_input = ui.number(
                             label="Y / Lat",
                             on_change=self.on_xy_change,
@@ -57,20 +159,13 @@ class KmTool:
                     )
 
                 with ui.column().classes("w-2/3 p-4 flex flex-col flex-1 h-full"):
-                    self.map = ui.leaflet(center=[53.2107, 6.5636], zoom=8).classes("w-full flex-1")
-                    self.map.on('map-click', self.on_map_click)
-                    self.marker = None
+                    self.input_map_card = MapCard(center=[53.2107, 6.5636], zoom=8, on_map_click=self.on_map_click)
 
-            self.result_area = ui.column().classes("mt-6 w-full")
-            with self.result_area:
-                self.result_card = ui.card().classes("p-4 shadow-md w-full mb-2")
-                with self.result_card:
-                    self.result_content = ui.column().classes("w-full")
+            self.result_area = ui.row().classes("mt-6 w-full flex flex-wrap gap-4")
 
         self.sync_all_fields()
 
     async def resolve_km_from_point(self, point: Point):
-        """Resolve KM measures from the KM service"""
         return get_km_service().get_km(point.x, point.y)
 
     def parse_decimal(self, value: str) -> float:
@@ -87,7 +182,6 @@ class KmTool:
             return f"<gml:coordinates>{point.x:.3f},{point.y:.3f}</gml:coordinates>"
 
     def sync_all_fields(self):
-        """Update ALL input fields & map using self.rd_point"""
         self.is_syncing = True
 
         rd_point = self.rd_point
@@ -103,16 +197,11 @@ class KmTool:
         self.gml_input_rd.value = self.format_point_gml(rd_point)
 
         lon, lat = rd2wgs.transform(rd_point.x, rd_point.y)
-        self.update_map_marker(lat, lon)
+        self.input_map_card.update_marker(lat, lon)
 
         self.is_syncing = False
 
         asyncio.create_task(self.run_km_lookup())
-
-    def update_map_marker(self, lat, lon):
-        if self.marker:
-            self.map.remove_layer(self.marker)
-        self.marker = self.map.marker(latlng=(lat, lon))
 
     def on_mode_change(self):
         self.use_wgs = self.mode_checkbox.value
@@ -175,11 +264,11 @@ class KmTool:
         lat = event.args["latlng"]["lat"]
         lon = event.args["latlng"]["lng"]
         rd_x, rd_y = wgs2rd.transform(lon, lat)
+        self.input_map_card.map.set_center((lat, lon))
         self.rd_point = Point(rd_x, rd_y)
         self.sync_all_fields()
 
     async def download_geojson(self):
-        """Download GeoJSON using self.result.geojson_string()"""
         if not self.result:
             ui.notify("No KM result to download.", type="warning")
             return
@@ -193,24 +282,35 @@ class KmTool:
         ui.download(tmp_path, filename="point.geojson")
 
     async def run_km_lookup(self):
-        """Fetch KM measures and update result"""
-        self.result_content.clear()
         try:
             self.result = await self.resolve_km_from_point(self.rd_point)
-            if not self.result.km_measures:
-                with self.result_content:
-                    ui.label("No KM values found.").classes("text-red-500")
-            else:
-                with self.result_content:
-                    for res in self.result.km_measures:
-                        ui.label(f"{res.display}").classes("font-bold text-lg")
+            geojson = json.loads(self.result.geojson_string())
+            input_xy = self.format_point_xystring(self.rd_point)
 
-                    ui.button(
-                        "Download GeoJSON",
-                        on_click=self.download_geojson,
-                    ).classes("mt-4 btn-primary")
+            def on_download():
+                asyncio.create_task(self.download_geojson())
 
-                    ui.notify("KM values resolved!", type="positive")  # ✅ inside WITH
+            def on_close(card):
+                self.result_area.remove(card.card)
+                self.response_cards.remove(card)
+
+            card = KmResponseCard(
+                index=len(self.response_cards) + 1,
+                km_measures=self.result.km_measures,
+                geojson=geojson,
+                input_xy=input_xy,
+                on_download=on_download,
+                on_close=lambda: on_close(card)
+            )
+            self.response_cards.append(card)
+
+            # ✅ Build inside the slot:
+            with self.result_area:
+                card.build()
+
         except Exception as e:
-            with self.result_content:
+            with self.result_area:
                 ui.notify(f"Error: {e}", type="negative")
+
+# Example usage:
+# KmTool(ui.column())
