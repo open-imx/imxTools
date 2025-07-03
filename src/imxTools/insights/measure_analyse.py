@@ -4,7 +4,7 @@ import pandas as pd
 from imxInsights.repo.imxRepo import ImxRepo
 from shapely import LineString, Point
 
-from insights.mesaure_analyse_enums import MeasureAnalyseColumns
+from src.imxTools.insights.mesaure_analyse_enums import MeasureAnalyseColumns
 from src.imxTools.revision.revision_enums import (
     RevisionColumns,
     RevisionOperationValues,

@@ -2,7 +2,6 @@
 A variety of tools for working with IMX.
 
 
-
 ## 🧪 Development Setup
 
 We highly recommend using [uv](https://github.com/astral-sh/uv) to manage packages and Python versions — it’s ⚡fast and easy 🦾! 
@@ -58,6 +57,7 @@ Activate Unix/Mac
 ```bash
   uv pip install --editable .
   uv pip install --group dev
+  uv pip install --group gui
 ```
 
 Or all at once:

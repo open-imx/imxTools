@@ -12,10 +12,10 @@ from nicegui import ui
 from openpyxl import load_workbook
 
 from apps.gui.helpers.io import spooled_file_to_temp_file
-from insights.diff_and_population import write_diff_output_files
-from insights.measure_analyse import generate_measure_excel
-from revision.process_revision import process_imx_revisions
-from utils.helpers import load_imxinsights_container_or_file, create_timestamp
+from src.imxTools.insights.diff_and_population import write_diff_output_files
+from src.imxTools.insights.measure_analyse import generate_measure_excel
+from src.imxTools.revision.process_revision import process_imx_revisions
+from src.imxTools.utils.helpers import load_imxinsights_container_or_file, create_timestamp
 
 
 

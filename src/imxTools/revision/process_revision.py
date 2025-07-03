@@ -18,7 +18,7 @@ from src.imxTools.revision.revision_enums import (
 )
 from src.imxTools.settings import config
 from src.imxTools.utils.custom_logger import logger
-from utils.exceptions import ErrorList
+from src.imxTools.utils.exceptions import ErrorList
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
