@@ -94,4 +94,4 @@ def km_page():
     MeasureCorrectionFlowPage()
 
 
-ui.run(title="IMX 🛠️ Tools", reload=False)
+ui.run(title="IMX 🛠️ Tijn Tool", reload=False)

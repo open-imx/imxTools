@@ -18,7 +18,6 @@ EXECUTABLE_NAME = "imx-tools-gui"
 APP_FOLDER_NAME = f"{EXECUTABLE_NAME}-{imxTools_version}-windows"
 ENTRY_FILE = "apps/gui/main.py"
 
-# PathsDATA_FOLDER = Path("data")
 DIST_ROOT = Path("dist")
 FINAL_APP_FOLDER = DIST_ROOT / APP_FOLDER_NAME
 BUILD_FOLDER = Path(".build_gui_app")
@@ -42,10 +41,21 @@ def build_nicegui_app():
 
     entry_path = Path(ENTRY_FILE).resolve()
 
+    # Paths to include
+    add_data_args = []
+    paths_to_include = [
+        (Path("src/data").resolve(), "src/data"),
+        (Path("apps/gui/data").resolve(), "apps\\gui\\data\\"),
+    ]
+
+    for source, target in paths_to_include:
+        add_data_args.extend(["--add-data", f"{source}{os.pathsep}{target}"])
+
     process = subprocess.Popen(
         [
             sys.executable, "-m", "nicegui.scripts.pack",
             "--name", EXECUTABLE_NAME,
+            *add_data_args,
             str(entry_path)
         ],
         cwd=BUILD_FOLDER,
