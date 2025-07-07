@@ -1,7 +1,7 @@
 [project]
 name = "imxTools"
 description = "....."
-current_version = "0.0.1-dev3"
+version = "0.0.1.dev3"
 readme = "README.md"
 authors = [
   { name = "Hazedd", email = "Hazedd@users.noreply.github.com" },
