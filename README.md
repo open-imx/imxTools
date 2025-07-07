@@ -81,58 +81,20 @@ Or all at once:
 ## 🧮 Version Bumping
 
 
-
-## todo: implement bump-my-version
-
-1. first run
-`uv run bump-my-version sample-config --no-prompt --destination .bumpversion.toml`
-
-2. config so we have dev rc final 
-
-3. show bump
-`uv run  bump-my-version show-bump`
-
-
-##### first
-check out all docs 
-implement flow manually (see docs https://github.com/callowayproject/bump-my-version)
-implement flow github actions (see docs https://github.com/callowayproject/bump-my-version)
-
-
-
-
-
-## TODO: Remove below!!!!
-
-### 🧾 Version Format
-
-Versions follow the pattern:
-
-- 🧪 **Development versions (dev)**: Incremental dev builds  
-- 🧬 **Alpha versions (alpha)**: Early pre-release builds for testing  
-- 🧯 **Release candidates (rc)**: Final pre-production testing  
-- 🐞 **Patch versions (patch)**: Bug fixes  
-- ✨ **Minor versions (minor)**: Backward-compatible features  
-- 💥 **Major versions (major)**: Breaking changes  
-
 🧭 Typical flow:
 
 dev* → alpha* → rc* → patch/minor/major → next dev*
 
-Use the included CLI tool to bump the package version in `src/rifmp/__init__.py`.
+we use bump-my-version for manging the verisons 
 
+```shell
+  bump-my-version show-bump
+```
 
+the pick the firsion
 
-########################################################
-
-
-
-
-
-
-
-
-
+### **TODO implement github actions**
+see docs https://github.com/callowayproject/bump-my-version
 
 
 ## 🪵 Error Monitoring with Sentry
