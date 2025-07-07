@@ -3,6 +3,8 @@ import tempfile
 
 from nicegui import ui
 
+from apps.gui.helpers.io import spooled_file_to_temp_file
+
 
 class UploadFile:
     def __init__(self, label: str, on_change: callable = None, accept: str = ".xlsx"):
@@ -26,13 +28,7 @@ class UploadFile:
                     )
 
     async def _handle_upload(self, event):
-        uploaded = event["content"]
-        filename = event["name"]
-
-        temp_file = Path(tempfile.gettempdir()) / filename
-        temp_file.write_bytes(uploaded)
-
-        self.file_path = temp_file
+        self.file_path = spooled_file_to_temp_file(event)
 
         if self._on_change:
             self._on_change(self.file_path)
