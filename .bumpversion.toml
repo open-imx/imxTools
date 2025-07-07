@@ -1,5 +1,5 @@
 [tool.bumpversion]
-current_version = "0.0.2-dev"
+current_version = "0.0.1-dev3"
 
 parse = """(?x)
     (?P<major>0|[1-9]\\d*)\\.
@@ -19,6 +19,10 @@ serialize = [
 search = "{current_version}"
 replace = "{new_version}"
 regex = false
+files = [
+  "pyproject.toml",
+  "src/imxTools/__init__.py"
+]
 ignore_missing_version = false
 ignore_missing_files = false
 tag = false
