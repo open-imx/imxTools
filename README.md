@@ -2,9 +2,9 @@
 A variety of tools for working with IMX.
 
 
-## 🧪 Development Setup
+## Development Setup
 
-We highly recommend using [uv](https://github.com/astral-sh/uv) to manage packages and Python versions — it’s ⚡fast and easy 🦾! 
+⚠️ We highly recommend using [uv](https://github.com/astral-sh/uv) to manage packages and Python versions — it’s ⚡fast and easy 🦾! 
 
 We use the following tools:
 
@@ -63,42 +63,43 @@ Activate Unix/Mac
 Or all at once:
 
 ```bash
-  uv pip install --editable . --group dev
+  uv pip install --editable . --group dev --group gui
 ```
 
-### Manage Dependencies
+### Manage dependencies
 
 ```bash
-  uv add <pkg>               # Add to main group
-  uv add --dev <pkg>         # Add to dev group
-  uv sync                    # Sync venv with pyproject.toml
+uv add <pkg>               # Add to main group
+uv add --dev <pkg>         # Add to dev group
+uv remove <pkg>            # Remove a package
+uv update <pkg>            # Upgrade a package
+uv sync                    # Sync venv with pyproject.toml
 ```
+💡 **Tip:** Always commit `pyproject.toml` and `uv.lock` before `uv sync`!
 
-📚 See the [uv docs](https://docs.astral.sh/uv/) for full details.
+📚 See the [uv docs](https://docs.astral.sh/uv/) for full details.  
 
 ---
 
-## 🧮 Version Bumping
-
-
-🧭 Typical flow:
-
-dev* → alpha* → rc* → patch/minor/major → next dev*
-
-we use bump-my-version for manging the verisons 
+### 🧮 Version Bumping
+**We use bump-my-version for manging the versions** 
 
 ```shell
   bump-my-version show-bump
 ```
 
-the pick the firsion
+the pick the version to bump
 
-### **TODO implement github actions**
+🧭 Typical flow:
+
+dev* → alpha* → rc* → patch/minor/major → next dev*
+
+
+#### **TODO implement github actions**
 see docs https://github.com/callowayproject/bump-my-version
 
 
 ## 🪵 Error Monitoring with Sentry
-
 This project includes optional integration with [Sentry.io](https://sentry.io/) for error tracking and diagnostics.
 
 --- 
