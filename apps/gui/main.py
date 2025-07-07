@@ -40,8 +40,9 @@ def layout():
                 ui.link("📊 Population Report", target="/population")
                 ui.link("💬 Comments", target="/comments")
                 ui.link("📝 Revisions", target="/revision")
-                ui.link("📍 KM Lookup", target="/km")
                 ui.link("📐 Measure Check", target="/measure")
+                ui.link("📍 KM Report", target="/km-excel")
+                ui.link("📍 KM Lookup", target="/km")
 
     with ui.footer().style('background-color: #3874c8'):
         with ui.column().classes('gap-0 p-0'):
