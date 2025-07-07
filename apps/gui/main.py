@@ -2,6 +2,7 @@ import importlib.metadata
 
 from nicegui import ui
 
+from apps.gui.pages.add_km_excel_page import AddKmExcelPage
 from apps.gui.pages.comment_page import CommentPage
 from apps.gui.pages.diff_page import DiffPage
 from apps.gui.pages.km_page import KmPage
@@ -81,6 +82,13 @@ def revision_page():
 def km_page():
     layout()
     KmPage()
+
+@ui.page("/km-excel")
+def km_page():
+    layout()
+    AddKmExcelPage()
+
+
 
 
 @ui.page("/measure")
