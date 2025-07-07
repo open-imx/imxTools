@@ -147,27 +147,18 @@ class MeasureCorrectionTool:
                 ui.button('Finish', on_click=self._on_finish).props('flat')
                 ui.button('Back', on_click=self.stepper.previous).props('flat')
 
-    def _build_upload_widget(
-            self,
-            label: str,
-            on_upload,
-            allowed_extensions: list[str] | None = None,
-    ):
-        props = {}
-        if allowed_extensions:
-            props["accept"] = ",".join(allowed_extensions)
+    def _build_upload_widget(self, label, on_upload, allowed_extensions: list[str] | None = None):
+        if allowed_extensions is not None:
+            accept = f'accept={",".join(allowed_extensions)}'
+        else:
+            accept = ''
 
-        return (
-            ui.upload(
-                label=label,
-                auto_upload=True,
-                on_upload=on_upload,
-                max_files=1,
-                **props,
-            )
-            .classes("w-full")
-            .style("flex: 1")
-        )
+        return ui.upload(
+            label=label,
+            auto_upload=True,
+            on_upload=on_upload,
+            max_files=1,
+        ).classes("w-full").style("flex: 1").props(accept)
 
     def end_and_reset_stepper(self):
         self.stepper.set_value(self.UPLOAD_STEP)
