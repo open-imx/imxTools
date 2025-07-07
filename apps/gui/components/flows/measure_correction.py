@@ -136,7 +136,7 @@ class MeasureCorrectionTool:
     def _build_check_result_step(self):
         with ui.step(self.CHECK_RESULT_STEP).classes('font-bold'):
             ui.label('The IMX file has been updated.').classes('text-xl font-semibold text-primary')
-            ui.button('Download revision zip', icon='download', on_click=self._on_download_result).props('outline')
+            ui.button('Download revision IMX', icon='download', on_click=self._on_download_result).props('outline')
 
             with ui.row():
                 self.diff_button = ui.button('Create And Download Diff Report', icon='download', on_click=self._on_generate_diff).props('outline')
