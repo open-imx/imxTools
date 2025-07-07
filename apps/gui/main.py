@@ -1,12 +1,12 @@
 from nicegui import ui
 
+from apps.gui.pages.comment_page import CommentPage
 from apps.gui.pages.diff_page import DiffPage
 from apps.gui.pages.km_page import KmPage
 from apps.gui.pages.measure_correction_flow_page import MeasureCorrectionFlowPage
 from apps.gui.pages.measure_page import MeasurePage
 from apps.gui.pages.population_page import PopulationPage
 from apps.gui.pages.revision_page import RevisionPage
-
 
 def layout():
     with ui.header().classes("bg-base-200 text-base-content"):
@@ -74,6 +74,7 @@ def revision_page():
 @ui.page("/comments")
 def revision_page():
     layout()
+    CommentPage()
 
 
 @ui.page("/km")
