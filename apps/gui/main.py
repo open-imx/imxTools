@@ -26,14 +26,6 @@ def layout():
         with ui.column().classes("p-4"):
             ui.link("🏠 Home", target="/")
             ui.separator()
-
-            ui.label('🔄 Work Flows')
-            with ui.column().classes("pl-4"):
-                ui.link("🔧 Measure Correction", target="/measure-correction-flow")
-                ui.link("➕ Add km to report", target="/")
-
-            ui.separator()
-
             ui.label('🛠️ Tools')
             with ui.column().classes("pl-4"):
                 ui.link("🧮 Diff Report", target="/diff")
@@ -41,6 +33,7 @@ def layout():
                 ui.link("💬 Comments", target="/comments")
                 ui.link("📝 Revisions", target="/revision")
                 ui.link("📐 Measure Check", target="/measure")
+                ui.link("🔧 Measure Correction", target="/measure-correction-flow")
                 ui.link("📍 KM Report", target="/km-excel")
                 ui.link("📍 KM Lookup", target="/km")
 
