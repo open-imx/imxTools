@@ -1,19 +1,12 @@
 from apps.gui.components.tools.diffTool import DiffTool
 from apps.gui.components.layouts.toolPanelWithHelp import ToolPanelWithHelp
+from apps.gui.helpers.io import load_markdown
 
 
 class DiffPage:
     def __init__(self):
-        help_text = """
-        ### ℹ️ IMX Diff Help
+        help_text = load_markdown('../data/help_markdowns/diff_tool_help.md')
 
-        1. **Upload T1 and T2** IMX files.
-        2. **Select a situation** if using XML.
-        3. **Use toggles** to export extra formats.
-        4. Click **Run Comparison** to generate results.
-
-        Tip: You can use `.zip` files without situation selection.
-        """
 
         def build_diff_content(container):
             DiffTool(container)

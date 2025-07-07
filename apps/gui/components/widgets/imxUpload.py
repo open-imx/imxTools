@@ -64,3 +64,12 @@ class ImxUpload(UploadFile):
 
     def get_value(self):
         return self.file_path, self.situation
+
+    @property
+    def situation_options(self):
+        return self.situation_dropdown.options
+
+    @property
+    def situation_options_value(self):
+        return self.situation_dropdown.value
+

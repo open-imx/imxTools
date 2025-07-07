@@ -10,6 +10,7 @@ from apps.gui.pages.measure_page import MeasurePage
 from apps.gui.pages.population_page import PopulationPage
 from apps.gui.pages.revision_page import RevisionPage
 
+from src.imxTools import __version__ as imx_tools_version
 
 def layout():
     with ui.header().classes("bg-base-200 text-base-content"):
@@ -43,7 +44,7 @@ def layout():
 
     with ui.footer().style('background-color: #3874c8'):
         with ui.column().classes('gap-0 p-0'):
-            ui.label(f"ImxTools v{importlib.metadata.version('imxTools')}").classes('text-lg m-0').style('line-height: 1')
+            ui.label(f"ImxTools v{imx_tools_version}").classes('text-lg m-0').style('line-height: 1')
             ui.label(f"using ImxInsights v{importlib.metadata.version('imxInsights')}").classes('text-xs mt-1').style('line-height: 1')
 
 
