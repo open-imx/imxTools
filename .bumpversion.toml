@@ -19,10 +19,16 @@ serialize = [
 search = "{current_version}"
 replace = "{new_version}"
 regex = false
-files = [
-  "pyproject.toml",
-  "src/imxTools/__init__.py"
-]
+
+[[tool.bumpversion.files]]
+filename = "pyproject.toml"
+
+[[tool.bumpversion.files]]
+filename = "src/imxTools/__init__.py"
+search = '__version__ = "{current_version}"'
+replace = '__version__ = "{new_version}"'
+regex = false
+
 ignore_missing_version = false
 ignore_missing_files = false
 tag = false
