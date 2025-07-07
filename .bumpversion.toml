@@ -32,13 +32,15 @@ regex = false
 
 ignore_missing_version = false
 ignore_missing_files = false
-tag = false
+
+commit = true
+tag = true
 sign_tags = false
+
 tag_name = "v{new_version}"
-tag_message = "Bump version: {current_version} → {new_version}"
-allow_dirty = false
-commit = false
+tag_message = "Release {new_version}"
 message = "Bump version: {current_version} → {new_version}"
+
 moveable_tags = []
 commit_args = ""
 setup_hooks = []
