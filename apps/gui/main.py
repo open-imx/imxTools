@@ -1,3 +1,5 @@
+import importlib.metadata
+
 from nicegui import ui
 
 from apps.gui.pages.comment_page import CommentPage
@@ -8,9 +10,10 @@ from apps.gui.pages.measure_page import MeasurePage
 from apps.gui.pages.population_page import PopulationPage
 from apps.gui.pages.revision_page import RevisionPage
 
+
 def layout():
     with ui.header().classes("bg-base-200 text-base-content"):
-        ui.button(on_click=lambda: menu.toggle()).props("flat dense icon=menu").classes(
+        ui.button("🛠️", on_click=lambda: menu.toggle()).props("flat dense icon=menu").classes(
             "ml-2"
         )
         ui.label("IMX Tools").classes("text-xl font-bold ml-4")
@@ -33,13 +36,15 @@ def layout():
             with ui.column().classes("pl-4"):
                 ui.link("🧮 Diff Report", target="/diff")
                 ui.link("📊 Population Report", target="/population")
-                ui.link("📐 Measure Check", target="/measure")
-                ui.link("📝 Revisions", target="/revision")
                 ui.link("💬 Comments", target="/comments")
+                ui.link("📝 Revisions", target="/revision")
                 ui.link("📍 KM Lookup", target="/km")
+                ui.link("📐 Measure Check", target="/measure")
 
     with ui.footer().style('background-color: #3874c8'):
-        ui.label('FOOTER')
+        with ui.column().classes('gap-0 p-0'):
+            ui.label(f"ImxTools v{importlib.metadata.version('imxTools')}").classes('text-lg m-0').style('line-height: 1')
+            ui.label(f"using ImxInsights v{importlib.metadata.version('imxInsights')}").classes('text-xs mt-1').style('line-height: 1')
 
 
 @ui.page("/")
@@ -60,21 +65,15 @@ def population_page():
     PopulationPage()
 
 
-@ui.page("/measure")
-def measure_page():
+@ui.page("/comments")
+def revision_page():
     layout()
-    MeasurePage()
-
+    CommentPage()
 
 @ui.page("/revision")
 def revision_page():
     layout()
     RevisionPage()
-
-@ui.page("/comments")
-def revision_page():
-    layout()
-    CommentPage()
 
 
 @ui.page("/km")
@@ -83,10 +82,16 @@ def km_page():
     KmPage()
 
 
+@ui.page("/measure")
+def measure_page():
+    layout()
+    MeasurePage()
+
+
 @ui.page("/measure-correction-flow")
 def km_page():
     layout()
     MeasureCorrectionFlowPage()
 
 
-ui.run(title="IMX Insights", reload=False)
+ui.run(title="IMX 🛠️ Tools", reload=False)

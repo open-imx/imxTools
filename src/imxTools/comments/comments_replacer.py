@@ -149,7 +149,10 @@ def apply_comment_to_cell(
         )
 
         if comment_text and comment_text != existing_comment_text:
-            header_cell.comment = Comment(comment_text, "IMX Tool")
+            new_comment = Comment(comment_text, "IMX Tool")
+            new_comment.visible = False
+            header_cell.comment = new_comment
+
 
         header_cell.style = style_name
 
@@ -166,7 +169,9 @@ def apply_comment_to_cell(
                 }
             )
         elif comment_text:
-            cell.comment = Comment(comment_text, "open-imx-comment-replacer")
+            new_comment = Comment(comment_text, "open-imx-comment-replacer")
+            new_comment.visible = False
+            cell.comment = new_comment
             processed.append({**data, "Value": cell.value})
         else:
             skipped.append({**data, "Value": cell.value, "Reason": "Empty comment"})
