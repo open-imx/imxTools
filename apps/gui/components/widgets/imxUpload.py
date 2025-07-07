@@ -1,47 +1,34 @@
 from nicegui import ui
 from imxInsights.file.singleFileImx.imxSituationEnum import ImxSituationEnum
 
-from apps.gui.helpers.io import spooled_file_to_temp_file
+from apps.gui.components.widgets.uploadFile import UploadFile
 from src.imxTools.utils.helpers import get_situations
+from apps.gui.helpers.io import spooled_file_to_temp_file
 
 
-class ImxUpload:
+
+class ImxUpload(UploadFile):
     def __init__(self, label: str, on_change: callable = None):
-        self.label = label
-        self.on_change = on_change
-        self.file_path = None
+        super().__init__(label, accept=".xml,.zip", on_change=self._imx_on_change)
         self.situation = None
+        self._user_on_change = on_change
 
-        with ui.card().classes("w-full"):
-            ui.label(self.label).classes("font-bold")
-            with ui.card_section().classes("w-full"):
-                with ui.row().classes("w-full"):
-                    self.file_input = (
-                        ui.upload(
-                            label="Upload IMX file",
-                            auto_upload=True,
-                            on_upload=self.handle_upload,
-                            max_files=1,
-                        )
-                        .classes("w-full")
-                        .style("flex: 1")
-                    )
-
-                with ui.row().classes("w-full"):
-                    self.situation_dropdown = (
-                        ui.select(
-                            [],
-                            label="Select Situation",
-                            on_change=self._on_situation_change,
-                        )
-                        .classes("w-full")
-                        .style("flex: 1")
-                    )
+        # ✅ Add the situation dropdown INSIDE the card_section:
+        with self.section:
+            self.situation_dropdown = (
+                ui.select(
+                    [],
+                    label="Select Situation",
+                    on_change=self._on_situation_change,
+                )
+                .classes("w-full")
+                .style("flex: 1")
+            )
 
         self.situation_dropdown.disable()
 
-    def handle_upload(self, e):
-        self.file_path = spooled_file_to_temp_file(e)
+    async def _handle_upload(self, event):
+        self.file_path = spooled_file_to_temp_file(event)
         suffix = self.file_path.suffix.lower()
 
         if suffix == ".zip":
@@ -60,16 +47,20 @@ class ImxUpload:
                 self.situation_dropdown.disable()
                 self.situation = None
 
-        if self.on_change:
-            self.on_change(self.file_path, self.situation)
+        if self._user_on_change:
+            self._user_on_change(self.file_path, self.situation)
+
+    def _imx_on_change(self, file_path):
+        # Ignore — handled in _handle_upload instead
+        pass
 
     def _on_situation_change(self, e):
         if e.value:
             self.situation = ImxSituationEnum[e.value]
         else:
             self.situation = None
-        if self.on_change:
-            self.on_change(self.file_path, self.situation)
+        if self._user_on_change:
+            self._user_on_change(self.file_path, self.situation)
 
     def get_value(self):
         return self.file_path, self.situation
