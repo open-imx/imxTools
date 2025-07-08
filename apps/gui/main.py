@@ -42,12 +42,24 @@ def layout():
             ui.label(f"ImxTools v{imx_tools_version}").classes('text-lg m-0').style('line-height: 1')
             ui.label(f"using ImxInsights v{importlib.metadata.version('imxInsights')}").classes('text-xs mt-1').style('line-height: 1')
 
+from src.imxTools import __version__ as build_version
 
 @ui.page("/")
 def home_page():
     layout()
     ui.label("Welcome to IMX Tools").classes("text-2xl p-4")
 
+    ui.add_body_html(
+        '<script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>')
+
+    src = 'https://lottie.host/838bfce2-f68e-4cd4-a14a-fe2ae95b7e2f/gfeOVDiswh.json'
+    ui.html(f'<lottie-player src="{src}" loop autoplay />').classes('w-full')
+
+    with ui.column().classes('w-full h-screen items-center justify-center'):
+        ui.label(f"baked v{build_version}: gepofte bol").classes("text-4xl p-4")
+        ui.image(
+            'https://favorflav.com/images/gepofte-knoflook-uit-de-oven-916x458.jpg'
+        ).classes('object-contain w-full h-full')
 
 @ui.page("/diff")
 def diff_page():
