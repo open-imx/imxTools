@@ -1,4 +1,4 @@
-name: Enforce-version-bump
+name: Enforce Version Bump
 
 on:
   push:
