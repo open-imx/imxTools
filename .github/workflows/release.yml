@@ -1,4 +1,4 @@
-name: Pre-Release
+name: Release
 
 on:
   pull_request:
@@ -6,9 +6,10 @@ on:
 
 jobs:
   release:
-    if: |
-      github.event.pull_request.merged == true &&
+    if: github.event.pull_request.merged == true && (
+      github.event.pull_request.base.ref == 'dev' ||
       github.event.pull_request.base.ref == 'main'
+    )
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -77,14 +78,14 @@ jobs:
           source .venv/bin/activate
           git cliff --config cliff.toml --tag v${{ env.CURRENT_VERSION }} > RELEASE_NOTES.md
 
-      - name: 🚀 Create prerelease with build artifacts
+      - name: 🚀 Create release
         if: env.SHOULD_RELEASE == 'true'
         uses: ncipollo/release-action@bcfe5470707e8832e12347755757cec0eb3c22af
         with:
           tag: "v${{ env.CURRENT_VERSION }}"
-          name: "Pre-release v${{ env.CURRENT_VERSION }}"
+          name: "Release v${{ env.CURRENT_VERSION }}"
           bodyFile: "RELEASE_NOTES.md"
-          prerelease: true
+          prerelease: ${{ github.event.pull_request.base.ref == 'dev' }}
           artifacts: |
             dist/*.zip
             dist/*.tar.gz

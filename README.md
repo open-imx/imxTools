@@ -1,118 +1,30 @@
 # imxTools
-A variety of tools for working with IMX.
 
-
-## Development Setup
-
-⚠️ We highly recommend using [uv](https://github.com/astral-sh/uv) to manage packages and Python versions — it’s ⚡fast and easy 🦾! 
-
-We use the following tools:
-
-
-- 🧪 `pytest` — Unit Testing
-```bash
-  uv run pytest
-```
-
-- 🧹 `ruff` — Linter & Formatter
-```bash
-  uv run ruff format   # 🧽 Format code
-  uv run ruff check    # 🔎 Lint code
-```
-
-- ⚡ `ty` — Fast type checking
-```bash
-  uv run ty check      # 🧠 Type check
-```
-
-- 🌈 `zizmor` — GitHub workflow checking
-```bash
-  uv run zizmor . 
-```
-
+**imxTools** is a Python package bundled with a modern NiceGUI app for working with IMX — the Dutch railway’s specialized XML data format. *A command-line interface (CLI) is also planned for future releases.*
 
 ---
 
-## 📦 Managing Dependencies with `uv`
+## ✨ Core Features
 
-### Setup
-
-Create virtual environment
-```bash
-  uv venv
-```
-
-Activate Windows
-```bash
-  .venv\Scripts\activate
-```
-
-Activate Unix/Mac
-```bash
-  source .venv/bin/activate  
-```
-
-### Install project dependencies
-
-```bash
-  uv sync
-  uv pip install --editable .
-  uv pip install --group dev
-  uv pip install --group gui
-```
-
-Or all at once:
-
-```bash
-  uv pip install --group dev --group gui .
-```
-
-### Manage dependencies
-
-```bash
-uv add <pkg>               # Add to main group
-uv add --dev <pkg>         # Add to dev group
-uv remove <pkg>            # Remove a package
-uv update <pkg>            # Upgrade a package
-uv sync                    # Sync venv with pyproject.toml
-```
-💡 **Tip:** Always commit `pyproject.toml` and `uv.lock` before `uv sync`!
-
-📚 See the [uv docs](https://docs.astral.sh/uv/) for full details.  
+- 🧮 **Diff Reports** — Generate clear comparison reports between two IMX containers.
+- 📊 **Population Reports** — Analyze and report the contents of a single IMX container.
+- 💬 **Comments Handling** — Extract, manage, and reapply comments on generated reports.
+- 📝 **Revision Templates** — Apply revision templates directly to an IMX container.
+- 📐 **Measure Health Check** — Run checks on measure data for quality and consistency.
+- 🔧 **Measure Correction Flow** — Automate the correction process for measures.
+- 📍 **Add KM Data** — Append kilometer points to point-based reports.
+- 🗺️ **Interactive KM Lookup** — Look up kilometer points on an interactive map.
 
 ---
 
-### 🧮 Version Bumping
-**We use bump-my-version for manging the versions** 
+## 📥 Contributing
 
-```shell
-  bump-my-version show-bump
-```
+Want to improve **imxTools**? See our [Contribution Guidelines](CONTRIBUTING.md).
 
-```code
-0.0.1.dev6 ── bump ─┬─ major ─ 1.0.0.dev0
-                    ├─ minor ─ 0.1.0.dev0
-                    ├─ patch ─ 0.0.2.dev0
-                    ├─ pre_l ─ 0.0.1.rc0
-                    ╰─ pre_n ─ 0.0.1.dev7
-```
-
-Then pick the version to bump
-
-🧭 Typical flow:
-
-- dev* → alpha* → rc* → patch/minor/major → next dev*
-
-
-#### **TODO implement github actions**
-see docs https://github.com/callowayproject/bump-my-version
-
-
-## 🪵 Error Monitoring with Sentry
-This project includes optional integration with [Sentry.io](https://sentry.io/) for error tracking and diagnostics.
-
---- 
+---
 
 ## 📄 License
 
-[MIT License](LICENSE.md)
+This project is licensed under the [MIT License](LICENSE.md).
+
+---
