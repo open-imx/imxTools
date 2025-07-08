@@ -12,6 +12,8 @@ from apps.gui.pages.population_page import PopulationPage
 from apps.gui.pages.revision_page import RevisionPage
 
 from src.imxTools import __version__ as imx_tools_version
+from src.imxTools import __version__ as build_version
+
 
 def layout():
     with ui.header().classes("bg-base-200 text-base-content"):
@@ -42,10 +44,9 @@ def layout():
             ui.label(f"ImxTools v{imx_tools_version}").classes('text-lg m-0').style('line-height: 1')
             ui.label(f"using ImxInsights v{importlib.metadata.version('imxInsights')}").classes('text-xs mt-1').style('line-height: 1')
 
-from src.imxTools import __version__ as build_version
 
 @ui.page("/")
-def home_page():
+def home_page():  # noqa: F811
     layout()
     ui.label("Welcome to IMX Tools").classes("text-2xl p-4")
 
@@ -62,49 +63,47 @@ def home_page():
         ).classes('object-contain w-full h-full')
 
 @ui.page("/diff")
-def diff_page():
+def diff_page():  # noqa: F811
     layout()
     DiffPage()
 
 
 @ui.page("/population")
-def population_page():
+def population_page():  # noqa: F811
     layout()
     PopulationPage()
 
 
 @ui.page("/comments")
-def revision_page():
+def revision_page():  # noqa: F811
     layout()
     CommentPage()
 
 @ui.page("/revision")
-def revision_page():
+def revision_page():  # noqa: F811
     layout()
     RevisionPage()
 
 
 @ui.page("/km")
-def km_page():
+def km_page():  # noqa: F811
     layout()
     KmPage()
 
 @ui.page("/km-excel")
-def km_page():
+def km_page():  # noqa: F811
     layout()
     AddKmExcelPage()
 
 
-
-
 @ui.page("/measure")
-def measure_page():
+def measure_page():  # noqa: F811
     layout()
     MeasurePage()
 
 
 @ui.page("/measure-correction-flow")
-def km_page():
+def km_page():  # noqa: F811
     layout()
     MeasureCorrectionFlowPage()
 

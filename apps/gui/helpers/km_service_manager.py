@@ -1,5 +1,3 @@
-import asyncio
-
 KM_SERVICE_INSTANCE = None
 
 
