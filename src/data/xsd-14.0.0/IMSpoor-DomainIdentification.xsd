@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns="http://www.prorail.nl/IMSpoor" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xml="http://www.w3.org/XML/1998/namespace" targetNamespace="http://www.prorail.nl/IMSpoor" elementFormDefault="qualified" attributeFormDefault="unqualified" version="13.0.0">
+	<xs:include schemaLocation="IMSpoor-ManagementAreas.xsd"/>
+	<xs:element name="DomainIdentification">
+		<xs:annotation>
+			<xs:documentation>Registraties van identificatie van objecten in context van systemen. Hiermee kunnen systemen worden ondersteund die geen kennis hebben van PUIC's</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tDesignPetal">
+					<xs:sequence>
+						<xs:element ref="SystemIdentifications" minOccurs="0"/>
+						<xs:element ref="RouteIdentifications" minOccurs="0"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SystemIdentifications">
+		<xs:annotation>
+			<xs:documentation>Een lijst van systeemidentificaties</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="SystemIdentification" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SystemIdentification">
+		<xs:annotation>
+			<xs:documentation>Een systeemidentificatie is een manier om (infrastructuur)objecten binnen en tussen (IT)-systemen uniek te kunnen identificeren, zoals gebruikt in het bestaande systeemlandschap.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="objectRef" type="tUUIDRef" use="required">
+				<xs:annotation>
+					<xs:documentation>Een PUIC verwijzing naar het object waarvoor de systeemidentificatie van toepassing is.</xs:documentation>
+					<xs:appinfo>
+						<ObjectTypeRef>*</ObjectTypeRef>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="identificationSchema" type="tNameString" use="required">
+				<xs:annotation>
+					<xs:documentation>Het identificatieschema dat beschrijft binnen welke context waarbinnen de identificatie geldig is.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="objectName" type="tNameString" use="required">
+				<xs:annotation>
+					<xs:documentation>De objectnaam binnen het identificatieschema</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="objectType" type="tNameString" use="required">
+				<xs:annotation>
+					<xs:documentation>Het objecttype binnen het identificatieschema</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="areaName" type="tNameString" use="required">
+				<xs:annotation>
+					<xs:documentation>De gebiedsnaam binnen het identificatieschema</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="areaType" type="tNameString" use="required">
+				<xs:annotation>
+					<xs:documentation>Het gebiedstype binnen het identificatieschema</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="RouteIdentifications">
+		<xs:annotation>
+			<xs:documentation>Een lijst van route-identificaties</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="RouteIdentification" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="RouteIdentification">
+		<xs:annotation>
+			<xs:documentation>Een route-identificatie is een alternatieve identificatie voor routes naast de PUIC.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="StartSignal" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Identificatie van het beginsein van de route.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:attribute name="objectName" type="tNameString" use="required">
+							<xs:annotation>
+								<xs:documentation>De objectnaam binnen het identificatieschema</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="objectType" type="tNameString" use="required">
+							<xs:annotation>
+								<xs:documentation>Het objecttype binnen het identificatieschema</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="areaName" type="tNameString" use="required">
+							<xs:annotation>
+								<xs:documentation>De gebiedsnaam binnen het identificatieschema</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="areaType" type="tNameString" use="required">
+							<xs:annotation>
+								<xs:documentation>Het gebiedstype binnen het identificatieschema</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="EndSignal" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Identificatie van het eindsein van de route.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:attribute name="objectName" type="tNameString" use="required">
+							<xs:annotation>
+								<xs:documentation>De objectnaam binnen het identificatieschema</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="objectType" type="tNameString" use="required">
+							<xs:annotation>
+								<xs:documentation>Het objecttype binnen het identificatieschema</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="areaName" type="tNameString" use="required">
+							<xs:annotation>
+								<xs:documentation>De gebiedsnaam binnen het identificatieschema</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="areaType" type="tNameString" use="required">
+							<xs:annotation>
+								<xs:documentation>Het gebiedstype binnen het identificatieschema</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name="routeRef" type="tUUIDRef" use="required">
+				<xs:annotation>
+					<xs:documentation>Een PUIC verwijzing naar de route waarvoor de identificatie van toepassing is.</xs:documentation>
+					<xs:appinfo>
+						<ObjectTypeRef>SingularRoute</ObjectTypeRef>
+						<ObjectTypeRef>FunctionalRoute</ObjectTypeRef>
+						<ObjectTypeRef>CompositeRoute</ObjectTypeRef>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="identificationSchema" type="tNameString" use="required">
+				<xs:annotation>
+					<xs:documentation>Het identificatieschema dat beschrijft binnen welke context waarbinnen de identificatie geldig is.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="lrString" type="tString100" use="required">
+				<xs:annotation>
+					<xs:documentation>De LR-string wordt binnen Logistiek gebruikt als identificatie van een route binnen een rijweg. De opbouw van een LR-string is afhankelijk van het identificatieschema.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

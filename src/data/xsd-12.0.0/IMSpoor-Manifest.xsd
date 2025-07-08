@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns="http://www.prorail.nl/IMSpoor" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.prorail.nl/IMSpoor" elementFormDefault="qualified" attributeFormDefault="unqualified" version="12.0.0">
+	<xs:include schemaLocation="IMSpoor-BasicTypes.xsd"/>
+	<xs:element name="Manifest">
+		<xs:annotation>
+			<xs:documentation>Dit manifest beschrijft de inhoud van het zip-bestand van een ImSpoor uitwisselbestand. Het manifest maakt het mogelijk om inname en uitgifte (gedeeltelijk) te automatiseren door de inhoud voor machines leesbaar te maken.</xs:documentation>
+			<xs:documentation xml:lang="NL">Manifest</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="ImSpoorDataList">
+					<xs:annotation>
+						<xs:documentation>De lijst van een of meer ImSpoor-documenten van ImSpoor-Levering.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element ref="ImSpoorData" maxOccurs="unbounded"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="MediaList" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Een lijst van ondersteunende mediabestanden bij een ImSpoor-Levering.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element ref="Media" minOccurs="0" maxOccurs="unbounded"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name="imxVersion" type="tVersionString" use="required" fixed="12.0.0">
+				<xs:annotation>
+					<xs:documentation>Verplicht versienummer</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="nidRbc" type="tString20" use="optional">
+				<xs:annotation>
+					<xs:documentation>De identificatiecode van de RBC waarvoor deze dataset de configuratie vormt.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="nidC" type="tString20" use="optional">
+				<xs:annotation>
+					<xs:documentation>De landcode van de RBC waarvoor deze dataset de configuratie vormt.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="coreFileName" type="tFileName" use="optional">
+				<xs:annotation>
+					<xs:documentation>Het ImSpoorData bestand met het beveiligingsontwerp voor de RBC.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ImSpoorData">
+		<xs:annotation>
+			<xs:documentation>Een bestand in het formaat van ImSpoor-XML (IMX).</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="fileName" type="tFileName" use="required">
+				<xs:annotation>
+					<xs:documentation>De bestandsnaam van het ImSpoor-XML (IMX) document.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="hash" type="sha256" use="required">
+				<xs:annotation>
+					<xs:documentation>De SHA-256 hash van het ImSpoor-XML (IMX) bestand</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Media">
+		<xs:annotation>
+			<xs:documentation>Een ondersteunend bestand voor een ImSpoor levering in een ander formaat dan IMSpoor-XML (IMX).</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="fileName" type="tFileName" use="required">
+				<xs:annotation>
+					<xs:documentation>De bestandsnaam van het ondersteunde bestand.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="mediaType" type="tMediaType" use="required">
+				<xs:annotation>
+					<xs:documentation>Het media type van het bestand (IANA standaard).</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="hash" type="sha256" use="required">
+				<xs:annotation>
+					<xs:documentation>De SHA-256 hash van het media bestand</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:simpleType name="tFileName">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="255"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="tMediaType">
+		<xs:annotation>
+			<xs:documentation>Een mediatype, ook bekend als MIME-type of Content-Type is een tweedelig identificatieformat voor bestandsindelingen die via internet worden verzonden.[1] De Internet Assigned Numbers Authority (IANA) is de officiële instantie voor de standaardisatie en publicatie van deze classificaties.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="250"/>
+			<xs:pattern value="\w+/[-+.\w]+"/>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

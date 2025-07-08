@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: 📥 Checkout source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+
+      - name: 🐍 Install python with uv
+        uses: astral-sh/setup-uv@bd01e18f51369d5a26f1651c3cb451d3417e3bba
+
+      - name: 🗂️ Create virtual environment
+        run: uv venv
+
+      - name: 📦 Install dependencies
+        run: uv pip install --group dev --group gui .
+
+      - name: 🔎 Lint with ruff
+        run: uv run ruff check
+
+      - name: 🧠 Type check with ty (warn only)
+        run: |
+          if ! uv run ty check; then
+            echo "Type check failed, but continuing..."
+          fi
+
+      - name: 🧪 Run tests with pytest
+        run: uv run pytest
+
+      - name: 🌈 Check GitHub workflows with zizmor
+        run: uv run zizmor .
