@@ -31,6 +31,8 @@ jobs:
       - name: 🔢 Bump patch if needed & bump pre_n
         id: bump
         run: |
+          source .venv/bin/activate
+
           if ! bump-my-version show --current-version | grep -q '[a-zA-Z]'; then
             echo "No pre-release part found: bumping patch first"
             bump-my-version bump --part patch
@@ -43,6 +45,7 @@ jobs:
 
       - name: 📜 Generate changelog
         run: |
+          source .venv/bin/activate
           git-cliff -o CHANGELOG.md
 
       - name: ✅ Commit & push bump + changelog
