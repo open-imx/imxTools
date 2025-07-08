@@ -153,7 +153,6 @@ def apply_comment_to_cell(
             new_comment.visible = False
             header_cell.comment = new_comment
 
-
         header_cell.style = style_name
 
     header_comment = ws.cell(row=header_row, column=header_col).comment

@@ -21,7 +21,7 @@ class MapCard:
         self.zoom_lvl = zoom
         self.map = ui.leaflet(center=center, zoom=zoom).classes("w-full h-full flex-1")
         if on_map_click:
-            self.map.on('map-click', on_map_click)
+            self.map.on("map-click", on_map_click)
         self.marker = None
         self.geojson_layers = []
 
@@ -33,29 +33,35 @@ class MapCard:
     def add_geojson(self, geojson: dict):
         self.clear_geojson()
 
-        features = geojson['features']
+        features = geojson["features"]
         if not features:
             return
 
         for feature in features:
-            geom = feature['geometry']
-            coords = geom['coordinates']
+            geom = feature["geometry"]
+            coords = geom["coordinates"]
 
-            if geom['type'] == 'Point':
+            if geom["type"] == "Point":
                 latlng = (coords[1], coords[0])
-                layer = self.map.generic_layer(name='circle', args=[latlng, {'radius': 2, 'color': 'red'}])
+                layer = self.map.generic_layer(
+                    name="circle", args=[latlng, {"radius": 2, "color": "red"}]
+                )
                 self.map.set_center(latlng)
                 self.map.set_zoom(self.zoom_lvl)
 
-            elif geom['type'] == 'LineString':
+            elif geom["type"] == "LineString":
                 latlngs = [(c[1], c[0]) for c in coords]
-                layer = self.map.generic_layer(name='polyline', args=[latlngs, {'color': 'green'}])
-                self.map.set_center(latlngs[len(latlngs)//2])
+                layer = self.map.generic_layer(
+                    name="polyline", args=[latlngs, {"color": "green"}]
+                )
+                self.map.set_center(latlngs[len(latlngs) // 2])
                 self.map.set_zoom(self.zoom_lvl)
 
-            elif geom['type'] == 'Polygon':
+            elif geom["type"] == "Polygon":
                 latlngs = [(c[1], c[0]) for c in coords[0]]
-                layer = self.map.generic_layer(name='polygon', args=[latlngs, {'color': 'red', 'fillOpacity': 0.5}])
+                layer = self.map.generic_layer(
+                    name="polygon", args=[latlngs, {"color": "red", "fillOpacity": 0.5}]
+                )
                 self.map.set_center(latlngs[0])
                 self.map.set_zoom(self.zoom_lvl)
 
@@ -71,7 +77,9 @@ class MapCard:
 
 
 class KmResponseCard:
-    def __init__(self, index, km_measures, geojson, input_xy, on_download, on_close, on_go_to):
+    def __init__(
+        self, index, km_measures, geojson, input_xy, on_download, on_close, on_go_to
+    ):
         self.index = index
         self.km_measures = km_measures
         self.geojson = geojson
@@ -87,23 +95,21 @@ class KmResponseCard:
         self.card = ui.card().classes("p-2 shadow w-72 flex-none relative")
         with self.card:
             # ✅ Close button (right side)
-            ui.button(
-                icon='close',
-                on_click=self.on_close
-            ).props("flat round dense").classes("absolute top-1 right-1 z-10")
+            ui.button(icon="close", on_click=self.on_close).props(
+                "flat round dense"
+            ).classes("absolute top-1 right-1 z-10")
 
             # ✅ Aim icon to the LEFT of close, with small gap
-            ui.button(
-                icon='my_location',
-                on_click=self.on_go_to
-            ).props("flat round dense").classes("absolute top-1 right-10 z-10")
+            ui.button(icon="my_location", on_click=self.on_go_to).props(
+                "flat round dense"
+            ).classes("absolute top-1 right-10 z-10")
 
             with ui.column().classes("w-full gap-0"):
                 self.name_input = ui.input(
                     label="Name",
                     value=self.name,
                     placeholder="Enter name...",
-                    on_change=self.on_name_change
+                    on_change=self.on_name_change,
                 ).classes("w-full m-0 text-sm")
 
                 if not self.km_measures:
@@ -113,8 +119,7 @@ class KmResponseCard:
                         ui.label(f"{res.display}").classes("font-semibold text-xl m-0")
                 ui.label(f"Input: {self.input_xy}").classes("text-xs text-gray-600 m-0")
 
-            with ui.element('div').classes('w-full h-48'):
-
+            with ui.element("div").classes("w-full h-48"):
                 # TODO: this should be the input so we do not zoom to groningen :)
                 self.map_card = MapCard(center=[53.2107, 6.5636], zoom=15)
                 self.map_card.add_geojson(self.geojson)
@@ -123,6 +128,7 @@ class KmResponseCard:
 
     def on_name_change(self):
         self.name = self.name_input.value
+
 
 class KmTool:
     def __init__(self, container: Element):
@@ -136,7 +142,9 @@ class KmTool:
             with ui.row().classes("w-full flex flex-nowrap"):
                 with ui.column().classes("w-1/3 p-4 flex-none"):
                     # ui.label("Enter Coordinates").classes("text-md font-bold")
-                    self.km_label = ui.label("").classes("text-xl text-green-700 font-semibold p-o m-0")
+                    self.km_label = ui.label("").classes(
+                        "text-xl text-green-700 font-semibold p-o m-0"
+                    )
 
                     with ui.row():
                         self.x_input = ui.number(
@@ -150,12 +158,16 @@ class KmTool:
                             step=0.0001,
                         )
 
-                    ui.label("OR input coordinate pair").classes("text-sm italic text-gray-500")
+                    ui.label("OR input coordinate pair").classes(
+                        "text-sm italic text-gray-500"
+                    )
                     self.xy_input = ui.input(
                         label="X,Y Pair", on_change=self.on_xystring_change
                     ).classes("w-full")
 
-                    ui.label("OR input GML Point").classes("text-sm italic text-gray-500")
+                    ui.label("OR input GML Point").classes(
+                        "text-sm italic text-gray-500"
+                    )
                     self.gml_input_rd = ui.input(
                         label="GML Coordinates", on_change=self.on_gml_change
                     ).classes("w-full")
@@ -163,14 +175,18 @@ class KmTool:
                     self.mode_checkbox = ui.checkbox(
                         "Use WGS84 (lat/lon)",
                         value=False,
-                        on_change=self.on_mode_change
+                        on_change=self.on_mode_change,
                     )
 
                 with ui.column().classes("w-2/3 p-4 flex flex-col flex-1 h-full"):
-                    self.input_map_card = MapCard(center=[53.2107, 6.5636], zoom=12, on_map_click=self.on_map_click)
+                    self.input_map_card = MapCard(
+                        center=[53.2107, 6.5636],
+                        zoom=12,
+                        on_map_click=self.on_map_click,
+                    )
 
-            with ui.row().classes('h-4'):
-                ui.label("").props('inner-html')
+            with ui.row().classes("h-4"):
+                ui.label("").props("inner-html")
 
             self.result_area = ui.row().classes(
                 "mt-6 w-full flex-wrap content-start gap-4 overflow-auto max-h-[80vh]"
@@ -262,7 +278,9 @@ class KmTool:
         if self.is_syncing:
             return
         try:
-            match = re.search(r"<gml:coordinates>(.*?)</gml:coordinates>", self.gml_input_rd.value)
+            match = re.search(
+                r"<gml:coordinates>(.*?)</gml:coordinates>", self.gml_input_rd.value
+            )
             if match:
                 coords = match.group(1).strip().split(",")
                 x = self.parse_decimal(coords[0])
@@ -293,8 +311,8 @@ class KmTool:
 
         geojson_string = self.result.geojson_string()
 
-        with tempfile.NamedTemporaryFile(delete=False, suffix='.geojson') as tmp:
-            tmp.write(geojson_string.encode('utf-8'))
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".geojson") as tmp:
+            tmp.write(geojson_string.encode("utf-8"))
             tmp_path = tmp.name
 
         ui.download(tmp_path, filename="point.geojson")
@@ -336,7 +354,7 @@ class KmTool:
                 input_xy=input_xy,
                 on_download=on_download,
                 on_close=None,
-                on_go_to=None
+                on_go_to=None,
             )
 
             card.on_close = partial(self.close_card, card)
@@ -349,4 +367,3 @@ class KmTool:
 
         except Exception as e:
             ui.notify(f"Error: {e}", type="negative")
-

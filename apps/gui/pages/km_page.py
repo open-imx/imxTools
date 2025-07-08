@@ -49,16 +49,14 @@ class KmPage:
 
         else:
             ui.label("❌ KM Service is not running. Please start the service.")
-            with ui.row().classes('items-center gap-4'):
+            with ui.row().classes("items-center gap-4"):
                 start_button = ui.button("Start KM service")
-                spinner = ui.spinner(size='lg').props('color=primary').classes('hidden')
+                spinner = ui.spinner(size="lg").props("color=primary").classes("hidden")
 
             async def handle_start():
                 start_button.disable()
-                spinner.classes(remove='hidden')
+                spinner.classes(remove="hidden")
 
                 await start_km_service()
 
-
-
-            start_button.on('click', handle_start)
+            start_button.on("click", handle_start)

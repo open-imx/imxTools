@@ -6,7 +6,6 @@ from src.imxTools.utils.helpers import get_situations
 from apps.gui.helpers.io import spooled_file_to_temp_file
 
 
-
 class ImxUpload(UploadFile):
     def __init__(self, label: str, on_change: callable = None):
         super().__init__(label, accept=".xml,.zip", on_change=self._imx_on_change)
@@ -72,4 +71,3 @@ class ImxUpload(UploadFile):
     @property
     def situation_options_value(self):
         return self.situation_dropdown.value
-

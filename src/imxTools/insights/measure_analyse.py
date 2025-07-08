@@ -96,16 +96,17 @@ def calculate_measurements(imx: ImxRepo) -> list:
             continue
 
         for ref in obj.refs:
-
             if not _is_rail_connection_ref(ref.field):
                 continue
 
             rail_con = ref.imx_object
             if not rail_con:
-                logger.warning(f'rail connection {ref.field_value} not found for {obj.puic}')
+                logger.warning(
+                    f"rail connection {ref.field_value} not found for {obj.puic}"
+                )
                 continue
 
-            logger.info(f'calculating measure for {obj.puic} {ref.imx_object.puic}')
+            logger.info(f"calculating measure for {obj.puic} {ref.imx_object.puic}")
 
             measure_line = _get_or_create_measure_line(
                 rail_con.puic, rail_con, measure_lines

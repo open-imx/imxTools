@@ -37,9 +37,9 @@ class CommentsTool:
                 "Add to existing workbook (new sheet)",
                 on_change=self._on_add_to_wb_change,
             )
-            self.overwrite_checkbox = ui.checkbox(
-                "Overwrite sheet if it exists"
-            ).props('hint="Only applies when adding sheet to existing workbook."')
+            self.overwrite_checkbox = ui.checkbox("Overwrite sheet if it exists").props(
+                'hint="Only applies when adding sheet to existing workbook."'
+            )
             self.overwrite_checkbox.visible = False
 
         ui.button("Extract Comments", on_click=self.run_extract).classes(

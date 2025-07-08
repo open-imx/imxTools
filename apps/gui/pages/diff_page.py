@@ -5,8 +5,7 @@ from apps.gui.helpers.io import load_markdown
 
 class DiffPage:
     def __init__(self):
-        help_text = load_markdown('../data/help_markdowns/diff_tool_help.md')
-
+        help_text = load_markdown("../data/help_markdowns/diff_tool_help.md")
 
         def build_diff_content(container):
             DiffTool(container)
