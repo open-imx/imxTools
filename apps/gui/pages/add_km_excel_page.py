@@ -14,28 +14,22 @@ class AddKmExcelPage:
         def build_content(container: Element):
             KmExcelTool(container)
 
-        ToolPanelWithHelp(
-            title="Add KM to Excel",
-            help_text=help_text,
-            content_builder=build_content,
-        )
+        if is_km_service_running():
+            ToolPanelWithHelp(
+                title="Add KM to Excel",
+                help_text=help_text,
+                content_builder=build_content,
+            )
+        else:
+            ui.label("❌ KM Service is not running. Please start the service.")
+            with ui.row().classes('items-center gap-4'):
+                start_button = ui.button("Start KM service")
+                spinner = ui.spinner(size='lg').props('color=primary').classes('hidden')
 
-        # if is_km_service_running():
-        #     ToolPanelWithHelp(
-        #         title="Add KM to Excel",
-        #         help_text=help_text,
-        #         content_builder=build_content,
-        #     )
-        # else:
-        #     ui.label("❌ KM Service is not running. Please start the service.")
-        #     with ui.row().classes('items-center gap-4'):
-        #         start_button = ui.button("Start KM service")
-        #         spinner = ui.spinner(size='lg').props('color=primary').classes('hidden')
-        #
-        #     async def handle_start():
-        #         start_button.disable()
-        #         spinner.classes(remove='hidden')
-        #
-        #         await start_km_service()
-        #
-        #     start_button.on('click', handle_start)
+            async def handle_start():
+                start_button.disable()
+                spinner.classes(remove='hidden')
+
+                await start_km_service()
+
+            start_button.on('click', handle_start)

@@ -35,3 +35,6 @@ De tegenovergestelde situatie wordt automatisch geslecteerd maar kan handmatig w
 </br>
 
 Wanneer je alle stappen hebt doorlopen kun je het resultaat downloaden en opnieuw starten indien nodig. 🚂✨
+
+
+⚠️ NOTE: de applicatie is niet bedoeld om grote bestanden zoals een EOS te vergelijken, dit zal resulteren in een download die niet start wegens webframework limitations. 
