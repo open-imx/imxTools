@@ -21,7 +21,7 @@ jobs:
         id: vars
         run: echo "branch=$(echo ${GITHUB_REF#refs/heads/})" >> "$GITHUB_OUTPUT"
 
-- name: 🕵️‍♂️ Check version bump for dev/main
+      - name: 🕵️‍♂️ Check version bump for dev/main
         if: ${{ startsWith(steps.vars.outputs.branch, 'dev') || startsWith(steps.vars.outputs.branch, 'main') }}
         run: |
           echo "Checking version bump..."
