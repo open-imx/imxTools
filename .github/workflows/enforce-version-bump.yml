@@ -1,0 +1,55 @@
+name: Enforce-version-bump
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: 📥 Checkout source
+        uses: actions/checkout@latest
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: 🗂️ Get current branch name
+        id: vars
+        run: echo "branch=$(echo ${GITHUB_REF#refs/heads/})" >> "$GITHUB_OUTPUT"
+
+      - name: 🕵️‍♂️ Check version bump for dev/main
+        if: ${{ startsWith(steps.vars.outputs.branch, 'dev') || startsWith(steps.vars.outputs.branch, 'main') }}
+        run: |
+          echo "Checking version bump..."
+
+          # Extract new_version from the current .bumpversion.toml
+          new_version=$(grep 'current_version' .bumpversion.toml | head -1 | awk -F'=' '{print $2}' | tr -d '[:space:]"')
+          echo "New version: $new_version"
+
+          # Determine the commit SHA of the target branch or base branch
+          if [ "${{ github.event_name }}" == "push" ]; then
+            target_commit="${{ github.sha }}" # For push, compare with current commit on the branch
+          elif [ "${{ github.event_name }}" == "pull_request" ]; then
+            target_commit="${{ github.event.pull_request.base.sha }}"
+          fi
+
+          echo "Target commit SHA: $target_commit"
+
+          # Fetch the .bumpversion.toml content from the target commit's SHA
+          # And then extract the old_version from it
+          old_version=$(git show "$target_commit:.bumpversion.toml" | grep 'current_version' | head -1 | awk -F'=' '{print $2}' | tr -d '[:space:]"')
+          echo "Old version: $old_version"
+
+          python -c "
+          from packaging.version import parse
+          old = parse('$old_version')
+          new = parse('$new_version')
+          if new <= old:
+            raise SystemExit(f'❌ Version {new_version} is not newer than {old_version}')
+          else:
+            print(f'✅ Version {new_version} is newer than {old_version}')
+          "
