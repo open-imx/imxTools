@@ -28,16 +28,15 @@ class KmExcelTool:
 
             self.simple_checkbox = ui.checkbox(
                 "Use simple display value only",
-                value=False
+                value=True
             ).classes("mt-2")
 
-            self.process_button = ui.button(
-                "Add KM", on_click=self.run_add_km
-            ).classes("btn-primary mt-4")
 
-            self.status_label = ui.label().classes("text-sm italic mt-4")
-
-            self.spinner = ui.spinner(size='lg').props('color=primary').classes('hidden mt-2')
+            with ui.row():
+                self.process_button = ui.button(
+                    "Add KM", on_click=self.run_add_km
+                ).classes("btn-primary mt-4")
+                self.spinner = ui.spinner(size='lg').props('color=primary').classes('hidden mt-2')
 
         self.input_file: Path | None = None
 
@@ -52,7 +51,6 @@ class KmExcelTool:
 
         self.process_button.disable()
         self.spinner.classes(remove='hidden')
-        self.status_label.text = "Processing..."
 
         try:
             temp_output = Path(tempfile.gettempdir()) / f"km_result_{self.input_file.stem}.xlsx"
@@ -65,13 +63,11 @@ class KmExcelTool:
 
             ui.download(temp_output, filename=temp_output.name)
             ui.notify("✅ KM values added successfully.", type="positive")
-            self.status_label.text = "Done! Ready to download."
 
             asyncio.create_task(delete_later(temp_output))
 
         except Exception as e:
             ui.notify(f"❌ Error: {e}", type="negative")
-            self.status_label.text = "Failed. See error above."
 
         finally:
             self.process_button.enable()
