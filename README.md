@@ -88,11 +88,20 @@ uv sync                    # Sync venv with pyproject.toml
   bump-my-version show-bump
 ```
 
-the pick the version to bump
+```code
+0.0.1.dev6 ── bump ─┬─ major ─ 1.0.0.dev0
+                    ├─ minor ─ 0.1.0.dev0
+                    ├─ patch ─ 0.0.2.dev0
+                    ├─ pre_l ─ 0.0.1.rc0
+                    ╰─ pre_n ─ 0.0.1.dev7
+
+```
+
+Then pick the version to bump
 
 🧭 Typical flow:
 
-dev* → alpha* → rc* → patch/minor/major → next dev*
+- dev* → alpha* → rc* → patch/minor/major → next dev*
 
 
 #### **TODO implement github actions**
