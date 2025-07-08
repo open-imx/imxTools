@@ -44,21 +44,60 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # Required to create a release
+      contents: write
 
     steps:
-      - name: 📥 Checkout source
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
         with:
           persist-credentials: false
 
-      - name: 🚀 Create GitHub prerelease with build artifacts
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: 🔢 Install bump-my-version + git-cliff
+        run: |
+          pip install bump-my-version git-cliff
+
+      - name: 🔢 Bump patch if needed & bump pre_n
+        id: bump
+        run: |
+          # Bump patch if no pre_l exists
+          if ! bump-my-version show --current-version | grep -q '[a-zA-Z]'; then
+            echo "No pre-release part found: bumping patch first"
+            bump-my-version bump --part patch
+          fi
+  
+          # Ensure pre_l is dev if empty
+          bump-my-version bump --part pre_l --new-value dev
+  
+          # Bump pre_n
+          bump-my-version bump --part pre_n
+  
+          echo "NEW_VERSION=$(bump-my-version show --new-version)" >> $GITHUB_ENV
+
+      - name: 📜 Generate changelog
+        run: |
+          git-cliff -o CHANGELOG.md
+
+      - name: ✅ Commit & push bump + changelog
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "🔖 Bump version to v${{ env.NEW_VERSION }} [skip ci]"
+          git tag v${{ env.NEW_VERSION }}
+          git push origin main --tags
+
+      - name: 🚀 Create prerelease with build artifacts
         uses: ncipollo/release-action@bcfe5470707e8832e12347755757cec0eb3c22af
         with:
-          tag: prerelease-${{ github.sha }}
-          name: "Pre-release for PR #${{ github.event.pull_request.number }}"
+          tag: "v${{ env.NEW_VERSION }}"
+          name: "Pre-release v${{ env.NEW_VERSION }} for PR #${{ github.event.pull_request.number }}"
           body: |
-            This is an automatic pre-release for PR #${{ github.event.pull_request.number }}.
+            Automatic pre-release for PR #${{ github.event.pull_request.number }}.
           prerelease: true
           artifacts: |
             dist/*.zip
