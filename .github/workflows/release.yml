@@ -1,8 +1,9 @@
 name: Pre-Release
 
 on:
-  pull_request:
-    types: [closed]
+  push:
+#  pull_request:
+#    types: [closed]
 
 jobs:
   release:
@@ -28,46 +29,54 @@ jobs:
       - name: 📦 Install dependencies
         run: uv pip install --group dev --group gui .
 
-      - name: 🔢 Bump patch if needed & bump pre_n
-        id: bump
+      - name: 🔢 Get current version from project
+        id: get_version
         run: |
           source .venv/bin/activate
+          echo "CURRENT_VERSION=$(bump-my-version show --current-version)" >> $GITHUB_ENV
 
-          if ! bump-my-version show --current-version | grep -q '[a-zA-Z]'; then
-            echo "No pre-release part found: bumping patch first"
-            bump-my-version bump --part patch
+      - name: 🔢 Get latest release version
+        id: get_latest_release
+        run: |
+          LATEST_RELEASE=$(gh release view --json tagName -q ".tagName" || echo "none")
+          echo "LATEST_RELEASE=${LATEST_RELEASE#v}" >> $GITHUB_ENV
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🆚 Compare versions
+        id: compare
+        run: |
+          echo "Current version: $CURRENT_VERSION"
+          echo "Latest release: $LATEST_RELEASE"
+
+          if [ "$LATEST_RELEASE" = "none" ]; then
+            echo "No previous release found. Proceeding to release."
+            echo "SHOULD_RELEASE=true" >> $GITHUB_ENV
+          elif [ "$(printf '%s\n' "$LATEST_RELEASE" "$CURRENT_VERSION" | sort -V | head -n1)" != "$CURRENT_VERSION" ]; then
+            echo "Current version is newer than latest release."
+            echo "SHOULD_RELEASE=true" >> $GITHUB_ENV
+          else
+            echo "Current version is NOT newer. Skipping release."
+            echo "SHOULD_RELEASE=false" >> $GITHUB_ENV
           fi
-
-          bump-my-version bump --part pre_l --new-value dev
-          bump-my-version bump --part pre_n
-
-          echo "NEW_VERSION=$(bump-my-version show --new-version)" >> $GITHUB_ENV
-
-      - name: 📜 Generate changelog
-        run: |
-          source .venv/bin/activate
-          git-cliff -o CHANGELOG.md
-
-      - name: ✅ Commit & push bump + changelog
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add .
-          git commit -m "🔖 Bump version to v${{ env.NEW_VERSION }} [skip ci]"
-          git tag v${{ env.NEW_VERSION }}
-          git push origin main --tags
+        env:
+          CURRENT_VERSION: ${{ env.CURRENT_VERSION }}
+          LATEST_RELEASE: ${{ env.LATEST_RELEASE }}
 
       - name: 🛠️ Build project with uv
+        if: env.SHOULD_RELEASE == 'true'
         run: uv build
 
       - name: 🖥️ Run GUI build script
+        if: env.SHOULD_RELEASE == 'true'
         run: uv run python build-gui-app.py
 
       - name: 🚀 Create prerelease with build artifacts
+        if: env.SHOULD_RELEASE == 'true'
         uses: ncipollo/release-action@bcfe5470707e8832e12347755757cec0eb3c22af
         with:
-          tag: "v${{ env.NEW_VERSION }}"
-          name: "Pre-release v${{ env.NEW_VERSION }} for PR #${{ github.event.pull_request.number }}"
+          tag: "v${{ env.CURRENT_VERSION }}"
+          name: "Pre-release v${{ env.CURRENT_VERSION }} for PR #${{ github.event.pull_request.number }}"
           body: |
             Automatic pre-release for PR #${{ github.event.pull_request.number }}.
           prerelease: true
