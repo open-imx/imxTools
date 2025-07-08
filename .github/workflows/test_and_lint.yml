@@ -29,13 +29,10 @@ jobs:
         run: uv run ruff check
 
       - name: 🧠 Type check with ty (warn only)
-        shell: pwsh
         run: |
-          try {
-            uv run ty check
-          } catch {
-            Write-Host "Type check failed, but continuing..."
-          }
+          if ! uv run ty check; then
+            echo "Type check failed, but continuing..."
+          fi
 
       - name: 🧪 Run tests with pytest
         run: uv run pytest
