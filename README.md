@@ -55,6 +55,7 @@ Activate Unix/Mac
 ### Install project dependencies
 
 ```bash
+  uv sync
   uv pip install --editable .
   uv pip install --group dev
   uv pip install --group gui
@@ -63,7 +64,7 @@ Activate Unix/Mac
 Or all at once:
 
 ```bash
-  uv pip install --editable . --group dev --group gui
+  uv pip install --group dev --group gui .
 ```
 
 ### Manage dependencies
@@ -94,7 +95,6 @@ uv sync                    # Sync venv with pyproject.toml
                     ├─ patch ─ 0.0.2.dev0
                     ├─ pre_l ─ 0.0.1.rc0
                     ╰─ pre_n ─ 0.0.1.dev7
-
 ```
 
 Then pick the version to bump

@@ -6,10 +6,12 @@ repos:
         entry: uv run ruff check
         language: system
         pass_filenames: true
+        files: ^(src|apps)/
+        exclude: ^(src/data/|apps/gui/data/)
 
       - id: ty-check
         name: 🧠 Type check with Ty
-        entry: uv run ty check || echo "Type check failed, but continuing..."
+        entry: bash -c "uv run ty check || echo 'Type check failed, but continuing...'"
         language: system
         pass_filenames: false
 
@@ -18,7 +20,7 @@ repos:
         entry: uv run pytest
         language: system
         pass_filenames: false
-        stages: [push]
+        stages: [pre-push]
 
       - id: zizmor
         name: 🌈 Check GitHub workflows with Zizmor

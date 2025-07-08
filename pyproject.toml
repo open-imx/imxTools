@@ -42,6 +42,7 @@ dev = [
     "build==1.2.2.post1",
     "pre-commit==4.2.0",
     "bump-my-version>=1.2.0",
+    "pyinstaller>=6.14.2",
 ]
 
 gui = [
@@ -58,7 +59,7 @@ package-dir = { "" = "src" }
 [tool.ruff]
 line-length = 88
 target-version = "py310"
-exclude = [".venv", "build", "dist"]
+exclude = [".venv", "build", "dist", "src/data/", "apps/gui/data/"]
 
 [tool.ty.src]
 root = "."

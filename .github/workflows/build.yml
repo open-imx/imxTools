@@ -1,11 +1,13 @@
-name: Test & Lint
+name: Build
 
 on:
   push:
+    branches:
+      - main
   pull_request:
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -22,20 +24,8 @@ jobs:
       - name: 📦 Install dependencies
         run: uv pip install --group dev --group gui .
 
-      - name: 🔎 Lint with ruff
-        run: uv run ruff check
+      - name: 🛠️ Build project with uv
+        run: uv build
 
-      - name: 🧠 Type check with ty (warn only)
-        shell: pwsh
-        run: |
-          try {
-            uv run ty check
-          } catch {
-            Write-Host "Type check failed, but continuing..."
-          }
-
-      - name: 🧪 Run tests with pytest
-        run: uv run pytest
-
-      - name: 🌈 Check GitHub workflows with zizmor
-        run: uv run zizmor .
+      - name: 🖥️ Run GUI build script
+        run: uv run python build-gui-app.py
