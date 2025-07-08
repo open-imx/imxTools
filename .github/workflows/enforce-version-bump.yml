@@ -46,8 +46,9 @@ jobs:
 
           python -c "
           from packaging.version import parse
-          old = parse('$old_version')
-          new = parse('$new_version')
+          # Pass the shell variables as string literals to Python
+          old = parse('${old_version}')
+          new = parse('${new_version}')
           if new <= old:
             raise SystemExit(f'❌ Version {new_version} is not newer than {old_version}')
           else:
