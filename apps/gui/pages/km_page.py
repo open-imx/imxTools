@@ -1,4 +1,4 @@
-from nicegui import ui, context
+from nicegui import ui
 
 from nicegui.element import Element
 
