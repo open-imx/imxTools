@@ -22,9 +22,6 @@ replace = "{new_version}"
 regex = false
 
 [[tool.bumpversion.files]]
-filename = "pyproject.toml"
-
-[[tool.bumpversion.files]]
 filename = "src/imxTools/__init__.py"
 search = '__version__ = "{current_version}"'
 replace = '__version__ = "{new_version}"'
