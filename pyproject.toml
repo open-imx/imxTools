@@ -16,12 +16,12 @@ classifiers = [
 ]
 dynamic = ["version"]
 dependencies = [
-    "imxInsights",
-    "xmlschema",
-    "pandas",
-    "types-lxml",
-    "openpyxl",
-    "kmService",
+    "xmlschema==4.0.1",
+    "pandas==2.2.3",
+    "types-lxml==2025.3.30",
+    "openpyxl==3.1.5",
+    "kmService==0.0.2.dev2",
+    "imxinsights>=0.2.1a4",
 ]
 requires-python = ">=3.10"
 
@@ -37,15 +37,15 @@ dev = [
     "ty>=0.0.1a11",
     "ruff==0.12.0",
     "zizmor==1.9.0",
-    "pytest>=8.4.1",
-    "pytest-asyncio>=1.0.0",
-    "build>=1.2.2.post1",
-    "pre-commit>=4.2.0",
-    "bump-my-version",
+    "pytest==8.4.1",
+    "pytest-asyncio==1.0.0",
+    "build==1.2.2.post1",
+    "pre-commit==4.2.0",
+    "bump-my-version>=1.2.0",
 ]
 
 gui = [
-    "nicegui",
+    "nicegui==2.18.0",
 ]
 
 [tool.setuptools.dynamic]
