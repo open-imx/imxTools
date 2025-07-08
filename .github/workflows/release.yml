@@ -72,14 +72,19 @@ jobs:
         if: env.SHOULD_RELEASE == 'true'
         run: uv run python build-gui-app.py
 
+      - name: 📝 Generate changelog with git-cliff
+        if: env.SHOULD_RELEASE == 'true'
+        run: |
+          source .venv/bin/activate
+          git cliff --config cliff.toml --tag v${{ env.CURRENT_VERSION }} > RELEASE_NOTES.md
+
       - name: 🚀 Create prerelease with build artifacts
         if: env.SHOULD_RELEASE == 'true'
         uses: ncipollo/release-action@bcfe5470707e8832e12347755757cec0eb3c22af
         with:
           tag: "v${{ env.CURRENT_VERSION }}"
-          name: "Pre-release v${{ env.CURRENT_VERSION }} for PR #${{ github.event.pull_request.number }}"
-          body: |
-            Automatic pre-release for PR #${{ github.event.pull_request.number }}.
+          name: "Pre-release v${{ env.CURRENT_VERSION }}"
+          bodyFile: "RELEASE_NOTES.md"
           prerelease: true
           artifacts: |
             dist/*.zip
