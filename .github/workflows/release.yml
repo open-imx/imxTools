@@ -1,21 +1,17 @@
-name: Build and release
+name: Release Pre-Release
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
-    types:
-      - opened
-      - synchronize
-      - reopened
-      - closed
+    types: [closed]
 
 jobs:
-  build:
+  release:
+    if: |
+      github.event.pull_request.merged == true &&
+      github.event.pull_request.base.ref == 'main'
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
 
     steps:
       - name: 📥 Checkout source
@@ -32,53 +28,17 @@ jobs:
       - name: 📦 Install dependencies
         run: uv pip install --group dev --group gui .
 
-      - name: 🛠️ Build project with uv
-        run: uv build
-
-      - name: 🖥️ Run GUI build script
-        run: uv run python build-gui-app.py
-
-  release:
-    if: |
-      github.event_name == 'pull_request' &&
-      github.event.action == 'closed' &&
-      github.event.pull_request.merged == true &&
-      github.event.pull_request.base.ref == 'main'
-    needs: build
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-
-    steps:
-      - name: 📥 Checkout
-        uses: actions/checkout@v4
-        with:
-          persist-credentials: false
-
-      - name: 🐍 Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
-
-      - name: 🔢 Install bump-my-version + git-cliff
-        run: |
-          pip install bump-my-version git-cliff
-
       - name: 🔢 Bump patch if needed & bump pre_n
         id: bump
         run: |
-          # Bump patch if no pre_l exists
           if ! bump-my-version show --current-version | grep -q '[a-zA-Z]'; then
             echo "No pre-release part found: bumping patch first"
             bump-my-version bump --part patch
           fi
-  
-          # Ensure pre_l is dev if empty
+
           bump-my-version bump --part pre_l --new-value dev
-  
-          # Bump pre_n
           bump-my-version bump --part pre_n
-  
+
           echo "NEW_VERSION=$(bump-my-version show --new-version)" >> $GITHUB_ENV
 
       - name: 📜 Generate changelog
@@ -93,6 +53,9 @@ jobs:
           git commit -m "🔖 Bump version to v${{ env.NEW_VERSION }} [skip ci]"
           git tag v${{ env.NEW_VERSION }}
           git push origin main --tags
+
+
+      # todo: we should build stuff
 
       - name: 🚀 Create prerelease with build artifacts
         uses: ncipollo/release-action@bcfe5470707e8832e12347755757cec0eb3c22af
