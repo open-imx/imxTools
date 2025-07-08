@@ -21,7 +21,7 @@ jobs:
         id: vars
         run: echo "branch=$(echo ${GITHUB_REF#refs/heads/})" >> "$GITHUB_OUTPUT"
 
-      - name: 🕵️‍♂️ Check version bump for dev/main
+- name: 🕵️‍♂️ Check version bump for dev/main
         if: ${{ startsWith(steps.vars.outputs.branch, 'dev') || startsWith(steps.vars.outputs.branch, 'main') }}
         run: |
           echo "Checking version bump..."
@@ -44,13 +44,16 @@ jobs:
           old_version=$(git show "$target_commit:.bumpversion.toml" | grep 'current_version' | head -1 | awk -F'=' '{print $2}' | tr -d '[:space:]"')
           echo "Old version: $old_version"
 
-          python -c "
+          # Use printf to properly escape and pass the variables into the Python command
+          # This is more robust against special characters in the version strings.
+          printf "
           from packaging.version import parse
-          # Pass the shell variables as string literals to Python
-          old = parse('${old_version}')
-          new = parse('${new_version}')
+          old_version_str = '%s'
+          new_version_str = '%s'
+          old = parse(old_version_str)
+          new = parse(new_version_str)
           if new <= old:
-            raise SystemExit(f'❌ Version {new_version} is not newer than {old_version}')
+            raise SystemExit(f'❌ Version %s is not newer than %s' %% (new_version_str, old_version_str))
           else:
-            print(f'✅ Version {new_version} is newer than {old_version}')
-          "
+            print(f'✅ Version %s is newer than %s' %% (new_version_str, old_version_str))
+          " "$old_version" "$new_version" "$new_version" "$old_version" "$new_version" "$old_version" | python
