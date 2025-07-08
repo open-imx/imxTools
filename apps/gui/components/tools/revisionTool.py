@@ -3,9 +3,9 @@ import shutil
 import tempfile
 from pathlib import Path
 
-from imxTools.revision.input_validation import validate_process_input
-from imxTools.revision.process_revision import process_imx_revisions
-from imxTools.revision.revision_template import get_revision_template
+from src.imxTools.revision.input_validation import validate_process_input
+from src.imxTools.revision.process_revision import process_imx_revisions
+from src.imxTools.revision.revision_template import get_revision_template
 from nicegui import ui
 from nicegui.element import Element
 
