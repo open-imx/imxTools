@@ -1,7 +1,6 @@
 name: Pre-Release
 
 on:
-  push:
   pull_request:
     types: [closed]
 
@@ -19,6 +18,7 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           persist-credentials: false
+          fetch-depth: 0
 
       - name: 🐍 Install python with uv
         uses: astral-sh/setup-uv@bd01e18f51369d5a26f1651c3cb451d3417e3bba
