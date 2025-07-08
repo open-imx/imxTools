@@ -5,7 +5,7 @@ on:
   pull_request:
 
 jobs:
-  test:
+  enforce-version:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -44,16 +44,21 @@ jobs:
           old_version=$(git show "$target_commit:.bumpversion.toml" | grep 'current_version' | head -1 | awk -F'=' '{print $2}' | tr -d '[:space:]"')
           echo "Old version: $old_version"
 
-          # Use printf to properly escape and pass the variables into the Python command
-          # This is more robust against special characters in the version strings.
-          printf "
+          # IMPORTANT: We pass the shell variables directly into the Python command's string
+          # by ensuring they are properly quoted for Python. The `printf` is useful
+          # for multiline scripts, but direct string interpolation for the Python
+          # values inside the "python -c" block is often simpler for this specific case.
+          #
+          # We'll revert to the `python -c` approach but ensure string literals are formed.
+          # The key is to ensure the shell variables are expanded into the `python -c`
+          # command surrounded by Python's string literal quotes (single or double).
+          # This avoids the `NameError`.
+          python -c "
           from packaging.version import parse
-          old_version_str = '%s'
-          new_version_str = '%s'
-          old = parse(old_version_str)
-          new = parse(new_version_str)
+          old = parse('${old_version}')
+          new = parse('${new_version}')
           if new <= old:
-            raise SystemExit(f'❌ Version %s is not newer than %s' %% (new_version_str, old_version_str))
+            raise SystemExit(f'❌ Version {new_version} is not newer than {old_version}')
           else:
-            print(f'✅ Version %s is newer than %s' %% (new_version_str, old_version_str))
-          " "$old_version" "$new_version" "$new_version" "$old_version" "$new_version" "$old_version" | python
+            print(f'✅ Version {new_version} is newer than {old_version}')
+          ""$old_version" "$new_version" "$old_version" | python
