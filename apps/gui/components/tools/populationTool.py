@@ -3,10 +3,11 @@ import tempfile
 import zipfile
 from pathlib import Path
 
-from imxTools.insights.diff_and_population import write_population_output_files
-from imxTools.utils.helpers import create_timestamp
 from nicegui import ui
 from nicegui.element import Element
+
+from src.imxTools.insights.diff_and_population import write_population_output_files
+from src.imxTools.utils.helpers import create_timestamp
 
 from apps.gui.components.widgets.imxUpload import ImxUpload
 from apps.gui.helpers.io import delete_later
