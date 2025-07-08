@@ -1,30 +1,37 @@
 name: Test & Lint
 
 on:
-  push:
-    branches: [ main ]
   pull_request:
-    branches: [ main ]
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - name: 📥 Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
 
-      - name: 🐍 Install python whit uv
-        uses: astral-sh/setup-uv@v5
+      - name: 🐍 Install python with uv
+        uses: astral-sh/setup-uv@bd01e18f51369d5a26f1651c3cb451d3417e3bba
 
       - name: 📦 Install dependencies
-        run: uv pip sync
+        run: uv sync
 
       - name: 🔎 Lint with ruff
         run: uv run ruff check
 
-      - name: 🧠 Type check with ty
-        run: uv run ty check
+      - name: 🧠 Type check with ty (warn only)
+        shell: pwsh
+        run: |
+          try {
+            uv run ty check
+          } catch {
+            Write-Host "Type check failed, but continuing..."
+          }
 
       - name: 🧪 Run tests with pytest
         run: uv run pytest

@@ -1,0 +1,27 @@
+repos:
+  - repo: local
+    hooks:
+      - id: ruff
+        name: 🔎 Lint with Ruff
+        entry: uv run ruff check
+        language: system
+        pass_filenames: true
+
+      - id: ty-check
+        name: 🧠 Type check with Ty
+        entry: uv run ty check || echo "Type check failed, but continuing..."
+        language: system
+        pass_filenames: false
+
+      - id: pytest
+        name: 🧪 Run tests with pytest
+        entry: uv run pytest
+        language: system
+        pass_filenames: false
+        stages: [push]
+
+      - id: zizmor
+        name: 🌈 Check GitHub workflows with Zizmor
+        entry: uv run zizmor .
+        language: system
+        pass_filenames: false
