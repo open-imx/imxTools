@@ -1,5 +1,5 @@
 [tool.bumpversion]
-current_version = "0.0.1.dev9"
+current_version = "0.0.1.dev10"
 
 parse = '''(?x)
     (?P<major>0|[1-9]\d*)\.
@@ -30,7 +30,7 @@ allow_dirty = false
 commit = true
 message = "Bump version: {current_version} → {new_version}"
 moveable_tags = []
-commit_args = "y"
+commit_args = ""
 setup_hooks = []
 pre_commit_hooks = []
 post_commit_hooks = []
@@ -43,18 +43,6 @@ regex = false
 ignore_missing_version = false
 ignore_missing_files = false
 
-commit = true
-tag = true
-sign_tags = false
-tag_name = "v{new_version}"
-tag_message = "Release {new_version}"
-message = "Bump version: {current_version} → {new_version}"
-
-moveable_tags = []
-commit_args = ""
-setup_hooks = []
-pre_commit_hooks = []
-post_commit_hooks = []
 
 [tool.bumpversion.parts.pre_l]
 values = ["dev", "rc", "final"]
