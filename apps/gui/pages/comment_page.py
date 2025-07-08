@@ -17,5 +17,3 @@ class CommentPage:
             content_builder=build_diff_content,
             help_visible=False,  # Optional: Set to True to show help by default
         )
-
-

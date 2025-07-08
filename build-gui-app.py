@@ -34,7 +34,9 @@ if CLEAN_BUILD_FOLDER and BUILD_FOLDER.exists():
 
 
 def build_nicegui_app():
-    print(f'🚀 Building NiceGUI app "{EXECUTABLE_NAME}" in isolated temp environment...')
+    print(
+        f'🚀 Building NiceGUI app "{EXECUTABLE_NAME}" in isolated temp environment...'
+    )
 
     remove_folder_safely(BUILD_FOLDER)
     BUILD_FOLDER.mkdir(parents=True, exist_ok=True)
@@ -53,10 +55,13 @@ def build_nicegui_app():
 
     process = subprocess.Popen(
         [
-            sys.executable, "-m", "nicegui.scripts.pack",
-            "--name", EXECUTABLE_NAME,
+            sys.executable,
+            "-m",
+            "nicegui.scripts.pack",
+            "--name",
+            EXECUTABLE_NAME,
             *add_data_args,
-            str(entry_path)
+            str(entry_path),
         ],
         cwd=BUILD_FOLDER,
         env={**os.environ, "NICEGUI_AUTOSTART": "0"},
@@ -113,7 +118,9 @@ def main():
     build_nicegui_app()
     patch_static_assets()
     write_readme()
-    zip_result(FINAL_APP_FOLDER, imxTools_version, "windows", EXECUTABLE_NAME, DIST_ROOT)
+    zip_result(
+        FINAL_APP_FOLDER, imxTools_version, "windows", EXECUTABLE_NAME, DIST_ROOT
+    )
     print(f"🎉 App ready at {FINAL_APP_FOLDER}")
 
 

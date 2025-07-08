@@ -9,9 +9,18 @@ import xmlschema
 from lxml import etree
 from lxml.etree import _Element
 
-from src.imxTools.revision.imx_modifier import set_metadata, set_attribute_or_element_by_path, delete_attribute_if_matching, \
-    delete_element, create_element_under, delete_element_that_matches
-from src.imxTools.revision.input_validation import validate_process_input, validate_input_excel_content
+from src.imxTools.revision.imx_modifier import (
+    set_metadata,
+    set_attribute_or_element_by_path,
+    delete_attribute_if_matching,
+    delete_element,
+    create_element_under,
+    delete_element_that_matches,
+)
+from src.imxTools.revision.input_validation import (
+    validate_process_input,
+    validate_input_excel_content,
+)
 from src.imxTools.revision.revision_enums import (
     RevisionColumns,
     RevisionOperationValues,
@@ -227,7 +236,9 @@ def _prepare_dataframe(excel_path: Path) -> pd.DataFrame:
         dtype=str,
     )
 
-    df = df.apply(lambda col: col.map(lambda v: v.strip() if isinstance(v, str) else ""))
+    df = df.apply(
+        lambda col: col.map(lambda v: v.strip() if isinstance(v, str) else "")
+    )
 
     header_map = RevisionColumns.description_to_header()
     df.rename(columns=header_map, inplace=True)

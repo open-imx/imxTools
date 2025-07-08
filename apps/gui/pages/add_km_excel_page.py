@@ -9,7 +9,7 @@ from apps.gui.helpers.km_service_manager import is_km_service_running, start_km_
 
 class AddKmExcelPage:
     def __init__(self):
-        help_text = load_markdown('../data/help_markdowns/add_km_excel_help.md')
+        help_text = load_markdown("../data/help_markdowns/add_km_excel_help.md")
 
         def build_content(container: Element):
             KmExcelTool(container)
@@ -22,14 +22,14 @@ class AddKmExcelPage:
             )
         else:
             ui.label("❌ KM Service is not running. Please start the service.")
-            with ui.row().classes('items-center gap-4'):
+            with ui.row().classes("items-center gap-4"):
                 start_button = ui.button("Start KM service")
-                spinner = ui.spinner(size='lg').props('color=primary').classes('hidden')
+                spinner = ui.spinner(size="lg").props("color=primary").classes("hidden")
 
             async def handle_start():
                 start_button.disable()
-                spinner.classes(remove='hidden')
+                spinner.classes(remove="hidden")
 
                 await start_km_service()
 
-            start_button.on('click', handle_start)
+            start_button.on("click", handle_start)

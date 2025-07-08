@@ -7,7 +7,7 @@ from apps.gui.helpers.io import load_markdown
 
 class MeasureCorrectionFlowPage:
     def __init__(self):
-        help_text = load_markdown('../data/help_markdowns/measure_correction_help.md')
+        help_text = load_markdown("../data/help_markdowns/measure_correction_help.md")
 
         def build_content(container: Element):
             MeasureCorrectionTool(container)
@@ -17,4 +17,3 @@ class MeasureCorrectionFlowPage:
             help_text=help_text,
             content_builder=build_content,
         )
-

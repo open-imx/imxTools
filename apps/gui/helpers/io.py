@@ -26,4 +26,4 @@ async def delete_later(path: Path, delay: float = 30.0):
 def load_markdown(relative_file_path: str) -> str:
     base_path = Path(__file__).parent  # folder of this file
     md_path = (base_path / relative_file_path).resolve()
-    return md_path.read_text(encoding='utf-8')
+    return md_path.read_text(encoding="utf-8")

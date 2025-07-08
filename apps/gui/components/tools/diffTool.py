@@ -20,12 +20,16 @@ class DiffTool:
 
             with ui.column().classes("w-full"):
                 with ui.row().classes("w-full items-center gap-4"):
-                    self.reuse_t1_toggle = ui.switch("Use same IMX for T2?", value=False)
+                    self.reuse_t1_toggle = ui.switch(
+                        "Use same IMX for T2?", value=False
+                    )
                     self.reuse_t1_toggle.on_value_change(self._update_t2_inputs)
 
-                    self.t2_situation_picker = ui.select(
-                        options=[], label="Select Situation T2"
-                    ).props("outlined").classes("flex-grow")
+                    self.t2_situation_picker = (
+                        ui.select(options=[], label="Select Situation T2")
+                        .props("outlined")
+                        .classes("flex-grow")
+                    )
                     self.t2_situation_picker.visible = False
 
                 self.imx_t2_container = ui.column().classes("w-full")
@@ -46,7 +50,9 @@ class DiffTool:
                 )
                 update_wgs84_visibility()
 
-            ui.button("Run Comparison", on_click=self.run_diff).classes("mt-4 btn-primary")
+            ui.button("Run Comparison", on_click=self.run_diff).classes(
+                "mt-4 btn-primary"
+            )
 
     def _update_t2_inputs(self, event):
         show_picker = bool(event.value)
