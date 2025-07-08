@@ -1,0 +1,66 @@
+name: Build and release
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - closed
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: 📥 Checkout source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+
+      - name: 🐍 Install python with uv
+        uses: astral-sh/setup-uv@bd01e18f51369d5a26f1651c3cb451d3417e3bba
+
+      - name: 📦 Install dependencies
+        run: uv pip install --group dev --group gui .
+
+      - name: 🛠️ Build project with uv
+        run: uv build
+
+      - name: 🖥️ Run GUI build script
+        run: uv run python build-gui-app.py
+
+  release:
+    if: |
+      github.event_name == 'pull_request' &&
+      github.event.action == 'closed' &&
+      github.event.pull_request.merged == true &&
+      github.event.pull_request.base.ref == 'main'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Required to create a release
+
+    steps:
+      - name: 📥 Checkout source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+
+      - name: 🚀 Create GitHub prerelease with build artifacts
+        uses: ncipollo/release-action@bcfe5470707e8832e12347755757cec0eb3c22af
+        with:
+          tag: prerelease-${{ github.sha }}
+          name: "Pre-release for PR #${{ github.event.pull_request.number }}"
+          body: |
+            This is an automatic pre-release for PR #${{ github.event.pull_request.number }}.
+          prerelease: true
+          artifacts: |
+            dist/*.zip
+            dist/*.tar.gz
+            dist/*.whl
