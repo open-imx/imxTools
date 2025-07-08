@@ -1,4 +1,4 @@
-name: Release Pre-Release
+name: Pre-Release
 
 on:
   pull_request:
@@ -54,8 +54,11 @@ jobs:
           git tag v${{ env.NEW_VERSION }}
           git push origin main --tags
 
+      - name: 🛠️ Build project with uv
+        run: uv build
 
-      # todo: we should build stuff
+      - name: 🖥️ Run GUI build script
+        run: uv run python build-gui-app.py
 
       - name: 🚀 Create prerelease with build artifacts
         uses: ncipollo/release-action@bcfe5470707e8832e12347755757cec0eb3c22af
