@@ -15,7 +15,7 @@ jobs:
 
     steps:
       - name: Checkout PR branch
-        uses: actions/checkout@latest
+        uses: actions/checkout@v4
         with:
           persist-credentials: false
 
