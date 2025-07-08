@@ -1,0 +1,53 @@
+name: Commit Message Lint
+
+on:
+  pull_request:
+    branches:
+      - main
+      - dev
+
+permissions:
+  contents: read
+
+jobs:
+  commit-lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+
+      - name: Fetch main branch
+        run: git fetch origin main
+
+      - name: Get commit messages in PR
+        id: commits
+        run: |
+          git log origin/main..HEAD --pretty=format:"%s" > commit_messages.txt
+          echo "Commits in PR:"
+          cat commit_messages.txt
+
+      - name: Lint commit messages
+        run: |
+          PATTERN="^(feat|fix|perf|chore|docs|refactor|test|ci|style|build)(:|\()"
+          echo "Linting commits..."
+          FAIL=0
+          while IFS= read -r line; do
+            if [[ ! $line =~ $PATTERN ]]; then
+              echo "❌ Invalid commit message: '$line'"
+              FAIL=1
+            else
+              echo "✅ Valid: '$line'"
+            fi
+          done < commit_messages.txt
+
+          if [ $FAIL -eq 1 ]; then
+            echo "One or more commit messages do not follow the required pattern."
+            exit 1
+          fi
+
+      - name: Show success
+        if: success()
+        run: echo "All commit messages look good! 🚀"
