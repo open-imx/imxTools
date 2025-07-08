@@ -29,29 +29,46 @@ jobs:
           # --- Cleanly extract new_version and set environment variable ---
           NEW_VERSION_BUMP=$(grep 'current_version' .bumpversion.toml | head -1 | awk -F'=' '{print $2}' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | tr -d '\r')
           echo "New version: ${NEW_VERSION_BUMP}"
-          # EXPORT the variable so it's available to subsequent commands in THIS run block
           export NEW_VERSION_BUMP
 
-          # --- Determine target commit SHA (unchanged) ---
+          # --- Determine target commit SHA for comparison ---
+          # For 'push' events, compare against the PREVIOUS commit on this branch.
+          # For 'pull_request' events, compare against the BASE branch's head.
           if [ "${{ github.event_name }}" == "push" ]; then
-            target_commit="${{ github.sha }}"
+            # 'HEAD~1' refers to the commit directly before HEAD (the current commit).
+            # We need to ensure that the previous commit exists before trying to access it.
+            # If it's the very first commit, this logic might need adjustment.
+            # For typical usage where you expect commits to be pushed, this is safe.
+            target_commit="${{ github.sha }}~1"
+            echo "Determined target commit as parent of current push for version check."
           elif [ "${{ github.event_name }}" == "pull_request" ]; then
             target_commit="${{ github.event.pull_request.base.sha }}"
+            echo "Determined target commit as base of pull request for version check."
           fi
-          echo "Target commit SHA: ${target_commit}"
+
+          echo "Target commit SHA for comparison: ${target_commit}"
 
           # --- Cleanly extract old_version and set environment variable ---
-          OLD_VERSION_BUMP=$(git show "$target_commit:.bumpversion.toml" | grep 'current_version' | head -1 | awk -F'=' '{print $2}' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | tr -d '\r')
-          echo "Old version: ${OLD_VERSION_BUMP}"
-          # EXPORT the variable so it's available to subsequent commands in THIS run block
+          # Add a check here in case the target_commit doesn't have the file or version.
+          # This can happen on the very first commit of a repo.
+          if git show "$target_commit:.bumpversion.toml" &> /dev/null; then
+              OLD_VERSION_BUMP=$(git show "$target_commit:.bumpversion.toml" | grep 'current_version' | head -1 | awk -F'=' '{print $2}' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | tr -d '\r')
+              echo "Old version: ${OLD_VERSION_BUMP}"
+          else
+              echo "Warning: .bumpversion.toml not found in target commit ${target_commit}. Assuming old version is 0.0.0."
+              # If .bumpversion.toml doesn't exist in the old commit, assume a very low version
+              # so any new version is considered a bump. Adjust '0.0.0' if a different
+              # base version is more appropriate for your project.
+              OLD_VERSION_BUMP="0.0.0"
+          fi
           export OLD_VERSION_BUMP
 
-          # --- Python script ---
-          # Now the python script will correctly find these via os.environ.get()
+
+          # --- Python script (unchanged) ---
           python -c "
           import os
           from packaging.version import parse
-          import sys # Import sys for printing to stderr
+          import sys
 
           old_version_str = os.environ.get('OLD_VERSION_BUMP')
           new_version_str = os.environ.get('NEW_VERSION_BUMP')
@@ -63,12 +80,14 @@ jobs:
               print('Error: NEW_VERSION_BUMP not found or empty in environment.', file=sys.stderr)
               sys.exit(1)
 
-          # Your log shows versions with quotes: "0.0.1.dev12"
+          # Your log shows versions with quotes: '\"0.0.1.dev12\"'
           # This might be from awk/grep/sed not quite stripping them,
           # or the way they are being logged. Let's ensure Python strips them.
           old_version_str = old_version_str.strip('\"')
           new_version_str = new_version_str.strip('\"')
 
+          # Add verbose logging in Python for clarity
+          print(f'Python: Comparing old version "{old_version_str}" with new version "{new_version_str}"')
 
           old = parse(old_version_str)
           new = parse(new_version_str)
