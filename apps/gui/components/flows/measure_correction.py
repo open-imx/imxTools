@@ -140,6 +140,26 @@ class MeasureCorrectionTool:
                 allowed_extensions=[".xlsx"],
             )
 
+            with ui.row().classes("w-full items-center gap-4"):
+                self.metadata_radio = ui.radio(
+                    ["No Metadata", "Add Metadata", "Set Metadata"],
+                    value="No Metadata",
+                ).props("inline").classes("basis-1/3 py-4")
+
+                self.metadata_source_input = ui.input(
+                    label="Metadata Source"
+                ).classes("basis-1/3 text-gray-900 font-semibold")
+
+            self.metadata_source_input.set_visibility(False)
+
+            def on_metadata_change(e):
+                if self.metadata_radio.value == "No Metadata":
+                    self.metadata_source_input.set_visibility(False)
+                else:
+                    self.metadata_source_input.set_visibility(True)
+
+            self.metadata_radio.on("update:model-value", on_metadata_change)
+
             with ui.stepper_navigation():
                 self.process_revisions_button = ui.button(
                     "Process Revisions", on_click=self.process_revisions
