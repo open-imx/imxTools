@@ -4,6 +4,7 @@ import shutil
 import tempfile
 import zipfile
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -11,6 +12,7 @@ from imxInsights.file.singleFileImx.imxSituationEnum import ImxSituationEnum
 from nicegui import ui
 from openpyxl import load_workbook
 
+from apps.gui.components.widgets.isoTimePicker import IsoTimePicker
 from apps.gui.helpers.io import spooled_file_to_temp_file
 from src.imxTools.insights.diff_and_population import write_diff_output_files
 from src.imxTools.insights.measure_analyse import generate_measure_excel
@@ -141,24 +143,47 @@ class MeasureCorrectionTool:
             )
 
             with ui.row().classes("w-full items-center gap-4"):
-                self.metadata_radio = ui.radio(
-                    ["No Metadata", "Add Metadata", "Set Metadata"],
-                    value="No Metadata",
+                self.metadata_select = ui.select(
+                    ["Do not adjust Metadata", "Add to Metadata", "Set Metadata"],
+                    value="Do not adjust Metadata",
                 ).props("inline").classes("basis-1/3 py-4")
 
                 self.metadata_source_input = ui.input(
-                    label="Metadata Source"
-                ).classes("basis-1/3 text-gray-900 font-semibold")
+                    label="Metadata.Source"
+                ).classes("basis-1/2 font-bold")
 
+                self.metadata_set_parents = ui.switch(
+                    "set metadata parent", value=False
+                ).classes("p-0 m-0")
+
+            self.metadata_set_parents.set_visibility(False)
             self.metadata_source_input.set_visibility(False)
 
             def on_metadata_change(e):
-                if self.metadata_radio.value == "No Metadata":
+                if self.metadata_select.value == "Do not adjust Metadata":
                     self.metadata_source_input.set_visibility(False)
+                    self.metadata_set_parents.set_visibility(False)
                 else:
                     self.metadata_source_input.set_visibility(True)
+                    self.metadata_set_parents.set_visibility(True)
 
-            self.metadata_radio.on("update:model-value", on_metadata_change)
+            self.metadata_select.on("update:model-value", on_metadata_change)
+
+            # === ✅ REPLACEMENT: IsoTimePicker instead of inline date/time ===
+            with ui.row().classes("w-full items-center gap-4"):
+                self.time_stamp_select = ui.select(
+                    ["Do not adjust RegistrationTime", "RegistrationTime by Input"],
+                    value="Do not adjust RegistrationTime",
+                ).props("inline").classes("basis-1/3 py-4")
+
+                self.iso_time_picker = IsoTimePicker(label="RegistrationTime (ISO)")
+                self.iso_time_picker.set_visibility(False)
+
+                def on_time_stamp_change(e):
+                    visible = self.time_stamp_select.value != "Do not adjust RegistrationTime"
+                    self.iso_time_picker.set_visibility(visible)
+
+                self.time_stamp_select.on("update:model-value", on_time_stamp_change)
 
             with ui.stepper_navigation():
                 self.process_revisions_button = ui.button(
