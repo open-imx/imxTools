@@ -8,11 +8,11 @@ from apps.gui.helpers.io import spooled_file_to_temp_file
 
 class ImxUpload(UploadFile):
     def __init__(self, label: str, on_change: callable = None):
-        super().__init__(label, accept=".xml,.zip", on_change=self._imx_on_change)
+        # Accept XML and ZIP, and enforce extensions
+        super().__init__(label, accept=".xml,.zip", enforce_extensions=True, on_change=self._imx_on_change)
         self.situation = None
         self._user_on_change = on_change
 
-        # ✅ Add the situation dropdown INSIDE the card_section:
         with self.section:
             self.situation_dropdown = (
                 ui.select(
@@ -29,6 +29,12 @@ class ImxUpload(UploadFile):
     async def _handle_upload(self, event):
         self.file_path = spooled_file_to_temp_file(event)
         suffix = self.file_path.suffix.lower()
+
+        if self.enforce_extensions and suffix not in self.accept:
+            ui.notify(f"Invalid file type: {suffix} (Allowed: {self.accept})", type="negative")
+            self.file_path.unlink(missing_ok=True)
+            self.file_path = None
+            return
 
         if suffix == ".zip":
             self.situation_dropdown.options = []
@@ -50,7 +56,7 @@ class ImxUpload(UploadFile):
             self._user_on_change(self.file_path, self.situation)
 
     def _imx_on_change(self, file_path):
-        # Ignore — handled in _handle_upload instead
+        # Handled in _handle_upload instead
         pass
 
     def _on_situation_change(self, e):
