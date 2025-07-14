@@ -116,4 +116,4 @@ def km_page():  # noqa: F811
     MeasureCorrectionFlowPage()
 
 
-ui.run(title="IMX 🛠️ Tijn Tool", reload=False)
+ui.run(title="IMX 🛠️ Tools", reload=False)
