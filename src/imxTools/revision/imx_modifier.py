@@ -152,7 +152,12 @@ def set_metadata(
     registration_time: str | None = None,
 ):
     set_metadata_node(
-        node, replace_metadata, add_metadata, metadata_source, metadata_origin, registration_time
+        node,
+        replace_metadata,
+        add_metadata,
+        metadata_source,
+        metadata_origin,
+        registration_time,
     )
 
     if set_meta_parents:
