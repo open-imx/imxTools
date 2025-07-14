@@ -152,7 +152,11 @@ class MeasureCorrectionTool:
                 )
 
                 self.metadata_source_input = ui.input(label="Metadata.Source").classes(
-                    "basis-1/2 font-bold"
+                    "basis-1/4 font-bold"
+                )
+
+                self.metadata_origin_dropdown = ui.select(['Other', 'Unknown'], label="Metadata.Origin").classes(
+                    "basis-1/5 font-bold"
                 )
 
                 self.metadata_set_parents = ui.switch(
@@ -161,18 +165,20 @@ class MeasureCorrectionTool:
 
             self.metadata_set_parents.set_visibility(False)
             self.metadata_source_input.set_visibility(False)
+            self.metadata_origin_dropdown.set_visibility(False)
 
             def on_metadata_change(e):
                 if self.metadata_select.value == "Do not adjust Metadata":
                     self.metadata_source_input.set_visibility(False)
                     self.metadata_set_parents.set_visibility(False)
+                    self.metadata_origin_dropdown.set_visibility(False)
                 else:
                     self.metadata_source_input.set_visibility(True)
                     self.metadata_set_parents.set_visibility(True)
+                    self.metadata_origin_dropdown.set_visibility(True)
 
             self.metadata_select.on("update:model-value", on_metadata_change)
 
-            # === ✅ REPLACEMENT: IsoTimePicker instead of inline date/time ===
             with ui.row().classes("w-full items-center gap-4"):
                 self.time_stamp_select = (
                     ui.select(
@@ -381,6 +387,7 @@ class MeasureCorrectionTool:
                 True if self.metadata_select.value == "Set Metadata" else False,
                 True if self.metadata_select.value == "Add to Metadata" else False,
                 self.metadata_source_input.value,
+                self.metadata_origin_dropdown.value,
                 self.metadata_set_parents.value,
                 self.iso_time_picker.value
                 if self.time_stamp_select.value == "RegistrationTime by Input"

@@ -148,10 +148,11 @@ def set_metadata(
     replace_metadata: bool = True,
     add_metadata: bool = True,
     metadata_source: str = "DV",
+    metadata_origin: str = "Unknown",
     registration_time: str | None = None,
 ):
     set_metadata_node(
-        node, replace_metadata, add_metadata, metadata_source, registration_time
+        node, replace_metadata, add_metadata, metadata_source, metadata_origin, registration_time
     )
 
     if set_meta_parents:
@@ -173,6 +174,7 @@ def set_metadata(
                     replace_metadata,
                     add_metadata,
                     metadata_source,
+                    metadata_origin,
                     registration_time,
                 )
                 logger.success(f"metadata for parent {puic_} set")
@@ -184,6 +186,7 @@ def set_metadata_node(
     replace_metadata: bool = True,
     add_metadata: bool = True,
     metadata_source: str = "DV",
+    metadata_origin: str = "Unknown",
     registration_time: str | None = None,
 ):
     metadata = node.find(".//{http://www.prorail.nl/IMSpoor}Metadata")
@@ -195,12 +198,13 @@ def set_metadata_node(
         source_value = metadata_source
     else:
         source_value = str(metadata.get("source", ""))
+
         if add_metadata:
             if not source_value.endswith(metadata_source):
                 source_value = f"{source_value}_{metadata_source}"
 
     metadata.set("source", source_value)
-    metadata.set("originType", "Unknown")
+    metadata.set("originType", metadata_origin)
 
     if registration_time is not None:
         metadata.set("registrationTime", registration_time)

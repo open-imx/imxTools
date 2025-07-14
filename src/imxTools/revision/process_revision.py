@@ -99,6 +99,7 @@ def _finalize(
     replace_metadata: bool,
     add_metadata: bool,
     metadata_source: str,
+    metadata_origin: str,
     metadata_parents: bool,
     registration_time: str | None,
 ) -> None:
@@ -108,6 +109,7 @@ def _finalize(
         replace_metadata=replace_metadata,
         add_metadata=add_metadata,
         metadata_source=metadata_source,
+        metadata_origin=metadata_origin,
         registration_time=registration_time,
     )
     change["status"] = change.get("status", "processed")
@@ -173,6 +175,7 @@ def _process_changes(
     replace_metadata: bool,
     add_metadata: bool,
     metadata_source: str,
+    metadata_origin: str,
     metadata_parents: bool,
     registration_time: str | None,
 ) -> None:
@@ -195,6 +198,7 @@ def _process_changes(
                 replace_metadata=replace_metadata,
                 add_metadata=add_metadata,
                 metadata_source=metadata_source,
+                metadata_origin=metadata_origin,
                 metadata_parents=metadata_parents,
                 registration_time=registration_time,
             )
@@ -214,6 +218,7 @@ def process_imx_revisions(
     replace_metadata: bool = False,
     add_metadata: bool = False,
     metadata_source: str = "DV",
+    metadata_origin: str = "Other",
     metadata_parents: bool = False,
     registration_time: str | None = None,
     verbose: bool = True,
@@ -248,6 +253,7 @@ def process_imx_revisions(
         replace_metadata=replace_metadata,
         add_metadata=add_metadata,
         metadata_source=metadata_source,
+        metadata_origin=metadata_origin,
         metadata_parents=metadata_parents,
         registration_time=registration_time,
     )
