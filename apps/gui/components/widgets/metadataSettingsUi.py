@@ -17,7 +17,7 @@ class MetadataSettingsUI:
     def __init__(self):
         with ui.row().classes("w-full items-center gap-4"):
             self.select = ui.select(
-                ["Do not adjust Metadata", "Add to Metadata.@source", "Set Metadata.@source"],
+                ["Do not adjust Metadata", "Add to Metadata", "Set Metadata"],
                 value="Do not adjust Metadata",
             ).props("inline").classes("basis-1/3 py-4")
 

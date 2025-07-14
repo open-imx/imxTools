@@ -2,20 +2,13 @@ from nicegui.element import Element
 
 from apps.gui.components.tools.populationTool import PopulationTool
 from apps.gui.components.layouts.toolPanelWithHelp import ToolPanelWithHelp
+from apps.gui.helpers.io import load_markdown
 
 
 class PopulationPage:
     def __init__(self):
-        help_text = """
-        ### ℹ️ IMX Population Help
+        help_text = load_markdown("../data/help_markdowns/population_tool_help.md")
 
-        1. **Upload an IMX file** to analyze.
-        2. **Select a situation** (if applicable).
-        3. **Choose export formats** (GeoJSON/WGS84).
-        4. Click **Run Population Report** to start the process.
-
-        Tip: The result will be zipped for download.
-        """
 
         def build_content(container: Element):
             PopulationTool(container)

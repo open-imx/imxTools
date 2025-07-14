@@ -36,7 +36,7 @@ Na het uitvoeren van de revisie kan je na gaan in de process excel welke wel en 
 - Je kunt ook een Diff-rapport genereren en downloaden waarin het originele en het verwerkte IMX-bestand worden vergeleken.
 
 
-> **⚠️ Als er objecten worden aangepast moeten deze handmatig worden opgenomen in de `SituationChanges`!** 
+> **⚠️ NOTE: Als er objecten worden aangepast moeten deze handmatig worden opgenomen in de `SituationChanges`!** 
 
 </br>
 
