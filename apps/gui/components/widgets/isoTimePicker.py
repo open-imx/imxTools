@@ -59,11 +59,11 @@ class IsoTimePicker:
     def _validate_and_sync_from_iso(self, _):
         """Validate ISO and sync pickers if valid"""
         if self.is_valid():
-            self.iso_input.props(remove='error')
+            self.iso_input.error = None
             self.error_state = False
             self._sync_from_iso(_)
         else:
-            self.iso_input.props('error')
+            self.iso_input.error = 'Invalid ISO format'
             self.error_state = True
             ui.notify("Invalid ISO format. Use YYYY-MM-DDTHH:MM:SSZ", type='warning')
 

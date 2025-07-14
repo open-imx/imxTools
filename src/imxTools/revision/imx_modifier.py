@@ -142,8 +142,15 @@ def delete_element(element: _Element):
             add_comment(parent, None, f"_Element {element} removed")
 
 
-def set_metadata(node: _Element, set_meta_parents: bool = False):
-    set_metadata_node(node)
+def set_metadata(
+    node: _Element,
+    set_meta_parents: bool = False,
+    replace_metadata: bool = True,
+    add_metadata: bool = True,
+    metadata_source: str = "DV",
+    registration_time: str | None = None
+):
+    set_metadata_node(node, replace_metadata, add_metadata, metadata_source, registration_time)
 
     if set_meta_parents:
         parent = node.getparent()
@@ -159,32 +166,36 @@ def set_metadata(node: _Element, set_meta_parents: bool = False):
                 break
 
             elif puic_ is not None:
-                set_metadata_node(parent)
+                set_metadata_node(parent, replace_metadata, add_metadata, metadata_source, registration_time)
                 logger.success(f"metadata for parent {puic_} set")
             parent = parent.getparent()
 
 
-def set_metadata_node(node: _Element):
+def set_metadata_node(
+    node: _Element,
+    replace_metadata: bool = True,
+    add_metadata: bool = True,
+    metadata_source: str = "DV",
+    registration_time: str | None = None
+):
     metadata = node.find(".//{http://www.prorail.nl/IMSpoor}Metadata")
     if metadata is None:
-        logger.warning("No metadata node present, metadata not set!]")
+        logger.warning("No metadata node present, metadata not set!")
         return
 
-    original_source = [
-        item
-        for item in metadata.get("source", "").split("_")
-        if not any(keyword in item.lower() for keyword in ("prorail", "measure", "dv"))
-    ]
-
-    original_source.append("ProRail")
-    original_source.append("DV")
-    source_value = "_".join(original_source)
+    if replace_metadata:
+        source_value = metadata_source
+    else:
+        source_value = str(metadata.get("source", ""))
+        if add_metadata:
+            if not source_value.endswith(metadata_source):
+                source_value = f"{source_value}_{metadata_source}"
 
     metadata.set("source", source_value)
     metadata.set("originType", "Unknown")
 
-    if config.ADD_TIMESTAMP:
-        metadata.set("registrationTime", config.TIMESTAMP)
+    if registration_time is not None:
+        metadata.set("registrationTime", registration_time)
 
     if config.ADD_COMMENTS:
         add_comment(node, metadata, "MetadataChanged")

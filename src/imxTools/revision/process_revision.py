@@ -93,10 +93,24 @@ def apply_change(
         change["status"] = f"NOT processed: {operation} is not valid"
 
 
-def _finalize(change: dict[str, str], element: _Element) -> None:
-    set_metadata(element, config.SET_METADATA_PARENTS)
+def _finalize(
+    change: dict[str, str],
+    element: _Element,
+    replace_metadata: bool,
+    add_metadata: bool,
+    metadata_source: str,
+    metadata_parents: bool,
+    registration_time: str | None
+) -> None:
+    set_metadata(
+        element,
+        metadata_parents,
+        replace_metadata=replace_metadata,
+        add_metadata=add_metadata,
+        metadata_source=metadata_source,
+        registration_time=registration_time
+    )
     change["status"] = change.get("status", "processed")
-
 
 def _handle_create_or_update_attr(
     change: dict, element: _Element, _: PuicIndex
@@ -119,7 +133,6 @@ def _handle_create_or_update_attr(
         str(new_val),
         str(old_val) if is_update and old_val is not None else None,
     )
-    _finalize(change, element)
 
 
 def _handle_delete_attr(change: dict, element: _Element, _: PuicIndex) -> None:
@@ -128,7 +141,6 @@ def _handle_delete_attr(change: dict, element: _Element, _: PuicIndex) -> None:
         change.get(RevisionColumns.attribute_or_element.name, "").strip(),
         str(change.get(RevisionColumns.value_old.name, "")),
     )
-    _finalize(change, element)
 
 
 def _handle_delete_object(
@@ -136,7 +148,6 @@ def _handle_delete_object(
 ) -> None:
     delete_element(element)
     puic_index.pop(change.get(RevisionColumns.object_puic.name), None)
-    _finalize(change, element)
 
 
 def _handle_add_element(change: dict, element: _Element, _: PuicIndex) -> None:
@@ -145,7 +156,6 @@ def _handle_add_element(change: dict, element: _Element, _: PuicIndex) -> None:
         change.get(RevisionColumns.attribute_or_element.name, ""),
         str(change.get(RevisionColumns.value_new.name, "")),
     )
-    _finalize(change, element)
 
 
 def _handle_delete_element(change: dict, element: _Element, _: PuicIndex) -> None:
@@ -153,13 +163,17 @@ def _handle_delete_element(change: dict, element: _Element, _: PuicIndex) -> Non
         element,
         change.get(RevisionColumns.attribute_or_element.name, ""),
     )
-    _finalize(change, element)
 
 
 def _process_changes(
     changes: list[dict[Hashable, Any]],
     puic_index: PuicIndex,
     schema: xmlschema.XMLSchema,
+    replace_metadata: bool,
+    add_metadata: bool,
+    metadata_source: str,
+    metadata_parents: bool,
+    registration_time: str | None
 ) -> None:
     for change in changes:
         if not change.get(RevisionColumns.will_be_processed.name):
@@ -174,6 +188,15 @@ def _process_changes(
         try:
             validate_tag(change.get(RevisionColumns.object_path.name, ""), element)
             apply_change(change, element, puic_index)
+            _finalize(
+                change,
+                element,
+                replace_metadata=replace_metadata,
+                add_metadata=add_metadata,
+                metadata_source=metadata_source,
+                metadata_parents = metadata_parents,
+                registration_time = registration_time,
+            )
         except Exception as e:
             logger.error(e)
             change["status"] = f"Error: {e}"
@@ -187,6 +210,11 @@ def process_imx_revisions(
     input_imx: str | Path,
     input_excel: str | Path,
     out_path: str | Path,
+    replace_metadata: bool = False,
+    add_metadata: bool = False,
+    metadata_source: str = "DV",
+    metadata_parents: bool = False,
+    registration_time: str | None = None,
     verbose: bool = True,
 ) -> pd.DataFrame:
     input_imx, input_excel, out_path = _prepare_paths(input_imx, input_excel, out_path)
@@ -212,7 +240,14 @@ def process_imx_revisions(
     df = _prepare_dataframe(input_excel)
     changes = df.to_dict(orient="records")
 
-    _process_changes(changes, puic_index, schema)
+    _process_changes(
+        changes, puic_index, schema,
+        replace_metadata=replace_metadata,
+        add_metadata=add_metadata,
+        metadata_source=metadata_source,
+        metadata_parents=metadata_parents,
+        registration_time=registration_time,
+    )
 
     tree.write(imx_file, encoding="UTF-8", pretty_print=True)
 

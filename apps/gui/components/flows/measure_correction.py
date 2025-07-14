@@ -364,11 +364,29 @@ class MeasureCorrectionTool:
             self._temp_dirs.append(tmpdir)
             out_path = Path(tmpdir)
 
+
+            # todo:
+            #  - we should have a set parent parameter
+            #  - we should have parameter for registration time
+            #  - we should have add comments parameter
+
+
+            metadata_parents: bool = False,
+            registration_time: str | None = None,
+            verbose: bool = True,
+
+
             await asyncio.to_thread(
                 process_imx_revisions,
                 self.state.loaded_imx_data.path,
                 self.state.revisions_excel_upload_widget,
                 out_path,
+                True if self.metadata_select.value == "Set Metadata" else False,
+                True if self.metadata_select.value == "Add to Metadata" else False,
+                self.metadata_source_input.value,
+                self.metadata_set_parents.value,
+                self.iso_time_picker.value if self.time_stamp_select.value == "RegistrationTime by Input" else None,
+                True,
             )
 
             path_to_get = self.state.imx_file_path
