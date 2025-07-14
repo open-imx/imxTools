@@ -39,7 +39,9 @@ class UploadFile:
         suffix = self.file_path.suffix.lower()
 
         if self.enforce_extensions and suffix not in self.accept:
-            ui.notify(f"Invalid file type: {suffix} (Allowed: {self.accept})", type="negative")
+            ui.notify(
+                f"Invalid file type: {suffix} (Allowed: {self.accept})", type="negative"
+            )
             self.file_path.unlink(missing_ok=True)
             self.file_path = None
             return

@@ -100,7 +100,7 @@ def _finalize(
     add_metadata: bool,
     metadata_source: str,
     metadata_parents: bool,
-    registration_time: str | None
+    registration_time: str | None,
 ) -> None:
     set_metadata(
         element,
@@ -108,9 +108,10 @@ def _finalize(
         replace_metadata=replace_metadata,
         add_metadata=add_metadata,
         metadata_source=metadata_source,
-        registration_time=registration_time
+        registration_time=registration_time,
     )
     change["status"] = change.get("status", "processed")
+
 
 def _handle_create_or_update_attr(
     change: dict, element: _Element, _: PuicIndex
@@ -173,7 +174,7 @@ def _process_changes(
     add_metadata: bool,
     metadata_source: str,
     metadata_parents: bool,
-    registration_time: str | None
+    registration_time: str | None,
 ) -> None:
     for change in changes:
         if not change.get(RevisionColumns.will_be_processed.name):
@@ -194,8 +195,8 @@ def _process_changes(
                 replace_metadata=replace_metadata,
                 add_metadata=add_metadata,
                 metadata_source=metadata_source,
-                metadata_parents = metadata_parents,
-                registration_time = registration_time,
+                metadata_parents=metadata_parents,
+                registration_time=registration_time,
             )
         except Exception as e:
             logger.error(e)
@@ -241,7 +242,9 @@ def process_imx_revisions(
     changes = df.to_dict(orient="records")
 
     _process_changes(
-        changes, puic_index, schema,
+        changes,
+        puic_index,
+        schema,
         replace_metadata=replace_metadata,
         add_metadata=add_metadata,
         metadata_source=metadata_source,

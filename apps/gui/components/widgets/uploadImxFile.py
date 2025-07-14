@@ -9,7 +9,12 @@ from apps.gui.helpers.io import spooled_file_to_temp_file
 class ImxUpload(UploadFile):
     def __init__(self, label: str, on_change: callable = None):
         # Accept XML and ZIP, and enforce extensions
-        super().__init__(label, accept=".xml,.zip", enforce_extensions=True, on_change=self._imx_on_change)
+        super().__init__(
+            label,
+            accept=".xml,.zip",
+            enforce_extensions=True,
+            on_change=self._imx_on_change,
+        )
         self.situation = None
         self._user_on_change = on_change
 
@@ -31,7 +36,9 @@ class ImxUpload(UploadFile):
         suffix = self.file_path.suffix.lower()
 
         if self.enforce_extensions and suffix not in self.accept:
-            ui.notify(f"Invalid file type: {suffix} (Allowed: {self.accept})", type="negative")
+            ui.notify(
+                f"Invalid file type: {suffix} (Allowed: {self.accept})", type="negative"
+            )
             self.file_path.unlink(missing_ok=True)
             self.file_path = None
             return

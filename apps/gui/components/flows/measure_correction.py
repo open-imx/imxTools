@@ -4,7 +4,6 @@ import shutil
 import tempfile
 import zipfile
 from dataclasses import dataclass
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -143,14 +142,18 @@ class MeasureCorrectionTool:
             )
 
             with ui.row().classes("w-full items-center gap-4"):
-                self.metadata_select = ui.select(
-                    ["Do not adjust Metadata", "Add to Metadata", "Set Metadata"],
-                    value="Do not adjust Metadata",
-                ).props("inline").classes("basis-1/3 py-4")
+                self.metadata_select = (
+                    ui.select(
+                        ["Do not adjust Metadata", "Add to Metadata", "Set Metadata"],
+                        value="Do not adjust Metadata",
+                    )
+                    .props("inline")
+                    .classes("basis-1/3 py-4")
+                )
 
-                self.metadata_source_input = ui.input(
-                    label="Metadata.Source"
-                ).classes("basis-1/2 font-bold")
+                self.metadata_source_input = ui.input(label="Metadata.Source").classes(
+                    "basis-1/2 font-bold"
+                )
 
                 self.metadata_set_parents = ui.switch(
                     "set metadata parent", value=False
@@ -171,16 +174,22 @@ class MeasureCorrectionTool:
 
             # === ✅ REPLACEMENT: IsoTimePicker instead of inline date/time ===
             with ui.row().classes("w-full items-center gap-4"):
-                self.time_stamp_select = ui.select(
-                    ["Do not adjust RegistrationTime", "RegistrationTime by Input"],
-                    value="Do not adjust RegistrationTime",
-                ).props("inline").classes("basis-1/3 py-4")
+                self.time_stamp_select = (
+                    ui.select(
+                        ["Do not adjust RegistrationTime", "RegistrationTime by Input"],
+                        value="Do not adjust RegistrationTime",
+                    )
+                    .props("inline")
+                    .classes("basis-1/3 py-4")
+                )
 
                 self.iso_time_picker = IsoTimePicker(label="RegistrationTime (ISO)")
                 self.iso_time_picker.set_visibility(False)
 
                 def on_time_stamp_change(e):
-                    visible = self.time_stamp_select.value != "Do not adjust RegistrationTime"
+                    visible = (
+                        self.time_stamp_select.value != "Do not adjust RegistrationTime"
+                    )
                     self.iso_time_picker.set_visibility(visible)
 
                 self.time_stamp_select.on("update:model-value", on_time_stamp_change)
@@ -365,17 +374,6 @@ class MeasureCorrectionTool:
             out_path = Path(tmpdir)
 
 
-            # todo:
-            #  - we should have a set parent parameter
-            #  - we should have parameter for registration time
-            #  - we should have add comments parameter
-
-
-            metadata_parents: bool = False,
-            registration_time: str | None = None,
-            verbose: bool = True,
-
-
             await asyncio.to_thread(
                 process_imx_revisions,
                 self.state.loaded_imx_data.path,
@@ -385,7 +383,9 @@ class MeasureCorrectionTool:
                 True if self.metadata_select.value == "Add to Metadata" else False,
                 self.metadata_source_input.value,
                 self.metadata_set_parents.value,
-                self.iso_time_picker.value if self.time_stamp_select.value == "RegistrationTime by Input" else None,
+                self.iso_time_picker.value
+                if self.time_stamp_select.value == "RegistrationTime by Input"
+                else None,
                 True,
             )
 

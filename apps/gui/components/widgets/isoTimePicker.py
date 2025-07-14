@@ -1,35 +1,40 @@
 from nicegui import ui
 from datetime import datetime, timezone
 
+
 class IsoTimePicker:
     def __init__(self, label="ISO DateTime", default_utc=True):
         now = datetime.now(timezone.utc)
         current_date = now.strftime("%Y-%m-%d")
         current_time = "00:00"
 
-        self.iso_input = ui.input(label=label, value=f"{current_date}T{current_time}:00Z")
+        self.iso_input = ui.input(
+            label=label, value=f"{current_date}T{current_time}:00Z"
+        )
         self.date_input = ui.input(label="Date", value=current_date)
         self.time_input = ui.input(label="Time", value=current_time)
 
         self.error_state = False  # Track validity
 
-        with self.date_input.add_slot('append'):
+        with self.date_input.add_slot("append"):
             with ui.menu() as date_menu:
                 self.date_picker = ui.date(value=current_date)
                 self.date_picker.bind_value(self.date_input)
                 self.date_picker.on("update:model-value", self._sync_from_parts)
-                with ui.row().classes('justify-end'):
-                    ui.button('Close', on_click=date_menu.close).props('flat')
-            ui.icon('edit_calendar').on('click', date_menu.open).classes('cursor-pointer')
+                with ui.row().classes("justify-end"):
+                    ui.button("Close", on_click=date_menu.close).props("flat")
+            ui.icon("edit_calendar").on("click", date_menu.open).classes(
+                "cursor-pointer"
+            )
 
-        with self.time_input.add_slot('append'):
+        with self.time_input.add_slot("append"):
             with ui.menu() as time_menu:
                 self.time_picker = ui.time(value=current_time)
                 self.time_picker.bind_value(self.time_input)
                 self.time_picker.on("update:model-value", self._sync_from_parts)
-                with ui.row().classes('justify-end'):
-                    ui.button('Close', on_click=time_menu.close).props('flat')
-            ui.icon('access_time').on('click', time_menu.open).classes('cursor-pointer')
+                with ui.row().classes("justify-end"):
+                    ui.button("Close", on_click=time_menu.close).props("flat")
+            ui.icon("access_time").on("click", time_menu.open).classes("cursor-pointer")
 
         self.iso_input.on("blur", self._validate_and_sync_from_iso)
         self.date_input.on("update:model-value", self._sync_from_parts)
@@ -63,9 +68,9 @@ class IsoTimePicker:
             self.error_state = False
             self._sync_from_iso(_)
         else:
-            self.iso_input.error = 'Invalid ISO format'
+            self.iso_input.error = "Invalid ISO format"
             self.error_state = True
-            ui.notify("Invalid ISO format. Use YYYY-MM-DDTHH:MM:SSZ", type='warning')
+            ui.notify("Invalid ISO format. Use YYYY-MM-DDTHH:MM:SSZ", type="warning")
 
     def _sync_from_iso(self, _):
         """Update date/time pickers from ISO"""
