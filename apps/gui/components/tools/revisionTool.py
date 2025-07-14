@@ -3,6 +3,7 @@ import shutil
 import tempfile
 from pathlib import Path
 
+from apps.gui.components.widgets.metadataSettingsUi import MetadataSettingsUI
 from src.imxTools.revision.input_validation import validate_process_input
 from src.imxTools.revision.process_revision import process_imx_revisions
 from src.imxTools.revision.revision_template import get_revision_template
@@ -33,6 +34,8 @@ class RevisionTool:
                     max_files=1,
                     on_upload=self._on_excel_upload,
                 ).classes("w-full")
+
+                self.metadata_ui = MetadataSettingsUI()
 
                 self.status_label = ui.label().classes("text-sm italic")
                 ui.button("Apply Revisions", on_click=self.apply_revisions).classes(
@@ -69,6 +72,8 @@ class RevisionTool:
             return
 
         try:
+            settings = self.metadata_ui.get_metadata_settings()
+
             self.status_label.text = "Running revision process..."
             with tempfile.TemporaryDirectory() as temp_dir:
                 out_path = Path(temp_dir)
@@ -76,7 +81,17 @@ class RevisionTool:
                     validate_process_input, self.imx_file, self.excel_file, out_path
                 )
                 await asyncio.to_thread(
-                    process_imx_revisions, self.imx_file, self.excel_file, out_path
+                    process_imx_revisions,
+                    self.imx_file,
+                    self.excel_file,
+                    out_path,
+                    settings.set_metadata,
+                    settings.add_metadata,
+                    settings.source,
+                    settings.origin,
+                    settings.set_parents,
+                    settings.registration_time,
+                    True,
                 )
 
                 zip_path = out_path.with_suffix(".zip")

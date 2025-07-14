@@ -1,22 +1,14 @@
-### ℹ️ IMX Diff Report Tool
+### ℹ️ IMX Population Report Tool
 
-Deze tool genereerd een excel overzicht tussen twee IMX bestanden / situations. 
+Deze tool genereerd een excel overzicht van een IMX situatie. 
 - Een project IMX bestand heeft situaties, een IMX container (zip) is een situatie (snapshot) en daarom is het niet mogelijk deze te kiezen.
 
 </br>
 
-1️⃣ **Upload IMX T1**  
+1️⃣ **Upload IMX**  
 
-- **IMX T1**: Upload het eerste IMX-bestand of container dat als basis dient voor de vergelijking.
+- Upload het IMX-bestand of container waarvan het populatie overzicht gemaakt moet worden.
 - Indien het een project bestand is dan worden de aanwezig situations inzichtelijk in de dropdown, kies hier één van.
-
-</br>
-
-2️⃣ **Upload IMX T2**  
-
-Idem als upload IMX T1, maar het is ook mogelijk om het zelfde bestand te gebruiken.
-Zet hiervoor de switch **“Use same IMX for T2?”** aan. Hierna worden de aanwezig situatie in een dropdown weergegeven.
-De tegenovergestelde situatie wordt automatisch geslecteerd maar kan handmatig worden overschreven.
 
 </br>
 
@@ -27,14 +19,13 @@ De tegenovergestelde situatie wordt automatisch geslecteerd maar kan handmatig w
 
 </br>
 
-4️⃣ **Run de Vergelijking**  
+4️⃣ **Run de Tool**  
 
-- Klik op **“Run Comparison”** om de vergelijking uit te voeren.  
+- Klik op **“Run Population Report ”** om het rapport aan te maken.  
 - De resultaten worden automatisch als ZIP-bestand aangeboden voor download.
 
 </br>
 
 Wanneer je alle stappen hebt doorlopen kun je het resultaat downloaden en opnieuw starten indien nodig. 🚂✨
-
 
 ⚠️ NOTE: de applicatie is niet bedoeld om grote bestanden zoals een EOS te vergelijken, dit zal resulteren in een download die niet start wegens webframework limitations. 

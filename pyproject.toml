@@ -22,6 +22,7 @@ dependencies = [
     "openpyxl==3.1.5",
     "kmService==0.0.2.dev2",
     "imxinsights>=0.2.1a4",
+    "dateparser>=1.2.1",
 ]
 requires-python = ">=3.10"
 
@@ -60,8 +61,8 @@ package-dir = { "" = "src" }
 [tool.ruff]
 line-length = 88
 target-version = "py310"
-exclude = [".venv", "build", "dist", "src/data/", "apps/gui/data/"]
+exclude = [".venv", "build", "dist", "src/data/", "apps/gui/"]
 
 [tool.ty.src]
 root = "."
-exclude = ["tests/", "**/__init__.py"]
+exclude = ["tests/", "**/__init__.py", ".venv", "apps/gui/", "build-gui-app.py"]

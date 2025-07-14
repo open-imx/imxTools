@@ -3,7 +3,7 @@ import importlib.metadata
 from nicegui import ui
 
 from apps.gui.pages.add_km_excel_page import AddKmExcelPage
-from apps.gui.pages.comment_page import CommentPage
+# from apps.gui.pages.comment_page import CommentPage
 from apps.gui.pages.diff_page import DiffPage
 from apps.gui.pages.km_page import KmPage
 from apps.gui.pages.measure_correction_flow_page import MeasureCorrectionFlowPage
@@ -32,7 +32,7 @@ def layout():
             with ui.column().classes("pl-4"):
                 ui.link("🧮 Diff Report", target="/diff")
                 ui.link("📊 Population Report", target="/population")
-                ui.link("💬 Comments", target="/comments")
+                # ui.link("💬 Comments", target="/comments")
                 ui.link("📝 Revisions", target="/revision")
                 ui.link("📐 Measure Check", target="/measure")
                 ui.link("🔧 Measure Correction", target="/measure-correction-flow")
@@ -62,10 +62,7 @@ def home_page():  # noqa: F811
     ui.html(f'<lottie-player src="{src}" loop autoplay />').classes("w-full")
 
     with ui.column().classes("w-full h-screen items-center justify-center"):
-        ui.label(f"baked v{build_version}: gepofte bol").classes("text-4xl p-4")
-        ui.image(
-            "https://favorflav.com/images/gepofte-knoflook-uit-de-oven-916x458.jpg"
-        ).classes("object-contain w-full h-full")
+        ui.label(f"v{build_version}: Gepofte Knoflookbol").classes("text-4xl p-4")
 
 
 @ui.page("/diff")
@@ -80,10 +77,10 @@ def population_page():  # noqa: F811
     PopulationPage()
 
 
-@ui.page("/comments")
-def revision_page():  # noqa: F811
-    layout()
-    CommentPage()
+# @ui.page("/comments")
+# def revision_page():  # noqa: F811
+#     layout()
+#     CommentPage()
 
 
 @ui.page("/revision")
@@ -116,4 +113,4 @@ def km_page():  # noqa: F811
     MeasureCorrectionFlowPage()
 
 
-ui.run(title="IMX 🛠️ Tijn Tool", reload=False)
+ui.run(title="IMX 🛠️ Tools", reload=False)

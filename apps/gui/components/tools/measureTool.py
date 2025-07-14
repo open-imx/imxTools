@@ -4,11 +4,10 @@ from pathlib import Path
 from nicegui import ui
 from nicegui.element import Element
 
-
+from apps.gui.components.widgets.uploadImxFile import ImxUpload
 from src.imxTools.insights.measure_analyse import generate_measure_excel
 from src.imxTools.utils.helpers import load_imxinsights_container_or_file
 
-from apps.gui.components.widgets.imxUpload import ImxUpload
 from apps.gui.helpers.io import delete_later
 
 
