@@ -7,19 +7,16 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from imxInsights.file.singleFileImx.imxSituationEnum import ImxSituationEnum
 from nicegui import ui
 from openpyxl import load_workbook
 
-from apps.gui.components.widgets.isoTimePicker import IsoTimePicker
+from apps.gui.components.widgets.metadataSettingsUi import MetadataSettingsUI
 from apps.gui.helpers.io import spooled_file_to_temp_file
+from imxInsights.file.singleFileImx.imxSituationEnum import ImxSituationEnum
 from src.imxTools.insights.diff_and_population import write_diff_output_files
 from src.imxTools.insights.measure_analyse import generate_measure_excel
 from src.imxTools.revision.process_revision import process_imx_revisions
-from src.imxTools.utils.helpers import (
-    load_imxinsights_container_or_file,
-    create_timestamp,
-)
+from src.imxTools.utils.helpers import load_imxinsights_container_or_file, create_timestamp
 
 
 @dataclass
@@ -42,7 +39,7 @@ class MeasureCorrectionTool:
 
     def __init__(self, container):
         self.state = MeasureCorrectionState()
-        self._temp_dirs: list[str] = []  # track temp dirs we manually create
+        self._temp_dirs: list[str] = []
         with container:
             self._setup_widgets()
 
@@ -50,13 +47,6 @@ class MeasureCorrectionTool:
         self._cleanup()
 
     def _setup_widgets(self):
-        self.imx_upload_widget = None
-        self.gr_json_upload_widget = None
-        self.revisions_excel_upload_widget = None
-        self.threshold_input_field = None
-        self.exclude_context_checkbox = None
-        self.analyze_measures_button = None
-
         with ui.stepper().props("vertical").classes("w-full") as self.stepper:
             self._build_upload_step()
             self._build_review_step()
@@ -68,13 +58,11 @@ class MeasureCorrectionTool:
             self._build_imx_upload_card()
 
             ui.separator()
-            ui.label("Optional").classes("italic").visible = True
+            ui.label("Optional").classes("italic")
             self._build_json_upload_card()
 
             with ui.stepper_navigation():
-                self.analyze_measures_button = ui.button(
-                    "Analyse Measures", on_click=self.run_measure_check
-                )
+                self.analyze_measures_button = ui.button("Analyse Measures", on_click=self.run_measure_check)
                 self.analyze_measures_button.disable()
                 self.upload_spinner = ui.spinner(size="lg")
                 self.upload_spinner.visible = False
@@ -83,29 +71,22 @@ class MeasureCorrectionTool:
         with ui.card().classes("w-full"):
             ui.label("The IMX file you want to analyze and correct.")
             self.imx_upload_widget = self._build_upload_widget(
-                label="Upload IMX file", on_upload=self._on_imx_upload
+                label="Upload IMX file", on_upload=self._on_imx_upload, allowed_extensions=[".xml", ".zip"]
             )
-            ui.label(
-                'If a single IMX project file is uploaded, only the "NewSituation" will be corrected.'
-            ).classes("text-sm italic text-gray-500")
-
-            self.threshold_input_field = ui.number(
-                label="Threshold (meters)", value=0.015
-            ).classes("w-full")
+            ui.label('If a single IMX project file is uploaded, only the "NewSituation" will be corrected.')\
+                .classes("text-sm italic text-gray-500")
+            self.threshold_input_field = ui.number(label="Threshold (meters)", value=0.015).classes("w-full")
 
     def _build_json_upload_card(self):
         with ui.card().classes("w-full"):
             ui.label("The Naiade JSON file to exclude 'context area' objects.")
-            ui.label(
-                "When uploaded, only 'work area', 'user area', and 'new' objects will be flagged to be corrected."
-            ).classes("text-sm italic text-gray-500")
-
+            ui.label("When uploaded, only 'work area', 'user area', and 'new' objects will be flagged.")\
+                .classes("text-sm italic text-gray-500")
             self.gr_json_upload_widget = self._build_upload_widget(
                 label="Upload the JSON file (GR_xxxxx.json)",
                 on_upload=self._on_json_upload,
                 allowed_extensions=[".json"],
             )
-
             self.exclude_context_checkbox = ui.checkbox(
                 "Flag all 'work area', 'user area', and 'new' objects (excluding 'context area')."
             )
@@ -113,27 +94,17 @@ class MeasureCorrectionTool:
 
     def _build_review_step(self):
         with ui.step(self.REVIEW_STEP).classes("font-bold"):
-            ui.label("The uploaded IMX file has been analyzed.").classes(
-                "text-xl font-semibold text-primary"
-            )
-            ui.label(
-                'You can now download the analyse (Excel) and review detected discrepancies in the "revisions" sheet.'
-            ).classes("text-sm")
-            ui.label(
-                'If a correction is needed, set the value in the "processing required" column to `True`.'
-            ).classes("text-sm")
+            ui.label("The uploaded IMX file has been analyzed.").classes("text-xl font-semibold text-primary")
+            ui.label('You can now download the analyse (Excel) and review detected discrepancies in the "revisions" sheet.')\
+                .classes("text-sm")
+            ui.label('If a correction is needed, set the value in the "processing required" column to `True`.')\
+                .classes("text-sm")
 
-            ui.button(
-                "Download Revisions File",
-                icon="download",
-                on_click=self._on_download_revisions,
-            ).props("outline")
+            ui.button("Download Revisions File", icon="download", on_click=self._on_download_revisions)\
+                .props("outline")
 
             ui.space()
-
-            ui.label(
-                "After reviewing and correcting the revisions, upload the file to proceed with processing."
-            )
+            ui.label("After reviewing and correcting the revisions, upload the file to proceed.")
 
             self.revisions_excel_upload_widget = self._build_upload_widget(
                 label="Upload flagged revisions Excel file",
@@ -141,91 +112,23 @@ class MeasureCorrectionTool:
                 allowed_extensions=[".xlsx"],
             )
 
-            with ui.row().classes("w-full items-center gap-4"):
-                self.metadata_select = (
-                    ui.select(
-                        ["Do not adjust Metadata", "Add to Metadata", "Set Metadata"],
-                        value="Do not adjust Metadata",
-                    )
-                    .props("inline")
-                    .classes("basis-1/3 py-4")
-                )
-
-                self.metadata_source_input = ui.input(label="Metadata.Source").classes(
-                    "basis-1/4 font-bold"
-                )
-
-                self.metadata_origin_dropdown = ui.select(['Other', 'Unknown'], label="Metadata.Origin").classes(
-                    "basis-1/5 font-bold"
-                )
-
-                self.metadata_set_parents = ui.switch(
-                    "set metadata parent", value=False
-                ).classes("p-0 m-0")
-
-            self.metadata_set_parents.set_visibility(False)
-            self.metadata_source_input.set_visibility(False)
-            self.metadata_origin_dropdown.set_visibility(False)
-
-            def on_metadata_change(e):
-                if self.metadata_select.value == "Do not adjust Metadata":
-                    self.metadata_source_input.set_visibility(False)
-                    self.metadata_set_parents.set_visibility(False)
-                    self.metadata_origin_dropdown.set_visibility(False)
-                else:
-                    self.metadata_source_input.set_visibility(True)
-                    self.metadata_set_parents.set_visibility(True)
-                    self.metadata_origin_dropdown.set_visibility(True)
-
-            self.metadata_select.on("update:model-value", on_metadata_change)
-
-            with ui.row().classes("w-full items-center gap-4"):
-                self.time_stamp_select = (
-                    ui.select(
-                        ["Do not adjust RegistrationTime", "RegistrationTime by Input"],
-                        value="Do not adjust RegistrationTime",
-                    )
-                    .props("inline")
-                    .classes("basis-1/3 py-4")
-                )
-
-                self.iso_time_picker = IsoTimePicker(label="RegistrationTime (ISO)")
-                self.iso_time_picker.set_visibility(False)
-
-                def on_time_stamp_change(e):
-                    visible = (
-                        self.time_stamp_select.value != "Do not adjust RegistrationTime"
-                    )
-                    self.iso_time_picker.set_visibility(visible)
-
-                self.time_stamp_select.on("update:model-value", on_time_stamp_change)
+            self.metadata_ui = MetadataSettingsUI()
 
             with ui.stepper_navigation():
-                self.process_revisions_button = ui.button(
-                    "Process Revisions", on_click=self.process_revisions
-                )
-                self.process_revisions_back = ui.button(
-                    "Back", on_click=self.stepper.previous
-                ).props("flat")
+                self.process_revisions_button = ui.button("Process Revisions", on_click=self.process_revisions)
+                self.process_revisions_back = ui.button("Back", on_click=self.stepper.previous).props("flat")
                 self.review_spinner = ui.spinner(size="lg")
                 self.review_spinner.visible = False
 
     def _build_check_result_step(self):
         with ui.step(self.CHECK_RESULT_STEP).classes("font-bold"):
-            ui.label("The IMX file has been updated.").classes(
-                "text-xl font-semibold text-primary"
-            )
-            ui.button(
-                "Download revision IMX",
-                icon="download",
-                on_click=self._on_download_result,
-            ).props("outline")
+            ui.label("The IMX file has been updated.").classes("text-xl font-semibold text-primary")
+            ui.button("Download revision IMX", icon="download", on_click=self._on_download_result)\
+                .props("outline")
 
             with ui.row():
                 self.diff_button = ui.button(
-                    "Create And Download Diff Report",
-                    icon="download",
-                    on_click=self._on_generate_diff,
+                    "Create And Download Diff Report", icon="download", on_click=self._on_generate_diff
                 ).props("outline")
                 self.diff_spinner = ui.spinner(size="lg")
                 self.diff_spinner.visible = False
@@ -234,36 +137,10 @@ class MeasureCorrectionTool:
                 ui.button("Finish", on_click=self._on_finish).props("flat")
                 ui.button("Back", on_click=self.stepper.previous).props("flat")
 
-    def _build_upload_widget(
-        self, label, on_upload, allowed_extensions: list[str] | None = None
-    ):
-        if allowed_extensions is not None:
-            accept = f"accept={','.join(allowed_extensions)}"
-        else:
-            accept = ""
-
-        return (
-            ui.upload(
-                label=label,
-                auto_upload=True,
-                on_upload=on_upload,
-                max_files=1,
-            )
-            .classes("w-full")
-            .style("flex: 1")
-            .props(accept)
-        )
-
-    def end_and_reset_stepper(self):
-        self.stepper.set_value(self.UPLOAD_STEP)
-        self.imx_upload_widget.reset()
-        self.gr_json_upload_widget.reset()
-        self.exclude_context_checkbox.value = False
-        self.state = MeasureCorrectionState()
-
-    def _on_finish(self):
-        self.end_and_reset_stepper()
-        self._notify("Process has been reset.", type_="positive")
+    def _build_upload_widget(self, label, on_upload, allowed_extensions: list[str] | None = None):
+        accept = f"accept={','.join(allowed_extensions)}" if allowed_extensions else ""
+        return ui.upload(label=label, auto_upload=True, on_upload=on_upload, max_files=1)\
+            .classes("w-full").style("flex: 1").props(accept)
 
     def _on_imx_upload(self, event):
         self._notify(f"Uploaded IMX: {event.name}")
@@ -281,18 +158,12 @@ class MeasureCorrectionTool:
 
     def _on_download_revisions(self):
         base_name = self.state.imx_file_path.stem
-        ui.download(
-            self.state.measure_excel_file,
-            filename=f"{base_name}-{self.state.time_stamp}-revision.xlsx",
-        )
+        ui.download(self.state.measure_excel_file, filename=f"{base_name}-{self.state.time_stamp}-revision.xlsx")
         self._notify("Download started (revisions)")
 
     def _on_download_result(self):
         base_name = self.state.imx_file_path.stem
-        ui.download(
-            self.state.revision_log_zip,
-            filename=f"{base_name}-{self.state.time_stamp}-processed.zip",
-        )
+        ui.download(self.state.revision_log_zip, filename=f"{base_name}-{self.state.time_stamp}-processed.zip")
         self._notify("Download started (revision log)")
 
     async def _on_generate_diff(self):
@@ -301,7 +172,6 @@ class MeasureCorrectionTool:
         try:
             temp_dir = tempfile.mkdtemp()
             self._temp_dirs.append(temp_dir)
-
             output_path = Path(temp_dir) / "output"
             output_path.mkdir(parents=True, exist_ok=True)
 
@@ -315,9 +185,11 @@ class MeasureCorrectionTool:
                 False,
                 False,
             )
+
             base_name = self.state.imx_file_path.stem
             zip_name = f"{base_name}-{self.state.time_stamp}-diff.zip"
             zip_path = Path(tempfile.gettempdir()) / zip_name
+
             with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
                 for file in output_path.rglob("*"):
                     zipf.write(file, file.relative_to(output_path))
@@ -341,10 +213,7 @@ class MeasureCorrectionTool:
                 self.state.imx_file_path,
                 self.DEFAULT_SITUATION,
             )
-            self.state.measure_excel_file = (
-                Path(tempfile.gettempdir())
-                / f"measure_output_{self.state.imx_file_path.stem}.xlsx"
-            )
+            self.state.measure_excel_file = Path(tempfile.gettempdir()) / f"measure_output_{self.state.imx_file_path.stem}.xlsx"
             if self.state.measure_excel_file.exists():
                 self.state.measure_excel_file.unlink()
 
@@ -356,12 +225,8 @@ class MeasureCorrectionTool:
             )
 
             if self.state.gr_json_file_path:
-                puics_false, puics_true = self._classify_puics(
-                    self.state.gr_json_file_path
-                )
-                self._update_excel_puics(
-                    self.state.measure_excel_file, puics_false, puics_true
-                )
+                puics_false, puics_true = self._classify_puics(self.state.gr_json_file_path)
+                self._update_excel_puics(self.state.measure_excel_file, puics_false, puics_true)
 
             self.stepper.next()
         except Exception as e:
@@ -379,19 +244,19 @@ class MeasureCorrectionTool:
             self._temp_dirs.append(tmpdir)
             out_path = Path(tmpdir)
 
+            settings = self.metadata_ui.get_metadata_settings()
+
             await asyncio.to_thread(
                 process_imx_revisions,
                 self.state.loaded_imx_data.path,
                 self.state.revisions_excel_upload_widget,
                 out_path,
-                True if self.metadata_select.value == "Set Metadata" else False,
-                True if self.metadata_select.value == "Add to Metadata" else False,
-                self.metadata_source_input.value,
-                self.metadata_origin_dropdown.value,
-                self.metadata_set_parents.value,
-                self.iso_time_picker.value
-                if self.time_stamp_select.value == "RegistrationTime by Input"
-                else None,
+                settings.set_metadata,
+                settings.add_metadata,
+                settings.source,
+                settings.origin,
+                settings.set_parents,
+                settings.registration_time,
                 True,
             )
 
@@ -413,7 +278,6 @@ class MeasureCorrectionTool:
 
             self._notify("Revisions applied successfully!", type_="positive")
             self.state.revision_log_zip = zip_path
-
             self.stepper.next()
         except Exception as e:
             self._notify(f"Error processing revisions: {e}", type_="negative")
@@ -434,9 +298,7 @@ class MeasureCorrectionTool:
                         puics_true.append(item["Puic"])
         return puics_false, puics_true
 
-    def _update_excel_puics(
-        self, excel_path: Path, puics_false: list, puics_true: list
-    ):
+    def _update_excel_puics(self, excel_path: Path, puics_false: list, puics_true: list):
         wb = load_workbook(excel_path)
         ws = wb["revisions"]
         header = [cell.value for cell in next(ws.iter_rows(min_row=1, max_row=1))]
@@ -451,26 +313,27 @@ class MeasureCorrectionTool:
                 row[revision_reasoning_col - 1].value = "Not a ContextArea object"
             elif puic_value in puics_false:
                 row[will_be_processed_col - 1].value = False
-                row[
-                    revision_reasoning_col - 1
-                ].value = "ContextArea objects can be corrected"
+                row[revision_reasoning_col - 1].value = "ContextArea objects can be corrected"
 
         wb.save(excel_path)
-
-    def _clear_imx_data(self):
-        self.analyze_measures_button.disable()
-        self.state.loaded_imx_data = None
-        self.state.measure_excel_file = None
-
-    def _clear_gr_json(self):
-        self.state.gr_json_file_path = None
 
     def _cleanup(self):
         for dir_path in self._temp_dirs:
             try:
                 shutil.rmtree(dir_path)
-            except Exception as e:
-                raise e
+            except Exception:
+                pass
 
     def _notify(self, message: str, type_: str = "info"):
         ui.notify(message, type=type_)
+
+    def _on_finish(self):
+        self.end_and_reset_stepper()
+        self._notify("Process has been reset.", type_="positive")
+
+    def end_and_reset_stepper(self):
+        self.stepper.set_value(self.UPLOAD_STEP)
+        self.imx_upload_widget.reset()
+        self.gr_json_upload_widget.reset()
+        self.exclude_context_checkbox.value = False
+        self.state = MeasureCorrectionState()
