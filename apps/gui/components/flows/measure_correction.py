@@ -373,7 +373,6 @@ class MeasureCorrectionTool:
             self._temp_dirs.append(tmpdir)
             out_path = Path(tmpdir)
 
-
             await asyncio.to_thread(
                 process_imx_revisions,
                 self.state.loaded_imx_data.path,
