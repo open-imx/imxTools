@@ -10,34 +10,35 @@ jobs:
     permissions:
       contents: read
 
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-version: ["3.10", "3.11"]
+
     steps:
       - name: 📥 Checkout source
         uses: actions/checkout@v4
         with:
           persist-credentials: false
 
-      # seems uv actions is not working on act......
-      # - name: 🐍 Install python with uv
-      #   uses: astral-sh/setup-uv@bd01e18f51369d5a26f1651c3cb451d3417e3bba
-      # we should check if uv is working on actions...
-
-      # Skip when running in act, should be commented out if working
       - name: 🐍 Setup Python
         uses: actions/setup-python@v5
         if: ${{ !env.ACT }}
         with:
-          python-version: "3.11"
+          python-version: ${{ matrix.python-version }}
 
       - name: 📦 Install uv
         run: pip install uv
-      ######################
+
+      - name: 📦 Install uv (Windows)
+        if: matrix.os == 'windows-latest'
+        run: pip install uv
 
       - name: 🗂️ Create virtual environment
         run: uv venv
 
       - name: 📦 Install dependencies
         run: |
-          . .\.venv\Scripts\Activate.ps1
           uv pip install --group dev --group gui .
 
       - name: 🛠️ Build project with uv
@@ -45,4 +46,3 @@ jobs:
 
       - name: 🖥️ Run GUI build script
         run: uv run --active python build-gui-app.py
-

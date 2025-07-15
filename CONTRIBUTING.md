@@ -253,13 +253,58 @@ For now this is a manual proces, we aim to include dev bumps in the ci.
 --- 
 
 
-#### GITHUB ACTIONS TESTING
-use act 
 
-make sure we do a self-hosted windows platform if needed
+
+
+
+## 🧪 Local GitHub Actions Testing with `act`
+
+You can use [`act`](https://github.com/nektos/act) to run your GitHub Actions workflows locally for faster feedback during development.
+
+#### ✅ Basic Usage (Linux/macOS)
 ```bash
- act -W .github/workflows/ci.yml -P windows-latest=-self-hosted
+# Run CI workflow
+act -W .github/workflows/ci.yml
 
- act -W .github/workflows/build.yml -P windows-latest=-self-hosted
+# Run Build workflow
+act -W .github/workflows/build.yml
+```
 
+
+#### 🪟 Running Windows Jobs (Self-hosted Only)
+`act` does not support native Windows runners out of the box. You need to simulate them using the `-P` flag with a self-hosted label:
+
+```bash
+# Simulate windows-latest using a self-hosted runner
+act -W .github/workflows/ci.yml -P windows-latest=self-hosted
+
+act -W .github/workflows/build.yml -P windows-latest=self-hosted
+```
+
+> ℹ️ Make sure your local machine has the necessary tools (e.g. Python, uv, etc.) installed when simulating Windows.
+
+---
+
+### 💡 Conditional Steps for `act`
+
+You can use the `ACT` environment variable in your workflow to skip or adapt steps when running locally:
+
+```yaml
+if: matrix.os == 'windows-latest' && !env.ACT
+```
+
+This lets you:
+- Skip setup that doesn't work in `act`
+- Mock or echo long-running tasks during local testing
+
+To set the `ACT` variable automatically when running `act`, add this flag:
+
+```bash
+act -s ACT=true
+```
+
+Or, set it inline:
+
+```bash
+ACT=true act -W .github/workflows/ci.yml
 ```
