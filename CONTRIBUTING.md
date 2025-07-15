@@ -251,3 +251,15 @@ For now this is a manual proces, we aim to include dev bumps in the ci.
 > See 👉 [bump-my-version docs](https://github.com/callowayproject/bump-my-version)
 
 --- 
+
+
+#### GITHUB ACTIONS TESTING
+use act 
+
+make sure we do a self-hosted windows platform if needed
+```bash
+ act -W .github/workflows/ci.yml -P windows-latest=-self-hosted
+
+ act -W .github/workflows/build.yml -P windows-latest=-self-hosted
+
+```

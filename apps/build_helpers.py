@@ -10,6 +10,14 @@ from imxInsights import __version__ as imxInsights_version
 from imxTools import __version__ as imxTools_version
 
 
+def print_unicode_safe(msg: str):
+    """Print a message with fallback in case encoding fails."""
+    try:
+        print(msg)
+    except UnicodeEncodeError:
+        print(msg.encode('ascii', 'ignore').decode())
+
+
 def insert_readable_metadata(file_path: Path, app_name: str):
     metadata = (
         f"# **{app_name}** \n"
@@ -45,13 +53,13 @@ def zip_result(
 ):
     zip_name = f"{app_name}-{version}-{system}.zip"
     zip_path = dist_root / zip_name
-    print(f"📦 Creating ZIP: {zip_path}")
+    print_unicode_safe(f"📦 Creating ZIP: {zip_path}")
 
     with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
         for file in folder_path.rglob("*"):
             zipf.write(file, arcname=file.relative_to(folder_path))
 
-    print(f"✅ Packaged: {zip_path}")
+    print_unicode_safe(f"✅ Packaged: {zip_path}")
 
 
 def remove_folder_safely(path: Path, retries=3, delay=1):
@@ -62,6 +70,6 @@ def remove_folder_safely(path: Path, retries=3, delay=1):
             else:
                 return
         except Exception as e:
-            print(f"⚠️ Attempt {i + 1}: Failed to remove {path}: {e}")
+            print_unicode_safe(f"⚠️ Attempt {i + 1}: Failed to remove {path}: {e}")
             time.sleep(delay)
-    print(f"❌ Giving up on deleting {path}")
+    print_unicode_safe(f"❌ Giving up on deleting {path}")

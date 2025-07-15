@@ -9,9 +9,10 @@ import nicegui
 from apps.build_helpers import (
     insert_readable_metadata,
     zip_result,
-    remove_folder_safely,
+    remove_folder_safely, print_unicode_safe,
 )
 from imxTools import __version__ as imxTools_version
+
 
 # App constants
 EXECUTABLE_NAME = "imx-tools-gui"
@@ -34,9 +35,7 @@ if CLEAN_BUILD_FOLDER and BUILD_FOLDER.exists():
 
 
 def build_nicegui_app():
-    print(
-        f'🚀 Building NiceGUI app "{EXECUTABLE_NAME}" in isolated temp environment...'
-    )
+    print_unicode_safe(f'🚀 Building NiceGUI app "{EXECUTABLE_NAME}" in isolated temp environment...')
 
     remove_folder_safely(BUILD_FOLDER)
     BUILD_FOLDER.mkdir(parents=True, exist_ok=True)
@@ -73,21 +72,21 @@ def build_nicegui_app():
     )
 
     for line in process.stdout:
-        print(line, end="")
+        print_unicode_safe(line.rstrip())
 
     process.wait()
 
     if process.returncode != 0:
-        print(f"\n❌ Build failed with exit code {process.returncode}")
+        print_unicode_safe(f"\n❌ Build failed with exit code {process.returncode}")
         sys.exit(process.returncode)
 
-    print("✅ Build complete.")
+    print_unicode_safe("✅ Build complete.")
 
     # Locate built app
     dist_path = BUILD_FOLDER / "dist"
     candidates = list(dist_path.glob(f"{EXECUTABLE_NAME}*"))
     if not candidates:
-        print(f"❌ Could not find built app in {dist_path}")
+        print_unicode_safe(f"❌ Could not find built app in {dist_path}")
         sys.exit(1)
 
     built_path = candidates[0]
@@ -95,23 +94,23 @@ def build_nicegui_app():
     FINAL_APP_FOLDER.parent.mkdir(parents=True, exist_ok=True)
     remove_folder_safely(FINAL_APP_FOLDER)
     shutil.move(str(built_path), str(FINAL_APP_FOLDER))
-    print(f"📁 App moved to: {FINAL_APP_FOLDER}")
+    print_unicode_safe(f"📁 App moved to: {FINAL_APP_FOLDER}")
 
 
 def patch_static_assets():
     if not STATIC_SRC.exists():
-        print(f"❌ Could not find NiceGUI static files at {STATIC_SRC}")
+        print_unicode_safe(f"❌ Could not find NiceGUI static files at {STATIC_SRC}")
         sys.exit(1)
-    print(f"⚖️ Copying static files from {STATIC_SRC} to {STATIC_DST}")
+    print_unicode_safe(f"⚖️ Copying static files from {STATIC_SRC} to {STATIC_DST}")
     STATIC_DST.parent.mkdir(parents=True, exist_ok=True)
     shutil.copytree(STATIC_SRC, STATIC_DST, dirs_exist_ok=True)
-    print("✅ Static files copied.")
+    print_unicode_safe("✅ Static files copied.")
 
 
 def write_readme():
     readme_path = FINAL_APP_FOLDER / "README.md"
     insert_readable_metadata(readme_path, APP_FOLDER_NAME)
-    print(f"📘 Added metadata to README: {readme_path}")
+    print_unicode_safe(f"📘 Added metadata to README: {readme_path}")
 
 
 def main():
@@ -121,7 +120,7 @@ def main():
     zip_result(
         FINAL_APP_FOLDER, imxTools_version, "windows", EXECUTABLE_NAME, DIST_ROOT
     )
-    print(f"🎉 App ready at {FINAL_APP_FOLDER}")
+    print_unicode_safe(f"🎉 App ready at {FINAL_APP_FOLDER}")
 
 
 if __name__ == "__main__":
