@@ -6,9 +6,10 @@ on:
 
 jobs:
   release:
-    if: github.event.pull_request.merged == true && 
-        (github.event.pull_request.base.ref == 'dev' || github.event.pull_request.base.ref == 'main')
-    runs-on: windows-latest
+    if: >
+      github.event.pull_request.merged == true &&
+      (github.event.pull_request.base.ref == 'dev' || github.event.pull_request.base.ref == 'main')
+    runs-on: windows-latest  # use windows to match pwsh shell and paths
     permissions:
       contents: write
 
@@ -19,26 +20,29 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
 
-      - name: 🐍 Install python with uv
+      - name: 🐍 Install Python with uv
         uses: astral-sh/setup-uv@bd01e18f51369d5a26f1651c3cb451d3417e3bba
 
       - name: 🗂️ Create virtual environment
-        run: uv venv
         shell: pwsh
+        run: |
+          uv venv
 
       - name: 📦 Install dependencies
-        run: uv pip install --group dev --group gui .
         shell: pwsh
+        run: |
+          uv pip install --group dev --group gui .
 
       - name: 🔢 Get current version from project
+        shell: pwsh
         id: get_version
         run: |
           .\.venv\Scripts\Activate.ps1
-          $version = bump-my-version show current_version
-          "CURRENT_VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Append
-        shell: pwsh
+          $currentVersion = bump-my-version show --current-version
+          "CURRENT_VERSION=$currentVersion" | Out-File -FilePath $env:GITHUB_ENV -Append
 
       - name: 🔢 Get latest release version
+        shell: pwsh
         id: get_latest_release
         run: |
           $latest = gh release view --json tagName -q ".tagName" 2>$null
@@ -46,39 +50,45 @@ jobs:
           "LATEST_RELEASE=$($latest -replace '^v', '')" | Out-File -FilePath $env:GITHUB_ENV -Append
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        shell: pwsh
 
       - name: 🆚 Compare versions
+        shell: pwsh
         id: compare
         run: |
           Write-Host "Current version: $env:CURRENT_VERSION"
           Write-Host "Latest release: $env:LATEST_RELEASE"
 
           if ($env:LATEST_RELEASE -eq "none") {
+            Write-Host "No previous release found. Proceeding to release."
             "SHOULD_RELEASE=true" | Out-File -FilePath $env:GITHUB_ENV -Append
-          } elseif ([version]$env:CURRENT_VERSION -gt [version]$env:LATEST_RELEASE) {
+          }
+          elseif ([System.Version]::Parse($env:CURRENT_VERSION) -gt [System.Version]::Parse($env:LATEST_RELEASE)) {
+            Write-Host "Current version is newer than latest release."
             "SHOULD_RELEASE=true" | Out-File -FilePath $env:GITHUB_ENV -Append
-          } else {
+          }
+          else {
+            Write-Host "Current version is NOT newer. Skipping release."
             "SHOULD_RELEASE=false" | Out-File -FilePath $env:GITHUB_ENV -Append
           }
-        shell: pwsh
 
       - name: 🛠️ Build project with uv
         if: env.SHOULD_RELEASE == 'true'
-        run: uv build
         shell: pwsh
+        run: |
+          uv build
 
       - name: 🖥️ Run GUI build script
         if: env.SHOULD_RELEASE == 'true'
-        run: uv run python build-gui-app.py
         shell: pwsh
+        run: |
+          uv run python build-gui-app.py
 
       - name: 📝 Generate changelog with git-cliff
         if: env.SHOULD_RELEASE == 'true'
+        shell: pwsh
         run: |
           .\.venv\Scripts\Activate.ps1
-          git cliff --config cliff.toml --tag v${{ env.CURRENT_VERSION }} > RELEASE_NOTES.md
-        shell: pwsh
+          git cliff --config cliff.toml --tag "v$env:CURRENT_VERSION" > RELEASE_NOTES.md
 
       - name: 🚀 Create release
         if: env.SHOULD_RELEASE == 'true'
