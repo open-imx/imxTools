@@ -31,7 +31,7 @@ jobs:
         id: get_version
         run: |
           source .venv/bin/activate
-          echo "CURRENT_VERSION=$(bump-my-version show --current-version)" >> $GITHUB_ENV
+          echo "CURRENT_VERSION=$(bump-my-version show current-version)" >> $GITHUB_ENV
 
       - name: 🔢 Get latest release version
         id: get_latest_release
