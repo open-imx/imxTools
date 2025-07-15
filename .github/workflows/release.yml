@@ -6,8 +6,9 @@ on:
 
 jobs:
   release:
-    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'dev' || github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'
-    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true && 
+        (github.event.pull_request.base.ref == 'dev' || github.event.pull_request.base.ref == 'main')
+    runs-on: windows-latest
     permissions:
       contents: write
 
@@ -18,64 +19,64 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
 
-      - name: 🐍 Install python with uv
+      - name: 🐍 Install Python with uv
         uses: astral-sh/setup-uv@bd01e18f51369d5a26f1651c3cb451d3417e3bba
 
-      - name: 🗂️ Create virtual environment
+      - name: 🗂️ Create virtual environment with uv
         run: uv venv
 
       - name: 📦 Install dependencies
-        run: uv pip install --group dev --group gui .
+        run: .\.venv\Scripts\uv.exe pip install --group dev --group gui .
 
       - name: 🔢 Get current version from project
         id: get_version
         run: |
-          source .venv/bin/activate
-          echo "CURRENT_VERSION=$(bump-my-version show current-version)" >> $GITHUB_ENV
+          $version = .\.venv\Scripts\python.exe -m bump_my_version show current-version
+          echo "CURRENT_VERSION=$version" >> $env:GITHUB_ENV
 
       - name: 🔢 Get latest release version
         id: get_latest_release
         run: |
-          LATEST_RELEASE=$(gh release view --json tagName -q ".tagName" || echo "none")
-          echo "LATEST_RELEASE=${LATEST_RELEASE#v}" >> $GITHUB_ENV
+          $tag = gh release view --json tagName -q ".tagName" 2>$null
+          if (!$tag) {
+            $tag = "none"
+          } else {
+            $tag = $tag -replace "^v", ""
+          }
+          echo "LATEST_RELEASE=$tag" >> $env:GITHUB_ENV
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: 🆚 Compare versions
         id: compare
         run: |
-          echo "Current version: $CURRENT_VERSION"
-          echo "Latest release: $LATEST_RELEASE"
+          echo "Current version: $env:CURRENT_VERSION"
+          echo "Latest release: $env:LATEST_RELEASE"
 
-          if [ "$LATEST_RELEASE" = "none" ]; then
+          if ($env:LATEST_RELEASE -eq "none") {
             echo "No previous release found. Proceeding to release."
-            echo "SHOULD_RELEASE=true" >> $GITHUB_ENV
-          elif [ "$(printf '%s\n' "$LATEST_RELEASE" "$CURRENT_VERSION" | sort -V | head -n1)" != "$CURRENT_VERSION" ]; then
+            echo "SHOULD_RELEASE=true" >> $env:GITHUB_ENV
+          } elseif ([version]$env:CURRENT_VERSION -gt [version]$env:LATEST_RELEASE) {
             echo "Current version is newer than latest release."
-            echo "SHOULD_RELEASE=true" >> $GITHUB_ENV
-          else
-            echo "Current version is NOT newer. Skipping release."
-            echo "SHOULD_RELEASE=false" >> $GITHUB_ENV
-          fi
-        env:
-          CURRENT_VERSION: ${{ env.CURRENT_VERSION }}
-          LATEST_RELEASE: ${{ env.LATEST_RELEASE }}
+            echo "SHOULD_RELEASE=true" >> $env:GITHUB_ENV
+          } else {
+            echo "Current version is not newer. Skipping release."
+            echo "SHOULD_RELEASE=false" >> $env:GITHUB_ENV
+          }
 
       - name: 🛠️ Build project with uv
         if: env.SHOULD_RELEASE == 'true'
-        run: uv build
+        run: .\.venv\Scripts\uv.exe build
 
       - name: 🖥️ Run GUI build script
         if: env.SHOULD_RELEASE == 'true'
-        run: uv run python build-gui-app.py
+        run: .\.venv\Scripts\python.exe build-gui-app.py
 
       - name: 📝 Generate changelog with git-cliff
         if: env.SHOULD_RELEASE == 'true'
-        run: |
-          source .venv/bin/activate
-          git cliff --config cliff.toml --tag v${{ env.CURRENT_VERSION }} > RELEASE_NOTES.md
+        run: .\.venv\Scripts\git-cliff.exe --config cliff.toml --tag v${{ env.CURRENT_VERSION }} > RELEASE_NOTES.md
 
-      - name: 🚀 Create release
+      - name: 🚀 Create GitHub release
         if: env.SHOULD_RELEASE == 'true'
         uses: ncipollo/release-action@bcfe5470707e8832e12347755757cec0eb3c22af
         with:
