@@ -28,16 +28,10 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: 📦 Install uv
-        run: pip install uv
-
-      - name: 🗂️ Create virtual environment with uv
-        run: uv venv
-
       - name: 📦 Install dependencies
         run: |
-          uv pip install bump-my-version
-          uv pip install packaging
+          pip install bump-my-version
+          pip install packaging
 
       - name: 🔢 Get current version from project
         id: get_version
