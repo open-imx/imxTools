@@ -37,6 +37,7 @@ jobs:
       - name: 📦 Install dependencies
         run: |
           uv pip install bump-my-version
+          uv pip install packaging
 
       - name: 🔢 Get current version from project
         id: get_version
