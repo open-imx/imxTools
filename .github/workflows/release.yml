@@ -72,20 +72,18 @@ jobs:
         id: compare
         shell: powershell
         run: |
-          echo "Current version: $env:CURRENT_VERSION"
-          echo "Latest release: $env:LATEST_RELEASE"
+          $output = uv run python .github/compare_versions.py
+          $output | Write-Output
       
-          if ($env:LATEST_RELEASE -eq "none") {
-            echo "No previous release found. Proceeding to release."
-            "SHOULD_RELEASE=true" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          } elseif ([version]$env:CURRENT_VERSION -gt [version]$env:LATEST_RELEASE) {
-            echo "Current version is newer than latest release."
-            "SHOULD_RELEASE=true" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          } else {
-            echo "Current version is not newer. Skipping release."
-            "SHOULD_RELEASE=false" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          foreach ($line in $output -split "`n") {
+            if ($line -like "SHOULD_RELEASE=*") {
+              $shouldRelease = $line -replace "SHOULD_RELEASE=", ""
+              "SHOULD_RELEASE=$shouldRelease" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+            }
           }
-
+        env:
+          CURRENT_VERSION: ${{ env.CURRENT_VERSION }}
+          LATEST_RELEASE: ${{ env.LATEST_RELEASE }}
 
       - name: 🛠️ Build project with uv
         if: env.SHOULD_RELEASE == 'true'
