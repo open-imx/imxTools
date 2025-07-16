@@ -68,7 +68,7 @@ root = "."
 exclude = ["tests/", "**/__init__.py", ".venv", "apps/gui/", "build-gui-app.py"]
 
 [tool.bumpversion]
-current_version = "0.0.1.rc3"
+current_version = "0.0.1.rc4"
 
 parse = '''(?x)
     (?P<major>0|[1-9]\d*)\.
