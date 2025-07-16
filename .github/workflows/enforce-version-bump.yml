@@ -21,6 +21,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: 🐍 Setup Python
         uses: actions/setup-python@v5
@@ -28,21 +29,23 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: 📦 Install uv
-        run: pip install uv
-
-      - name: 🗂️ Create virtual environment with uv
-        run: uv venv
-
       - name: 📦 Install dependencies
         run: |
-          uv pip install --group dev --group gui .
+          pip install bump-my-version
+          pip install packaging
 
       - name: 🔢 Get current version from project
         id: get_version
         shell: powershell
         run: |
-          $version = uv run --active bump-my-version show current_version
+          [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+          $pyproject = Get-Content "pyproject.toml" -Raw
+          $match = [regex]::Match($pyproject, '(?ms)^\[tool\.bumpversion\].*?^current_version\s*=\s*"([^"]+)"')
+          if (-not $match.Success) {
+            Write-Error "Could not find current_version in pyproject.toml"
+            exit 1
+          }
+          $version = $match.Groups[1].Value.Trim()
           Write-Host "Extracted version: $version"
           "CURRENT_VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
@@ -93,25 +96,35 @@ jobs:
           "main_version=$mainVersion" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
           "dev_version=$devVersion" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
 
-
-      - name: 🚨 Check version bump
+      - name: 🚨 Enforce version bump
+        shell: python
         run: |
-          echo "Current:  ${{ env.CURRENT_VERSION }}"
-          echo "Main:     ${{ steps.base_versions.outputs.main_version }}"
-          echo "Dev:      ${{ steps.base_versions.outputs.dev_version }}"
-          
+          import os
+          import sys
+          from packaging.version import parse
 
-#      - name: 🚨 Check version bump
-#        run: |
-#          Write-Host "Comparing version against base branches..."
-#          Write-Host "Current version: ${{ steps.current.outputs.current_version }}"
-#          Write-Host "Main version:    ${{ steps.base_versions.outputs.main_version }}"
-#          Write-Host "Dev version:     ${{ steps.base_versions.outputs.dev_version }}"
-#
-#          if ("${{ steps.current.outputs.current_version }}" -eq "${{ steps.base_versions.outputs.main_version }}" -and
-#              "${{ steps.current.outputs.current_version }}" -eq "${{ steps.base_versions.outputs.dev_version }}") {
-#            Write-Error "❌ Version not bumped! Please update the version in pyproject.toml using 'bump-my-version bump [patch|minor|major]'"
-#            exit 1
-#          } else {
-#            Write-Host "✅ Version has been bumped correctly."
-#          }
+          current = parse(os.environ["CURRENT_VERSION"])
+          main = parse(os.environ["MAIN_VERSION"])
+          dev = parse(os.environ["DEV_VERSION"])
+          base_ref = os.environ["GITHUB_BASE_REF"]
+
+          print(f"Current: {current}")
+          print(f"Target branch: {base_ref}")
+
+          if base_ref == "main":
+              target = main
+              branch = "main"
+          elif base_ref == "dev":
+              target = dev
+              branch = "dev"
+          else:
+              print("Skipping version check: not targeting main or dev")
+              sys.exit(0)
+
+          print(f"Comparing with {branch} version: {target}")
+
+          if current <= target:
+              print(f"Version must be higher than {branch} branch ({target})")
+              sys.exit(1)
+          else:
+              print(f"Version bump OK: {current} > {target}")
