@@ -1,93 +1,113 @@
 name: Enforce Version Bump
 
 on:
-  push:
   pull_request:
+    branches:
+      - main
+      - dev
+  push:
+    branches:
+      - main
+      - dev
 
 jobs:
   enforce-version:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     permissions:
       contents: read
 
     steps:
-      - name: 📥 Checkout source
+      - name: 📥 Checkout code
         uses: actions/checkout@v4
         with:
-          persist-credentials: false
-          fetch-depth: 0
+          fetch-depth: 0  # Required to access other branches
 
-      - name: 🗂️ Get current branch name
-        id: vars
-        run: echo "branch=$(echo ${GITHUB_REF#refs/heads/})" >> "$GITHUB_OUTPUT"
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v5
+        if: ${{ !env.ACT }}
+        with:
+          python-version: ${{ matrix.python-version }}
 
-      - name: 🕵️‍♂️ Check version bump for dev/main
-        if: ${{ startsWith(steps.vars.outputs.branch, 'dev') || startsWith(steps.vars.outputs.branch, 'main') }}
+      - name: 📦 Install packaging module
+        run: pip install packaging
+        shell: powershell
+
+      - name: 🔍 Extract current version
+        id: current
+        shell: powershell
         run: |
-          echo "Checking version bump..."
+          $lines = Get-Content pyproject.toml
+          $versionLine = $lines | Where-Object { $_ -match '^version\s*=' }
+          $version = ($versionLine -split '"')[1]
+          Write-Host "Current version: $version"
+          "current_version=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
 
-          # Extract the `current_version` value from `.bumpversion.toml`:
-          # 1) Find the line with `current_version`
-          # 2) Take the first match
-          # 3) Split on '=' and take the version part
-          # 4) Trim leading/trailing spaces
-          # 5) Remove any Windows carriage returns
-          NEW_VERSION_BUMP=$(grep 'current_version' .bumpversion.toml | head -1 | awk -F'=' '{print $2}' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | tr -d '\r')
-          echo "New version: ${NEW_VERSION_BUMP}"
-          export NEW_VERSION_BUMP
+      - name: 🔄 Fetch base branches
+        shell: powershell
+        run: |
+          git fetch origin main
+          git fetch origin dev
 
-          if [ "${{ github.event_name }}" == "push" ]; then
-            target_commit="${{ github.sha }}~1"
-            echo "Determined target commit as parent of current push for version check."
-          elif [ "${{ github.event_name }}" == "pull_request" ]; then
-            target_commit="${{ github.event.pull_request.base.sha }}"
-            echo "Determined target commit as base of pull request for version check."
-          fi
+      - name: 🔍 Extract versions from main and dev
+        id: base_versions
+        shell: powershell
+        run: |
+          $mainContent = git show origin/main:pyproject.toml
+          $mainVersionLine = $mainContent -split "`n" | Where-Object { $_ -match '^version\s*=' }
+          $mainVersion = ($mainVersionLine -split '"')[1]
 
-          echo "Target commit SHA for comparison: ${target_commit}"
+          $devContent = git show origin/dev:pyproject.toml
+          $devVersionLine = $devContent -split "`n" | Where-Object { $_ -match '^version\s*=' }
+          $devVersion = ($devVersionLine -split '"')[1]
 
-          if git show "$target_commit:.bumpversion.toml" &> /dev/null; then
-          # Extract the `current_version` value from the `.bumpversion.toml` file in the target commit:
-              # 1) Use `git show` to read the file at the specified commit
-              # 2) Find the line containing `current_version`
-              # 3) Take the first matching line
-              # 4) Split on '=' and take the version part
-              # 5) Trim leading/trailing spaces
-              # 6) Remove any Windows carriage returns
-              OLD_VERSION_BUMP=$(git show "$target_commit:.bumpversion.toml" | grep 'current_version' | head -1 | awk -F'=' '{print $2}' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | tr -d '\r')
-              echo "Old version: ${OLD_VERSION_BUMP}"
-          else
-              echo "Warning: .bumpversion.toml not found in target commit ${target_commit}. Assuming old version is 0.0.0."
-              OLD_VERSION_BUMP="0.0.0"
-          fi
-          export OLD_VERSION_BUMP
+          Write-Host "Main version: $mainVersion"
+          Write-Host "Dev version: $devVersion"
 
-          python -c "
-          import os
-          from packaging.version import parse
+          "main_version=$mainVersion" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          "dev_version=$devVersion" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
+      - name: 🔎 Compare versions
+        shell: powershell
+        run: |
+          $current = "${{ steps.current.outputs.current_version }}"
+          $main = "${{ steps.base_versions.outputs.main_version }}"
+          $dev = "${{ steps.base_versions.outputs.dev_version }}"
+          $target = "${{ github.event.pull_request.base.ref }}"
+
+          Write-Host "🔍 Comparing versions..."
+          Write-Host "Target branch: $target"
+          Write-Host "Current version: $current"
+          Write-Host "Main version: $main"
+          Write-Host "Dev version: $dev"
+
+          $compareScript = @'
           import sys
-
-          old_version_str = os.environ.get('OLD_VERSION_BUMP')
-          new_version_str = os.environ.get('NEW_VERSION_BUMP')
-
-          if not old_version_str:
-              print('Error: OLD_VERSION_BUMP not found or empty in environment.', file=sys.stderr)
-              sys.exit(1)
-          if not new_version_str:
-              print('Error: NEW_VERSION_BUMP not found or empty in environment.', file=sys.stderr)
-              sys.exit(1)
-
-          old_version_str = old_version_str.strip('\"')
-          new_version_str = new_version_str.strip('\"')
-
-          print(f'Python: Comparing old version \"{old_version_str}\" with new version \"{new_version_str}\"')
-
-          old = parse(old_version_str)
-          new = parse(new_version_str)
-
-          if new <= old:
-            print(f'❌ Version {new_version_str} is not newer than {old_version_str}', file=sys.stderr)
-            sys.exit(1)
+          from packaging.version import parse
+          
+          current = parse("{0}")
+          main = parse("{1}")
+          dev = parse("{2}")
+          target = "{3}"
+          
+          print(f"🔍 Current: {current}, Main: {main}, Dev: {dev}, Target: {target}")
+          
+          if target == "main":
+              if current <= main:
+                  print("❌ Version must be greater than main branch.")
+                  sys.exit(1)
+          
+          elif target == "dev":
+              if current < main:
+                  print("❌ Dev version must be ≥ main version.")
+                  sys.exit(1)
+              if current <= dev:
+                  print("❌ Dev version must be greater than current dev version.")
+                  sys.exit(1)
+          
           else:
-            print(f'✅ Version {new_version_str} is newer than {old_version_str}')
-          "
+              print("✅ No version checks required for other branches.")
+          '@ -f $current, $main, $dev, $target
+          
+                    $tempFile = New-TemporaryFile
+                    Set-Content -Path $tempFile -Value $compareScript -Encoding UTF8
+                    python $tempFile
