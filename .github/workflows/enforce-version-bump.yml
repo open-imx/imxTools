@@ -96,12 +96,6 @@ jobs:
           "main_version=$mainVersion" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
           "dev_version=$devVersion" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
 
-      - name: ℹ️ Version info
-        run: |
-          echo "Current: '${{ env.CURRENT_VERSION }}'"
-          echo "Main:    '${{ steps.base_versions.outputs.main_version }}'"
-          echo "Dev:     '${{ steps.base_versions.outputs.dev_version }}'"
-
       - name: 🚨 Enforce version bump
         shell: python
         run: |
