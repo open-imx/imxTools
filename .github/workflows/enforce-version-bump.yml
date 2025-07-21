@@ -2,10 +2,11 @@ name: Enforce Version Bump
 
 on:
   pull_request:
-    branches:
-      - master
-      - develop
-  push:
+    types:
+      - opened
+      - edited
+      - synchronize
+      - reopened
     branches:
       - master
       - develop
