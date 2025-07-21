@@ -1,5 +1,6 @@
 [git]
 conventional_commits = false
+merge_commits = false
 
 commit_parsers = [
     { message = "^feat(:|\\()", group = "<!-- 0 -->:rocket: New features" },
