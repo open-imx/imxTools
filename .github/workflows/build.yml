@@ -3,6 +3,9 @@ name: Build
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+    branches:
+      - develop
+      - master
 
 jobs:
   build:
