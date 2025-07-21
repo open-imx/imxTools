@@ -62,7 +62,7 @@ def home_page():  # noqa: F811
     ui.html(f'<lottie-player src="{src}" loop autoplay />').classes("w-full")
 
     with ui.column().classes("w-full h-screen items-center justify-center"):
-        ui.label(f"v{build_version}: Gepofte Knoflookbol").classes("text-4xl p-4")
+        ui.label(f"v{build_version}: Texas Twinkies").classes("text-4xl p-4")
 
 
 @ui.page("/diff")
