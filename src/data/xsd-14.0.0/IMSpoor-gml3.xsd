@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns="http://www.opengis.net/gml3" xmlns:gml3="http://www.opengis.net/gml3" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.opengis.net/gml3" elementFormDefault="qualified" attributeFormDefault="unqualified" version="14.0.0">
+	<xs:element name="Point">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="gml3:pos"/>
+			</xs:sequence>
+			<xs:attribute name="srsName" type="xs:anyURI">
+				<xs:annotation>
+					<xs:documentation>Het gewenste coordinatenstelsel</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="LineString">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="gml3:posList"/>
+			</xs:sequence>
+			<xs:attribute name="srsName" type="xs:anyURI">
+				<xs:annotation>
+					<xs:documentation>Het gewenste coordinatenstelsel</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Curve">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="gml3:segments"/>
+			</xs:sequence>
+			<xs:attribute name="srsName" type="xs:anyURI">
+				<xs:annotation>
+					<xs:documentation>Het gewenste coordinatenstelsel</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Surface">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="gml3:patches"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Polygon">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="gml3:exterior"/>
+				<xs:element ref="gml3:interior" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="srsName" type="xs:anyURI">
+				<xs:annotation>
+					<xs:documentation>Het gewenste coordinatenstelsel</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="MultiPoint">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="gml3:pointMember" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="srsName" type="xs:anyURI">
+				<xs:annotation>
+					<xs:documentation>Het gewenste coordinatenstelsel</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="MultiSurface">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="gml3:surfaceMember" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="srsName" type="xs:anyURI">
+				<xs:annotation>
+					<xs:documentation>Het gewenste coordinatenstelsel</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="MultiCurve">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="gml3:curveMember" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="srsName" type="xs:anyURI">
+				<xs:annotation>
+					<xs:documentation>Het gewenste coordinatenstelsel</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="patches">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="gml3:PolygonPatch"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="PolygonPatch">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="gml3:exterior"/>
+				<xs:element ref="gml3:interior" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="srsName" type="xs:anyURI">
+				<xs:annotation>
+					<xs:documentation>Het gewenste coordinatenstelsel</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="lineStringMember">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="gml3:LineString"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Arc">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="gml3:posList"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Circle">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="gml3:posList"/>
+			</xs:sequence>
+			<xs:attribute name="numArc" type="xs:integer" fixed="1">
+				<xs:annotation>
+					<xs:documentation>
+Since this type describes always a single arc, the attribute is fixed to "1".
+</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="CircleByCenterPoint">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="gml3:pos"/>
+				<xs:element name="radius" type="xs:double">
+					<xs:annotation>
+						<xs:documentation>The radius of the arc.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name="numArc" type="xs:integer" use="required" fixed="1">
+				<xs:annotation>
+					<xs:documentation>
+Since this type describes always a single arc, the attribute is fixed to "1".
+</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="LineStringSegment">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="gml3:posList"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="LinearRing">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="gml3:posList"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Ring">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="gml3:curveMember" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="exterior">
+		<xs:complexType>
+			<xs:choice>
+				<xs:element ref="gml3:LinearRing"/>
+				<xs:element ref="gml3:Ring"/>
+			</xs:choice>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="interior">
+		<xs:complexType>
+			<xs:choice>
+				<xs:element ref="gml3:LinearRing"/>
+				<xs:element ref="gml3:Ring"/>
+			</xs:choice>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="pos">
+		<xs:complexType>
+			<xs:simpleContent>
+				<xs:extension base="xs:string"/>
+			</xs:simpleContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="posList">
+		<xs:complexType>
+			<xs:simpleContent>
+				<xs:extension base="xs:string"/>
+			</xs:simpleContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="segments">
+		<xs:complexType>
+			<xs:choice maxOccurs="unbounded">
+				<xs:element ref="gml3:Arc"/>
+				<xs:element ref="gml3:Circle"/>
+				<xs:element ref="gml3:CircleByCenterPoint"/>
+				<xs:element ref="gml3:LineStringSegment"/>
+			</xs:choice>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="pointMember">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="gml3:Point"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="curveMember">
+		<xs:complexType>
+			<xs:choice>
+				<xs:element ref="gml3:LineString"/>
+				<xs:element ref="gml3:Curve"/>
+			</xs:choice>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="surfaceMember">
+		<xs:complexType>
+			<xs:choice>
+				<xs:element ref="gml3:Polygon"/>
+				<xs:element ref="gml3:Surface"/>
+			</xs:choice>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

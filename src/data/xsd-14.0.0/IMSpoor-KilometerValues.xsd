@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns="http://www.prorail.nl/IMSpoor" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.prorail.nl/IMSpoor" elementFormDefault="qualified" attributeFormDefault="unqualified" version="14.0.0">
+	<xs:include schemaLocation="IMSpoor-BasicTypes.xsd"/>
+	<xs:element name="KilometerValues">
+		<xs:annotation>
+			<xs:documentation>Gegenereerde kilometerlintwaarden op basis van X,Y,Z waarden van het hoofdobject.</xs:documentation>
+			<xs:documentation xml:lang="NL">Kilometerlint Waarden</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tDesignPetal">
+					<xs:sequence>
+						<xs:element ref="KmRibbonLocations" minOccurs="0"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="KmRibbonLocations">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="KmRibbonLocation" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="KmRibbonLocation">
+		<xs:annotation>
+			<xs:documentation>De locatie op basis van kilometerlinten</xs:documentation>
+			<xs:documentation>Let op dat deze vorm van linear referencing uitsluitend bedoeld is om legacy informatie over de locatie rechtstreeks uit InfraAtlas over te nemen, ook al is bekend dat de waardes niet (volledig) correct zijn. Het element kan worden uitgegeven, maar zou nooit moeten worden ingenomen, anders dan via de harmoniseringssoftware van Naiade.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:annotation>
+				<xs:documentation>Positie aanduiding in een kilometerlintstelsel.</xs:documentation>
+			</xs:annotation>
+			<xs:attribute name="objectRef" type="tUUIDRef" use="required">
+				<xs:annotation>
+					<xs:documentation>PUIC verwijzing naar hoofdobject.</xs:documentation>
+					<xs:appinfo>
+						<ObjectTypeRef>*</ObjectTypeRef>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="kmRibbonRef" type="tUUIDRef" use="required">
+				<xs:annotation>
+					<xs:documentation>PUIC verwijzing naar het kilometerlint.</xs:documentation>
+					<xs:appinfo>
+						<ObjectTypeRef>KilometerRibbon</ObjectTypeRef>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="value" type="xs:double" use="required">
+				<xs:annotation>
+					<xs:documentation>Een waarde (measure) op het bijbehorende kilometerlint.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

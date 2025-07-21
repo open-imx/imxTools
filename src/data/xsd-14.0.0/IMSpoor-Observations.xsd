@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns="http://www.prorail.nl/IMSpoor" xmlns:gml="http://www.opengis.net/gml" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xml="http://www.w3.org/XML/1998/namespace" targetNamespace="http://www.prorail.nl/IMSpoor" elementFormDefault="qualified" attributeFormDefault="unqualified" version="14.0.0">
+	<xs:include schemaLocation="IMSpoor-BasicTypes.xsd"/>
+	<xs:include schemaLocation="IMSpoor-TrackAssets.xsd"/>
+	<xs:import namespace="http://www.opengis.net/gml" schemaLocation="IMSpoor-gml.xsd"/>
+	<xs:element name="Observations">
+		<xs:annotation>
+			<xs:documentation>Dit bloemblaadje heeft als doel het kunnen vastleggen en uitwisselen van waarnemingen van objecten.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tDesignPetal">
+					<xs:sequence>
+						<xs:element ref="Surveys" minOccurs="0"/>
+						<xs:element ref="ObservedLocations" minOccurs="0"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Surveys">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="Survey" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>	
+	<xs:element name="Survey">
+		<xs:annotation>
+			<xs:documentation>Het inwinproces waar de locatie van een functioneel object is vastgesteld.</xs:documentation>
+			<xs:documentation xml:lang="NL">Inwinproces</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tBaseObject">
+					<xs:attribute name="surveyTime" type="xs:dateTime" use="required">
+						<xs:annotation>
+							<xs:documentation>Het tijdstip waarop de inwinning heeft plaatsgevonden.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="dataAcquisitionMethod" type="tDataAcquisitionMethodEnum" use="required">
+						<xs:annotation>
+							<xs:documentation>Een indicatie van de kwaliteit en nauwkeurigheid van de geometrische data.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="accuracy" type="xs:double">
+						<xs:annotation>
+							<xs:documentation>De positionele nauwkeurigheid in millimeters.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ObservedLocations">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ObservedLocation" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ObservedLocation">
+		<xs:annotation>
+			<xs:documentation>Locatie (uitgedrukt als coördinaat en/of punt op een spoortak) die middels een waarneming is vastgesteld.</xs:documentation>
+			<xs:documentation xml:lang="NL">Waargenomen Locatie</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:choice>
+					<xs:element ref="gml:Point"/>
+					<xs:element ref="gml:LineString"/>
+					<xs:element ref="gml:Polygon"/>
+					<xs:element ref="gml:MultiPoint"/>
+					<xs:element ref="gml:MultiLineString"/>
+					<xs:element ref="gml:MultiPolygon"/>
+				</xs:choice>
+				<xs:element ref="RailConnectionInfo" minOccurs="0"/>
+			</xs:sequence>
+			<xs:attribute name="surveyRef" type="tUUIDRef" use="required">
+				<xs:annotation>
+					<xs:documentation>PUIC verwijzing naar het inwinproces waarbinnen de waarneming heeft plaats gevonden.</xs:documentation>
+					<xs:appinfo>
+						<ObjectTypeRef>Survey</ObjectTypeRef>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="objectRef" type="tUUIDRef" use="required">
+				<xs:annotation>
+					<xs:documentation>Referentie naar het functionele object vaarvan de locatie is vastgesteld</xs:documentation>
+					<xs:appinfo>
+						<ObjectTypeRef>*</ObjectTypeRef>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="azimuth" type="xs:double">
+				<xs:annotation>
+					<xs:documentation>De oriëntatie van een object. Vastgelegd in het aantal graden vanaf het noorden.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

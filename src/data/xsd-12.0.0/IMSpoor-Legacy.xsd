@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns="http://www.prorail.nl/IMSpoor" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xml="http://www.w3.org/XML/1998/namespace" targetNamespace="http://www.prorail.nl/IMSpoor" elementFormDefault="qualified" attributeFormDefault="unqualified" version="12.0.0">
+	<xs:include schemaLocation="IMSpoor-ManagementAreas.xsd"/>
+	<xs:element name="Legacy">
+		<xs:annotation>
+			<xs:documentation>De elementen in deze XSD hebben alleen waarde in de context van oude modellen en systemen welke geen ondersteuning voor IMX gaan hebben.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tDesignPetal">
+					<xs:sequence>
+						<xs:element ref="InfraAtlasAreas" minOccurs="0"/>
+						<xs:element ref="MovementPlanSources" minOccurs="0"/>
+						<xs:element ref="SystemIdentifications" minOccurs="0"/>
+						<xs:element ref="PpcPpcBoundaries" minOccurs="0"/>
+						<xs:element ref="RouteIdentifications" minOccurs="0"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SystemIdentifications">
+		<xs:annotation>
+			<xs:documentation>Een lijst van systeemidentificaties</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="SystemIdentification" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SystemIdentification">
+		<xs:annotation>
+			<xs:documentation>Een systeemidentificatie is een manier om (infrastructuur)objecten binnen en tussen (IT)-systemen uniek te kunnen identificeren, zoals gebruikt in het bestaande systeemlandschap.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="objectRef" type="tUUIDRef" use="required">
+				<xs:annotation>
+					<xs:documentation>Een PUIC verwijzing naar het object waarvoor de systeemidentificatie van toepassing is.</xs:documentation>
+					<xs:appinfo>
+						<ObjectTypeRef>*</ObjectTypeRef>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="identificationSchema" type="tNameString" use="required">
+				<xs:annotation>
+					<xs:documentation>Het identificatieschema dat beschrijft binnen welke context waarbinnen de identificatie geldig is.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="objectName" type="tNameString" use="required">
+				<xs:annotation>
+					<xs:documentation>De objectnaam binnen het identificatieschema</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="objectType" type="tNameString" use="required">
+				<xs:annotation>
+					<xs:documentation>Het objecttype binnen het identificatieschema</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="areaName" type="tNameString" use="required">
+				<xs:annotation>
+					<xs:documentation>De gebiedsnaam binnen het identificatieschema</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="areaType" type="tNameString" use="required">
+				<xs:annotation>
+					<xs:documentation>Het gebiedstype binnen het identificatieschema</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="RouteIdentifications">
+		<xs:annotation>
+			<xs:documentation>Een lijst van route-identificaties</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="RouteIdentification" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="RouteIdentification">
+		<xs:annotation>
+			<xs:documentation>Een route-identificatie is een alternatieve identificatie voor routes naast de PUIC.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="routeRef" type="tUUIDRef" use="required">
+				<xs:annotation>
+					<xs:documentation>Een PUIC verwijzing naar de route waarvoor de identificatie van toepassing is.</xs:documentation>
+					<xs:appinfo>
+						<ObjectTypeRef>SingularRoute</ObjectTypeRef>
+						<ObjectTypeRef>FunctionalRoute</ObjectTypeRef>
+						<ObjectTypeRef>CompositeRoute</ObjectTypeRef>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="identificationSchema" type="tNameString" use="required">
+				<xs:annotation>
+					<xs:documentation>Het identificatieschema dat beschrijft binnen welke context waarbinnen de identificatie geldig is.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="lrString" type="tString100" use="required">
+				<xs:annotation>
+					<xs:documentation>De LR-string wordt binnen Logistiek gebruikt als identificatie van een route binnen een rijweg. De opbouw van een LR-string is afhankelijk van het identificatieschema.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="InfraAtlasAreas">
+		<xs:annotation>
+			<xs:documentation>Een verzameling InfraAtlas-gebieden</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="InfraAtlasArea" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="InfraAtlasArea">
+		<xs:annotation>
+			<xs:documentation>Een InfraAtlas-gebied (IA-gebied) is een systeem specifieke gebiedsafbakening. Binnen dit gebied geldt dat de namen van objecten uniek zijn.</xs:documentation>
+			<xs:documentation xml:lang="NL">IA-Gebied</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tDemarcationAggregation">
+					<xs:sequence>
+						<xs:element name="OperationalPointRefs" type="tUUIDRefList" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Een lijst PUIC verwijzingen naar dienstregelpunten waaruit het IA-gebied is opgebouwd</xs:documentation>
+								<xs:appinfo>
+									<ObjectTypeRef>OperationalPoint</ObjectTypeRef>
+								</xs:appinfo>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="OpenLineRefs" type="tUUIDRefList" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Een lijst PUIC verwijzingen naar vrijebanen waaruit het IA-gebied is opgebouwd</xs:documentation>
+								<xs:appinfo>
+									<ObjectTypeRef>OpenLine</ObjectTypeRef>
+								</xs:appinfo>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+					<xs:attribute name="infraAtlasAreaType" type="tInfraAtlasAreaTypeEnum" use="required">
+						<xs:annotation>
+							<xs:documentation>Type InfraAtlas-gebied (IA-gebied). De lijst van opties is voorgedefinieerd.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="MovementPlanSources">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="MovementPlanSource" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="MovementPlanSource">
+		<xs:annotation>
+			<xs:documentation>Een administratieve koppeling tussen een Rijwegplan en de PRL configuratie waarmee deze gegenereerd is. Dit Object is een legacy constructie om de transitie van conventioneel naar 'data-only' te faciliteren</xs:documentation>
+			<xs:documentation xml:lang="NL">Rijwegplan Bron</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="movementPlanRef" type="tUUIDRef" use="required">
+				<xs:annotation>
+					<xs:documentation>PUIC verwijzing naar het Rijwegplan wat is gegenereerd op basis van de gekoppelde PRL configuratie</xs:documentation>
+					<xs:appinfo>
+						<ObjectTypeRef>MovementPlan</ObjectTypeRef>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="configurationVersion" type="tConfigurationVersion" use="required">
+				<xs:annotation>
+					<xs:documentation>PRL Route-configuratie-versie (in format Vxxxx bijvoorbeeld V900 of V1001)</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="configurationTimestamp" type="xs:dateTime" use="required">
+				<xs:annotation>
+					<xs:documentation>Generatie timestamp (datum + tijd) van de PRL Route-configuratie</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="PpcPpcBoundaries">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="PpcPpcBoundary" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="BoundaryConfiguration">
+		<xs:annotation>
+			<xs:documentation/>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="ConfigRecord" minOccurs="2" maxOccurs="2">
+					<xs:complexType>
+						<xs:attribute name="operationalPointRef" type="tUUIDRef" use="required">
+							<xs:annotation>
+								<xs:documentation>de PUIC van het dienstregelpunt</xs:documentation>
+								<xs:appinfo>
+									<ObjectTypeRef>OperationalPoint</ObjectTypeRef>
+								</xs:appinfo>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="operationalPointTrackRef" type="tUUIDRef" use="required">
+							<xs:annotation>
+								<xs:documentation>de PUIC van het dienstregelpunt-spoor</xs:documentation>
+								<xs:appinfo>
+									<ObjectTypeRef>OperationalPointTrack</ObjectTypeRef>
+								</xs:appinfo>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="operationalPointTrackFunction" type="tOperationalPointTrackFunctionEnum" use="required">
+							<xs:annotation>
+								<xs:documentation>spoorfunctie-code</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="connectingOperationalPointRef" type="tUUIDRef">
+							<xs:annotation>
+								<xs:documentation>de PUIC van het verbonden dienstregelpunt</xs:documentation>
+								<xs:appinfo>
+									<ObjectTypeRef>OperationalPoint</ObjectTypeRef>
+								</xs:appinfo>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="connectingOperationalPointTrackRef" type="tUUIDRef">
+							<xs:annotation>
+								<xs:documentation>de PUIC van het verbonden dienstregelpunt-spoor</xs:documentation>
+								<xs:appinfo>
+									<ObjectTypeRef>OperationalPointTrack</ObjectTypeRef>
+								</xs:appinfo>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="extendedOperationalPointRef" type="tUUIDRef">
+							<xs:annotation>
+								<xs:documentation>de PUIC van het rijweg-vervolg-dienstregelpunt</xs:documentation>
+								<xs:appinfo>
+									<ObjectTypeRef>OperationalPoint</ObjectTypeRef>
+								</xs:appinfo>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="extendedOperationalPointTrackRef" type="tUUIDRef">
+							<xs:annotation>
+								<xs:documentation>de PUIC van het rijweg-vervolg-dienstregelpunt-spoor</xs:documentation>
+								<xs:appinfo>
+									<ObjectTypeRef>OperationalPointTrack</ObjectTypeRef>
+								</xs:appinfo>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="infraAtlasAreaRef" type="tUUIDRef" use="required">
+							<xs:annotation>
+								<xs:documentation>de PUIC van het IA-gebied</xs:documentation>
+								<xs:appinfo>
+									<ObjectTypeRef>InfraAtlasArea</ObjectTypeRef>
+								</xs:appinfo>
+							</xs:annotation>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="PpcPpcBoundary">
+		<xs:annotation>
+			<xs:documentation>PPLG-PPLG-Grens tussen 2 PPLG's waarbij de inrijdseinen rug-aan-rug staan en waarbij een S-bocht-knip van toepassing is.</xs:documentation>
+			<xs:documentation xml:lang="NL">PPLG-PPLG-Grens</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tBaseObject">
+					<xs:sequence>
+						<xs:element name="PpcEntrySignalRefs" type="tUUIDRefList">
+							<xs:annotation>
+								<xs:documentation>PUIC verwijzingen naar de toeleidende toegangsseinen behorend bij aangrenzende PPLG’s die rug-aan-rug liggen.</xs:documentation>
+								<xs:appinfo>
+									<ObjectTypeRef>Signal</ObjectTypeRef>
+									<ObjectTypeRef>StopMarkerBoard</ObjectTypeRef>
+								</xs:appinfo>
+							</xs:annotation>
+						</xs:element>
+						<xs:element ref="BoundaryConfiguration" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Een S-bocht Configuratieobject</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+					<xs:attribute name="sharedDemarcationMarkerRef" type="tUUIDRef" use="required">
+						<xs:annotation>
+							<xs:documentation>PUIC-Verwijzing naar de SharedDemarcationMarker welke zich tussen 2 bediende dienstregelpunten begeeft</xs:documentation>
+							<xs:appinfo>
+								<ObjectTypeRef>SharedDemarcationMarker</ObjectTypeRef>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:simpleType name="tConfigurationVersion">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="V[0-9]{3,4}"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="tInfraAtlasAreaTypeEnum">
+		<xs:annotation>
+			<xs:documentation>Enumeratie van typen InfraAtlas-gebieden (IA-gebieden).</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Unknown">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Onbekend</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Switch">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">IA Wisselgebied</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Connection">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">IA Verbinding</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

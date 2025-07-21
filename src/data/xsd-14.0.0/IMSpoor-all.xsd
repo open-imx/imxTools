@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.prorail.nl/IMSpoor" targetNamespace="http://www.prorail.nl/IMSpoor">
+	<xs:include schemaLocation="IMSpoor-BGTObjects.xsd"/>
+	<xs:include schemaLocation="IMSpoor-Extensions.xsd"/>
+	<xs:include schemaLocation="IMSpoor-Furniture.xsd"/>
+	<xs:include schemaLocation="IMSpoor-InstallationDesign.xsd"/>
+	<xs:include schemaLocation="IMSpoor-Legacy.xsd"/>
+	<xs:include schemaLocation="IMSpoor-ManagementAreas.xsd"/>
+	<xs:include schemaLocation="IMSpoor-Manifest.xsd"/>
+	<xs:include schemaLocation="IMSpoor-NetworkConfiguration.xsd"/>
+	<xs:include schemaLocation="IMSpoor-Observations.xsd"/>
+	<xs:include schemaLocation="IMSpoor-RailwayElectrification.xsd"/>
+	<xs:include schemaLocation="IMSpoor-SchemaLayout.xsd"/>
+	<xs:include schemaLocation="IMSpoor-SignalingDesign.xsd"/>
+	<xs:include schemaLocation="IMSpoor-TrainControl.xsd"/>
+	<xs:include schemaLocation="IMSpoor-KilometerValues.xsd"/>
+	<xs:include schemaLocation="IMSpoor-DomainIdentification.xsd"/>
+	<xs:element name="ImSpoor">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="Manifest" minOccurs="0"/>
+				<xs:element name="Situation" type="tSituation" minOccurs="0"/>
+				<xs:element name="Project">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="NewSituation" type="tSituation" minOccurs="0"/>
+							<xs:element name="InitialSituation" type="tSituation" minOccurs="0"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="tSituation">
+		<xs:sequence>
+			<xs:element ref="SignalingDesign" minOccurs="0"/>
+			<xs:element ref="Bgt" minOccurs="0"/>
+			<xs:element ref="Extensions" minOccurs="0"/>
+			<xs:element ref="Furniture" minOccurs="0"/>
+			<xs:element ref="InstallationDesign" minOccurs="0"/>
+			<xs:element ref="Legacy" minOccurs="0"/>
+			<xs:element ref="ManagementAreas" minOccurs="0"/>
+			<xs:element ref="NetworkConfiguration" minOccurs="0"/>
+			<xs:element ref="Observations" minOccurs="0"/>
+			<xs:element ref="RailwayElectrification" minOccurs="0"/>
+			<xs:element ref="SchemaLayout" minOccurs="0"/>
+			<xs:element ref="TrainControl" minOccurs="0"/>
+			<xs:element ref="KilometerValues" minOccurs="0"/>
+			<xs:element ref="DomainIdentification" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

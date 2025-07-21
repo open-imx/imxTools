@@ -1,0 +1,110 @@
+name: Release
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  release:
+    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'
+    runs-on: windows-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: 📥 Checkout source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v5
+        if: ${{ !env.ACT }}
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: 📦 Install uv
+        run: pip install uv
+
+      - name: 🗂️ Create virtual environment with uv
+        run: uv venv
+
+      - name: 📦 Install dependencies
+        run: |
+          uv pip install --group dev --group gui .
+
+      - name: 🔢 Get current version from project
+        id: get_version
+        shell: powershell
+        run: |
+          $version = uv run bump-my-version show current_version
+          Write-Host "Extracted version: $version"
+          "CURRENT_VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: 🔢 Get latest release version
+        id: get_latest_release
+        shell: powershell
+        run: |
+          $ErrorActionPreference = "Stop"
+      
+          $releases = gh release list --limit 1
+          if (-not $releases) {
+            Write-Output "No release found, setting fallback to 'none'."
+            "LATEST_RELEASE=none" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          } else {
+            $tag = gh release view --json tagName -q ".tagName"
+      
+            if ([string]::IsNullOrWhiteSpace($tag)) {
+              Write-Error "Tag is empty, aborting."
+              exit 1
+            }
+      
+            $tag = $tag -replace "^v", ""
+            "LATEST_RELEASE=$tag" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          }
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
+      - name: 🆚 Compare versions
+        id: compare
+        shell: powershell
+        run: |
+          $output = uv run python .github/compare_versions.py
+          $output | Write-Output
+      
+          foreach ($line in $output -split "`n") {
+            if ($line -like "SHOULD_RELEASE=*") {
+              $shouldRelease = $line -replace "SHOULD_RELEASE=", ""
+              "SHOULD_RELEASE=$shouldRelease" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+            }
+          }
+        env:
+          CURRENT_VERSION: ${{ env.CURRENT_VERSION }}
+          LATEST_RELEASE: ${{ env.LATEST_RELEASE }}
+
+      - name: 🛠️ Build project with uv
+        if: env.SHOULD_RELEASE == 'true'
+        run: uv build
+
+      - name: 🖥️ Run GUI build script
+        if: env.SHOULD_RELEASE == 'true'
+        run: uv run --active python build-gui-app.py
+
+      - name: 📝 Generate changelog with git-cliff
+        if: env.SHOULD_RELEASE == 'true'
+        run: uv run git-cliff --config cliff.toml --tag v${{ env.CURRENT_VERSION }} | Out-File -FilePath RELEASE_NOTES.md -Encoding utf8
+
+      - name: 🚀 Create GitHub release
+        if: env.SHOULD_RELEASE == 'true'
+        uses: ncipollo/release-action@bcfe5470707e8832e12347755757cec0eb3c22af
+        with:
+          tag: "v${{ env.CURRENT_VERSION }}"
+          name: "Release v${{ env.CURRENT_VERSION }}"
+          bodyFile: "RELEASE_NOTES.md"
+          prerelease: ${{ github.event.pull_request.base.ref == 'dev' }}
+          artifacts: |
+            dist/*.zip
+            dist/*.tar.gz
+            dist/*.whl

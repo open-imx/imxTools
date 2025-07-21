@@ -1,0 +1,3137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns="http://www.prorail.nl/IMSpoor" xmlns:gml="http://www.opengis.net/gml" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xml="http://www.w3.org/XML/1998/namespace" targetNamespace="http://www.prorail.nl/IMSpoor" elementFormDefault="qualified" attributeFormDefault="unqualified" version="12.0.0">
+	<xs:include schemaLocation="IMSpoor-Groupings.xsd"/>	
+	<xs:element name="RailwayElectrification">
+		<xs:annotation>
+			<xs:documentation>De elementen in deze XSD bevatten de zgn. bovenleidingsobjecten.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tDesignPetal">
+					<xs:sequence>
+						<xs:element ref="OverheadLineTopology" minOccurs="0"/>
+						<xs:element ref="Insulators" minOccurs="0"/>
+						<xs:element ref="OverheadLineSectionBreaks" minOccurs="0"/>
+						<xs:element ref="PhaseBreaks" minOccurs="0"/>
+						<xs:element ref="Tensioners" minOccurs="0"/>
+						<xs:element ref="Wires" minOccurs="0"/>
+						<xs:element ref="OverheadLineGroups" minOccurs="0"/>
+						<xs:element ref="SectionInsulators" minOccurs="0"/>
+						<xs:element ref="PowerSwitches" minOccurs="0"/>
+						<xs:element ref="Accommodations" minOccurs="0"/>
+						<xs:element ref="DirectCurrentVoltageDistributors" minOccurs="0"/>
+						<xs:element ref="TractionRectifiers" minOccurs="0"/>
+						<xs:element ref="Transformers" minOccurs="0"/>
+						<xs:element ref="VoltageTransitions" minOccurs="0"/>
+						<xs:element ref="OverheadLineSupports" minOccurs="0"/>
+						<xs:element ref="OverheadLineConnectionPoints" minOccurs="0"/>
+						<xs:element ref="ContactWireBraces" minOccurs="0"/>
+						<xs:element ref="ContactWireBraceConnectionPoints" minOccurs="0"/>
+						<xs:element ref="ObiOperatingAreas" minOccurs="0"/>
+						<xs:element ref="HighVoltageStrikethroughCircuits" minOccurs="0"/>
+						<xs:element ref="HighVoltageProtectionEnds25kV" minOccurs="0"/>
+						<xs:element ref="HighVoltageProtectionEnds1500V" minOccurs="0"/>
+						<xs:element ref="GroundElectrodes" minOccurs="0"/>
+						<xs:element ref="OverVoltageArrestersInOverheadLine" minOccurs="0"/>
+						<xs:element ref="OverVoltageArrestersAtCableTermination" minOccurs="0"/>
+						<xs:element ref="TrainPreheatingPoints" minOccurs="0"/>
+						<xs:element ref="ExpansionElements" minOccurs="0"/>
+						<xs:element ref="FixedPoints" minOccurs="0"/>
+						<xs:element ref="ConductorRailTransitions" minOccurs="0"/>
+						<xs:element ref="HighVoltageDistributionDevices" minOccurs="0"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="OverheadLineTopology">
+		<xs:annotation>
+			<xs:documentation>Wrapper voor de pure bovenleidingsnetwerktopologie in knopen (Nodes) en verbindingen (Links).</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="MicroNodesRe"/>
+				<xs:element ref="MicroLinksRe"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="MicroNodesRe">
+		<xs:annotation>
+			<xs:documentation>Een set knooppunten in Bovenleiding.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="MicroNodeRe" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="MicroNodeRe">
+		<xs:annotation>
+			<xs:documentation>Een knoop in het topologie netwerk (Bovenleiding).</xs:documentation>
+			<xs:documentation xml:lang="NL">Micro-Node-EV</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tMicroNode">
+					<xs:attribute name="junctionReRef" type="tUUIDRef" use="required">
+						<xs:annotation>
+							<xs:documentation>PUIC verwijzing naar een bijbehorende vervuller (Bovenleiding)</xs:documentation>
+							<xs:appinfo>
+								<!-- Bovenleiding -->
+								<ObjectTypeRef>SectionInsulator</ObjectTypeRef>
+								<ObjectTypeRef>Insulator</ObjectTypeRef>
+								<ObjectTypeRef>ConductorRailTransition</ObjectTypeRef>
+								<ObjectTypeRef>OverheadLineSectionBreak</ObjectTypeRef>
+								<!-- Bovenleiding: Schakelaar -->
+								<ObjectTypeRef>BridgeOverheadLinePowerSwitch</ObjectTypeRef>
+								<ObjectTypeRef>HighSpeedCircuitBreaker</ObjectTypeRef>
+								<ObjectTypeRef>ShortCircuitPowerSwitch</ObjectTypeRef>
+								<ObjectTypeRef>BridgeBypassPowerSwitch</ObjectTypeRef>
+								<!-- Bovenleiding: Schakelaar - Bovenleidingschakelaar -->
+								<ObjectTypeRef>ThreePolePowerSwitch</ObjectTypeRef>
+								<ObjectTypeRef>FourPolePowerSwitch</ObjectTypeRef>
+								<ObjectTypeRef>SingleOverheadLinePowerSwitch</ObjectTypeRef>
+								<ObjectTypeRef>OverheadLineFeederPowerSwitch</ObjectTypeRef>
+								<!-- Bovenleiding: Elektrische-Verbinding-BVL -->
+								<ObjectTypeRef>FeedingPoint</ObjectTypeRef>
+								<ObjectTypeRef>GroundingPoint</ObjectTypeRef>
+								<ObjectTypeRef>MinusPoint</ObjectTypeRef>
+								<ObjectTypeRef>ConnectionPoint</ObjectTypeRef>
+								<ObjectTypeRef>Tensioner</ObjectTypeRef>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="MicroLinksRe">
+		<xs:annotation>
+			<xs:documentation>Een verzameling verbindingen in een bovenleidingnetwerk</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="MicroLinkRe" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="MicroLinkRe">
+		<xs:annotation>
+			<xs:documentation>Een verbinding tussen twee knooppunten in een bovenleidingnetwerk</xs:documentation>
+			<xs:documentation xml:lang="NL">EV-Micro-Link</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tMicroLink">
+					<xs:attribute name="implementationReObjectRef" type="tUUIDRef" use="required">
+						<xs:annotation>
+							<xs:documentation>PUIC verwijzing naar de bijbehorende vervuller</xs:documentation>
+							<xs:appinfo>
+								<ObjectTypeRef>NegativeFeederPart</ObjectTypeRef>
+								<ObjectTypeRef>EquipotentialPart</ObjectTypeRef>
+								<ObjectTypeRef>PositiveFeederPart</ObjectTypeRef>
+								<ObjectTypeRef>ContactWirePart</ObjectTypeRef>
+								<ObjectTypeRef>ConnectionWire</ObjectTypeRef>
+								<ObjectTypeRef>InsulatedCable</ObjectTypeRef>
+								<ObjectTypeRef>FeederCable</ObjectTypeRef>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Insulators">
+		<xs:annotation>
+			<xs:documentation>Een verzameling isolatoren.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="Insulator" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Insulator">
+		<xs:annotation>
+			<xs:documentation>In de bovenleiding opgenomen elektrische scheiding tussen spanning-spanning, spanning-aarde of spanning-minus.</xs:documentation>
+			<xs:documentation xml:lang="NL">Isolator</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tOverheadLinePointTrackAsset">
+					<xs:attribute name="isDriveable" type="tTrueFalseEnum" use="required">
+						<xs:annotation>
+							<xs:documentation>Indicator of het een berijdbare isolator betreft.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="OverheadLineSectionBreaks">
+		<xs:annotation>
+			<xs:documentation>Een lijst van spaninrichtingen</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="OverheadLineSectionBreak" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="OverheadLineSectionBreak">
+		<xs:annotation>
+			<xs:documentation>Een spaninrichting is een inrichting om de rijdraad strak te trekken. Toelichting: Er wordt onderscheid gemaakt tussen open en gesloten spaninrichtingen. Een gesloten spaninrichting (gsi) is een schakelaar die 2 bovenleidingen mechanisch kan scheiden, waarbij de spaninrichting uitsluitend een mechanische functie heeft.Een open spaninrichting (osi) is een spaninrichting met zowel een mechanische functie als een elektrisch functie voor het scheiden van twee groepen (zowel bij gelijk- als wisselstroom) of het scheiden van twee fasen (bij wisselspanning).</xs:documentation>
+			<xs:documentation xml:lang="NL">Spaninrichting</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tOverheadLinePointTrackAsset">
+					<xs:sequence>
+						<xs:element ref="ParallelWires"/>
+						<xs:element ref="SlopingWires" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+					<xs:attribute name="overheadLineSectionBreakType" type="tOverheadLineSectionBreakEnum" use="required">
+						<xs:annotation>
+							<xs:documentation>Het soort spaninrichting. De lijst van opties is voorgedefiniëerd. Alleen wanneer een spaninrichting de waarde 'open' heeft, kan het een fasescheidingbegrenzer zijn.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="PhaseBreaks">
+		<xs:annotation>
+			<xs:documentation>Een lijst van fasescheidingen</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="PhaseBreak" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="PhaseBreak">
+		<xs:annotation>
+			<xs:documentation>Een fasescheiding wordt gebruikt bij de overgang naar een ander onderstation. Een fasescheiding is alleen relevant bij bovenleiding-wisselspanning van 25kV.</xs:documentation>
+			<xs:documentation xml:lang="NL">Fasescheiding</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tObjectDemarcation">
+					<xs:sequence>
+						<xs:element name="DemarcationObject" minOccurs="1" maxOccurs="unbounded">
+							<xs:complexType>
+								<xs:attribute name="objectRef" type="tUUIDRef" use="required">
+									<xs:annotation>
+										<xs:documentation>Een PUIC verwijzing naar een fasescheidingbegrenzer.</xs:documentation>
+										<xs:appinfo>
+											<ObjectTypeRef>Insulator</ObjectTypeRef>
+											<ObjectTypeRef>SectionInsulator</ObjectTypeRef>
+											<ObjectTypeRef>OverheadLineSectionBreak</ObjectTypeRef>
+										</xs:appinfo>
+									</xs:annotation>
+								</xs:attribute>
+								<xs:attribute name="direction" type="tFunctionalDirectionEnum" use="required">
+									<xs:annotation>
+										<xs:documentation>De richting van de begrenzer ten opzichte van de normaalrichting van de functionele-spoortak. Begrenzers wijzen altijd naar de binnenkant van het gebied.</xs:documentation>
+									</xs:annotation>
+								</xs:attribute>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="OverheadLineDemarcationMarkers">
+		<xs:annotation>
+			<xs:documentation>Een lijst van afbakeningspunten.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="OverheadLineDemarcationPoint" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="OverheadLineDemarcationPoint">
+		<xs:complexType>
+			<xs:attribute name="wireRef" type="tUUIDRef" use="required">
+				<xs:annotation>
+					<xs:documentation>Referentie naar de draaddelen waarop dit object wordt geprojecteerd.</xs:documentation>
+					<xs:appinfo>
+						<ObjectTypeRef>ContactWirePart</ObjectTypeRef>
+						<ObjectTypeRef>EquipotentialPart</ObjectTypeRef>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="direction" type="tFunctionalDirectionEnum" use="required">
+				<xs:annotation>
+					<xs:documentation>De richting van het event ten opzichte van de digitalisatierichting.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="atMeasure" type="xs:double" use="required">
+				<xs:annotation>
+					<xs:documentation>De positie van het event op het lijnstuk. Het aantal meters vanaf het begin van de lijn.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="HighVoltageStrikethroughCircuits">
+		<xs:annotation>
+			<xs:documentation>Een verzameling doorslagveiligheid circuits.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="HighVoltageStrikethroughCircuit" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="HighVoltageStrikethroughCircuit">
+		<xs:annotation>
+			<xs:documentation>Een doorslagveiligheid slaat door als de bedrijfsspanning op de draagconstructie komt te staan. Zo wordt er dan een kortsluiting gerealiseerd en schakelt de snelschakelaar(s) af.</xs:documentation>
+			<xs:documentation xml:lang="NL">Doorslagveiligheid</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tPointObject"/>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="HighVoltageProtectionEnds25kV">
+		<xs:annotation>
+			<xs:documentation>Een verzameling verbindingen t.b.v. bescherming bij 25 kV.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="HighVoltageProtectionEnd25kV" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="HighVoltageProtectionEnd25kV">
+		<xs:annotation>
+			<xs:documentation>Een elektrische verbinding tussen een metalen object en een aarde (grounding) bij 25 kV.</xs:documentation>
+			<xs:documentation xml:lang="NL">Zakeind-25kV</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tPointObject"/>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="HighVoltageProtectionEnds1500V">
+		<xs:annotation>
+			<xs:documentation>Een verzameling verbindingen t.b.v. bescherming bij 1500 V.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="HighVoltageProtectionEnd1500V" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="HighVoltageProtectionEnd1500V">
+		<xs:annotation>
+			<xs:documentation>Een elektrische verbinding tussen een metalen object en een minus, met daartussen een doorslagveiligheid bij 1500V. De minus is de spoorstaaf die de retourstromen afvoert.</xs:documentation>
+			<xs:documentation xml:lang="NL">Zakeind-1500V</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tPointObject"/>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="GroundElectrodes">
+		<xs:annotation>
+			<xs:documentation>Een verzameling objecten in de grond die goed elektrisch contact maakt met de aarde.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="GroundElectrode" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="GroundElectrode">
+		<xs:annotation>
+			<xs:documentation>Object in de grond die goed elektrisch contact maakt met de aarde.</xs:documentation>
+			<xs:documentation xml:lang="NL">Aardelektrode</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tPointObject"/>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="OverVoltageArrestersInOverheadLine">
+		<xs:annotation>
+			<xs:documentation>Een verzameling overspanningsafleiders die toegepast worden in de bovenleiding.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="OverVoltageArresterInOverheadLine" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="OverVoltageArresterInOverheadLine">
+		<xs:annotation>
+			<xs:documentation>Een type overspanningsafleider toegepast in de bovenleiding.</xs:documentation>
+			<xs:documentation xml:lang="NL">Overspanningsafleider-In-De-Bovenleiding</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tOverVoltageArrester"/>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="OverVoltageArrestersAtCableTermination">
+		<xs:annotation>
+			<xs:documentation>Een verzameling overspanningsafleiders die toegepast worden bij voedende schakelaars.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="OverVoltageArresterAtCableTermination" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="OverVoltageArresterAtCableTermination">
+		<xs:annotation>
+			<xs:documentation>Een type overspanningsafleider toegepast bij voedende schakelaars.</xs:documentation>
+			<xs:documentation xml:lang="NL">Overspanningsafleider-Bij-Kabeleindsluiting</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tOverVoltageArrester"/>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="TrainPreheatingPoints">
+		<xs:annotation>
+			<xs:documentation>Een verzameling Treinvoorverwarmingspunten.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="TrainPreheatingPoint" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="TrainPreheatingPoint">
+		<xs:annotation>
+			<xs:documentation>Een nutsvoorziening op een opstelterrein om een trein voor te verwarmen.</xs:documentation>
+			<xs:documentation xml:lang="NL">Treinvoorverwarmingspunt</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tOverheadLinePointTrackAsset"/>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ExpansionElements">
+		<xs:annotation>
+			<xs:documentation>Een verzameling Expansie-Elementen.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ExpansionElement" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ExpansionElement">
+		<xs:annotation>
+			<xs:documentation>Element dat krimpen en uitzetten tussen twee stroomrails faciliteert.</xs:documentation>
+			<xs:documentation xml:lang="NL">Expansie-Element</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tOverheadLinePointTrackAsset">
+					<xs:sequence>
+						<xs:element ref="WirePartInfo" minOccurs="0"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="FixedPoints">
+		<xs:annotation>
+			<xs:documentation>Een verzameling op rijdraden vastgemaakte (punt)objecten om verbindingen tussen draagkabel en rijdraad te maken om zo de rijdraad te fixeren.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="FixedPoint" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="FixedPoint">
+		<xs:annotation>
+			<xs:documentation>Een op de rijdraad (mechanisch) vastgemaakt (punt)object, waarmee een verbinding tussen draagkabel en rijdraad wordt gemaakt om de rijdraad te fixeren.</xs:documentation>
+			<xs:documentation xml:lang="NL">Vastpunt</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tPointObject">
+					<xs:attribute name="fixedPointType" type="tFixedPointTypeEnum" use="required">
+						<xs:annotation>
+							<xs:documentation>Vastpunt type. Een lijst met opties is voorgedefinieerd.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ConductorRailTransitions">
+		<xs:annotation>
+			<xs:documentation>Een verzameling objecten die overgangen/scheidingen tussen stukken stroomrail ondersteunen.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ConductorRailTransition" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ConductorRailTransition">
+		<xs:annotation>
+			<xs:documentation>Object dat een overgang/scheiding tussen twee stukken stroomrail ondersteunt. Vaak toegepast bij een kunstwerk.</xs:documentation>
+			<xs:documentation xml:lang="NL">Stroomrailovergang</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tOverheadLinePointTrackAsset">
+					<xs:sequence>
+						<xs:element ref="WirePartInfo" minOccurs="0"/>
+					</xs:sequence>
+					<xs:attribute name="bridgeOverheadLinePowerSwitchRef" type="tUUIDRef">
+						<xs:annotation>
+							<xs:documentation>Een PUIC verwijzing naar een bovenleidingschakelaar met de functie koppelen. Een koppelende bovenleidingschakelaar is parallel geschakeld over een bovenleidingsgroepbegrenzer.</xs:documentation>
+							<xs:appinfo>
+								<ObjectTypeRef>BridgeOverheadLinePowerSwitch</ObjectTypeRef>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="HighVoltageDistributionDevices">
+		<xs:annotation>
+			<xs:documentation>Een verzameling verdeelinrichtingen aangesloten op midden- en hoogspanningsniveau.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="HighVoltageDistributionDevice" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="HighVoltageDistributionDevice">
+		<xs:annotation>
+			<xs:documentation>Een verdeelinrichting aangesloten op midden- en hoogspanningsniveau met de functie het elektrische vermogen te verdelen en distribueren.</xs:documentation>
+			<xs:documentation xml:lang="NL">Hoogspanningsverdeelinrichting</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tPointObject"/>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Tensioners">
+		<xs:annotation>
+			<xs:documentation>Een verzameling afspanningen.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="Tensioner" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Tensioner">
+		<xs:annotation>
+			<xs:documentation>Een afspanning is een inrichting om de rijdraad strak te trekken.</xs:documentation>
+			<xs:documentation xml:lang="NL">Afspanning</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tPointObject">
+					<xs:attribute name="overheadLineSectionBreakRef" type="tUUIDRef">
+						<xs:annotation>
+							<xs:documentation>Een PUIC verwijzing naar een spaninrichting</xs:documentation>
+							<xs:appinfo>
+								<ObjectTypeRef>OverheadLineSectionBreak</ObjectTypeRef>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="tensionerType" type="tTensionerTypeEnum" use="required">
+						<xs:annotation>
+							<xs:documentation>Het type van de afspanning. De lijst van opties is voorgedefiniëerd. Wanneer het een beweegbare afspanning betreft zijn de waarden 'none' en 'fixed' niet relevant. Wanneer het voltage bij overheadLineVoltageType V1500 betreft zijn de waarden ElectricalMechanism, Gas, Lever, Rol, TensorexClassic, TensorexCompact, Spring en Wheel relevant. Bij een voltagewaarden van V25000 zijn de waarden Spring_Tensorex_Seher, Wheel_1_3_Huth_N_Gaddum en Other relevant.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="overheadLineVoltageType" type="tVoltageClassEnum" use="required">
+						<xs:annotation>
+							<xs:documentation>Type voltage van draad dat wordt afgespannen door de afspanning. De lijst met opties is voorgedefiniëerd.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="poleRef" type="tUUIDRef">
+						<xs:annotation>
+							<xs:documentation>Een PUIC verwijzing naar een bovenleidingspaal. Een afspanning is gemonteerd op een bovenleidingspaal. Dit attribuut is alleen verplicht als tensionerType de waarde 'movable'heeft.</xs:documentation>
+							<xs:appinfo>
+								<ObjectTypeRef>Pole</ObjectTypeRef>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Wires">
+		<xs:annotation>
+			<xs:documentation>Een verzameling draden.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="NegativeFeeders" minOccurs="0"/>
+				<xs:element ref="NegativeFeederParts" minOccurs="0"/>
+				<xs:element ref="Equipotentials" minOccurs="0"/>
+				<xs:element ref="EquipotentialParts" minOccurs="0"/>
+				<xs:element ref="CatenaryWires" minOccurs="0"/>
+				<xs:element ref="PositiveFeeders" minOccurs="0"/>
+				<xs:element ref="PositiveFeederParts" minOccurs="0"/>
+				<xs:element ref="ContactWires" minOccurs="0"/>
+				<xs:element ref="ContactWireParts" minOccurs="0"/>
+				<xs:element ref="InsulatedCables" minOccurs="0"/>
+				<xs:element ref="ConnectionWires" minOccurs="0"/>
+				<xs:element ref="ProtectionWires" minOccurs="0"/>
+				<xs:element ref="FeederCables" minOccurs="0"/>
+				<xs:element ref="DetectionWires" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="NegativeFeeders">
+		<xs:annotation>
+			<xs:documentation>Een verzameling negatieve Feeders.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="NegativeFeeder" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="NegativeFeeder">
+		<xs:annotation>
+			<xs:documentation>Dit is een extra geleider in het 25kV systeem ten behoeve van het vermogenstransport. Deze zogenaamde 'negatieve' feeder heeft ook een spanning van 25 kV, die echter in tegenfase is (180 graden in fase verschoven) met de spanning van de bovenleiding (ook wel 'positieve' feeder genoemd). Hierdoor bedraagt de spanning tussen de positieve en negatieve feeder 50 kV.</xs:documentation>
+			<xs:documentation xml:lang="NL">Negatieve Feeder</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tWire"/>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="NegativeFeederParts">
+		<xs:annotation>
+			<xs:documentation>Een verzameling negatievefeederdelen.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="NegativeFeederPart" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="NegativeFeederPart">
+		<xs:annotation>
+			<xs:documentation>Een NegatiefFeederdeel is een deel van een Negatief-Feeder dat in het EV-netwerk een rol speelt als link, welke afgebakend is tussen twee nodes die ingevuld worden door bijvoorbeeld isolatoren of leidingonderbrekers.</xs:documentation>
+			<xs:documentation xml:lang="NL">Negatief-Feederdeel</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tWirePart"/>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Equipotentials">
+		<xs:annotation>
+			<xs:documentation>Een verzameling equipotentialen.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="Equipotential" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Equipotential">
+		<xs:annotation>
+			<xs:documentation>Dit is een extra retourstroom geleider die met de bovenleiding meegevoerd wordt en galvanisch is verbonden met iedere bovenleidingpaal. Door de aanwezigheid van de equipotentiaalgeleider zal er minder retourstroom door de spoorstaven en de bodem gaan, waarmee de stap- en aanraakspanningen alsmede de kabelmantelstromen gereduceerd worden.</xs:documentation>
+			<xs:documentation xml:lang="NL">Equipotentiaal</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tWire"/>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="EquipotentialParts">
+		<xs:annotation>
+			<xs:documentation>Een verzameling equipotentiaaldelen.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="EquipotentialPart" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="EquipotentialPart">
+		<xs:annotation>
+			<xs:documentation>Een equipotentiaaldeel is een deel van een equipotentiaal dat in het EV-netwerk een rol speelt als link, welke afgebakend is tussen twee nodes die ingevuld worden door bijvoorbeeld isolatoren of leidingonderbrekers.</xs:documentation>
+			<xs:documentation xml:lang="NL">Equipotentiaaldeel</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tWirePart"/>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="CatenaryWires">
+		<xs:annotation>
+			<xs:documentation>Een verzameling draagkabels.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="CatenaryWire" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="CatenaryWire">
+		<xs:annotation>
+			<xs:documentation>Een draagkabel is een horizontaal, ongeïsoleerd, meeraderig geslagen leiding, onderdeel van de bovenleiding en bedoeld voor het direct of indirect dragen van de rijdraad zodanig dat de doorhang van de rijdraad tussen de bovenleidingspalen beperkt blijft.</xs:documentation>
+			<xs:documentation xml:lang="NL">Draagkabel</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tWire"/>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="PositiveFeeders">
+		<xs:annotation>
+			<xs:documentation>Een verzameling versterkingsleidingen.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="PositiveFeeder" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="PositiveFeeder">
+		<xs:annotation>
+			<xs:documentation>Een horizontale, meeraderige geslagen leiding, onderdeel van de bovenleiding, bedoeld voor het verlagen van de elektrische weerstand van de bovenleiding en voor het verlagen van de thermische belasting van rijdraad en draagkabel.</xs:documentation>
+			<xs:documentation xml:lang="NL">Versterkingsleiding</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tWire"/>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="PositiveFeederParts">
+		<xs:annotation>
+			<xs:documentation>Een verzameling versterkingsleidingdelen.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="PositiveFeederPart" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="PositiveFeederPart">
+		<xs:annotation>
+			<xs:documentation>Een versterkingsleidingdeel is een deel van een versterkingsleiding dat in het EV-netwerk een rol speelt als link, welke afgebakend is tussen twee nodes die ingevuld worden door bijvoorbeeld isolatoren of leidingonderbrekers.</xs:documentation>
+			<xs:documentation xml:lang="NL">Versterkingsleidingdeel</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tWirePart">
+					<xs:attribute name="overheadLineGroupRef" type="tUUIDRef">
+						<xs:annotation>
+							<xs:documentation>Een PUIC verwijzing naar een bovenleidingsgroep, waar het versterkingsleidingdeel onderdeel van uit maakt.</xs:documentation>
+							<xs:appinfo>
+								<ObjectTypeRef>OverheadLineGroup</ObjectTypeRef>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ContactWires">
+		<xs:annotation>
+			<xs:documentation>Een verzameling rijdraden.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ContactWire" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ContactWire">
+		<xs:annotation>
+			<xs:documentation>Een sleepleiding, onderdeel van de bovenleiding, die contact maakt met de stroomafnemers van de trein. In praktijk kan dit als een gebied (over meerdere spoortakken heen) gezien worden waarbij het samenstel van o.a. de rijdraaddelen, tussen liggende EV-infra-objecten en draagkabel door afspanningen wordt strakgetrokken.</xs:documentation>
+			<xs:documentation xml:lang="NL">Rijdraad</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tWire">
+					<xs:sequence>
+						<xs:element ref="NotDrivable" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Indicatie voor welk deel van een rijdraad niet berijdbaar is.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+					<xs:attribute name="catenaryWireRef" type="tUUIDRef">
+						<xs:annotation>
+							<xs:documentation>Een PUIC verwijzing naar een draagkabel</xs:documentation>
+							<xs:appinfo>
+								<ObjectTypeRef>CatenaryWire</ObjectTypeRef>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="NotDrivable">
+		<xs:annotation>
+			<xs:documentation>Indicatie voor welk deel van een rijdraad niet berijdbaar is.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="fromMeasure" type="xs:double" use="required">
+				<xs:annotation>
+					<xs:documentation>De startpositie van het event op het lijnstuk. Het aantal meters vanaf het begin van de lijn.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="toMeasure" type="xs:double" use="required">
+				<xs:annotation>
+					<xs:documentation>De eindpositie van het event op het lijnstuk. Het aantal meters vanaf het begin van de lijn.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="InsulatedCables">
+		<xs:annotation>
+			<xs:documentation>Een verzameling Geïsoleerde-Kabel</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="InsulatedCable" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="InsulatedCable">
+		<xs:annotation>
+			<xs:documentation>Een kabel die onder een water wordt doorgevoerd parallel aan een beweegbare spoorbrug</xs:documentation>
+			<xs:documentation xml:lang="NL">Geïsoleerde-Kabel</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tWire">
+					<xs:sequence>
+						<xs:element name="PowerSwitchRefs" type="tUUIDRefList" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Een optionele PUIC verwijzing naar een of meer schakelaars.</xs:documentation>
+								<xs:appinfo>
+									<ObjectTypeRef>ShortCircuitPowerSwitch</ObjectTypeRef>
+									<ObjectTypeRef>HighSpeedCircuitBreaker</ObjectTypeRef>
+									<ObjectTypeRef>BridgeBypassPowerSwitch</ObjectTypeRef>
+									<ObjectTypeRef>ThreePolePowerSwitch</ObjectTypeRef>
+									<ObjectTypeRef>FourPolePowerSwitch</ObjectTypeRef>
+									<ObjectTypeRef>SingleOverheadLinePowerSwitch</ObjectTypeRef>
+									<ObjectTypeRef>OverheadLineFeederPowerSwitch</ObjectTypeRef>
+									<ObjectTypeRef>BridgeOverheadLinePowerSwitch</ObjectTypeRef>
+								</xs:appinfo>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ConnectionWires">
+		<xs:annotation>
+			<xs:documentation>Een verzameling verbindingsdraden.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ConnectionWire" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ConnectionWire">
+		<xs:annotation>
+			<xs:documentation>Zijn draden die onderling draden met elkaar verbinden via elektrische verbindingen die belegd zijn op een draad.</xs:documentation>
+			<xs:documentation xml:lang="NL">Verbindingsdraad</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tWire"/>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ProtectionWires">
+		<xs:annotation>
+			<xs:documentation>Een verzameling Beschermingsleiding.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ProtectionWire" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ProtectionWire">
+		<xs:annotation>
+			<xs:documentation>Bekabeling die metalen objecten doorverbindt met het een zakeind aan het retoursysteem. Toegepast in het 1500V en 25kVsysteem</xs:documentation>
+			<xs:documentation xml:lang="NL">Beschermingsleiding</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tWire"/>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="FeederCables">
+		<xs:annotation>
+			<xs:documentation>Een verzameling voedingskabels</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="FeederCable" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="FeederCable">
+		<xs:annotation>
+			<xs:documentation>Kabel waarmee spanning op een schakelaar wordt gezet.</xs:documentation>
+			<xs:documentation xml:lang="NL">Voedingskabel</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tWire">
+					<xs:sequence>
+						<xs:element name="PowerSwitchRefs" type="tUUIDRefList" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Een optionele PUIC verwijzing naar een of meer schakelaars.</xs:documentation>
+								<xs:appinfo>
+									<ObjectTypeRef>ShortCircuitPowerSwitch</ObjectTypeRef>
+									<ObjectTypeRef>HighSpeedCircuitBreaker</ObjectTypeRef>
+									<ObjectTypeRef>BridgeBypassPowerSwitch</ObjectTypeRef>
+									<ObjectTypeRef>ThreePolePowerSwitch</ObjectTypeRef>
+									<ObjectTypeRef>FourPolePowerSwitch</ObjectTypeRef>
+									<ObjectTypeRef>SingleOverheadLinePowerSwitch</ObjectTypeRef>
+									<ObjectTypeRef>OverheadLineFeederPowerSwitch</ObjectTypeRef>
+									<ObjectTypeRef>BridgeOverheadLinePowerSwitch</ObjectTypeRef>
+								</xs:appinfo>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="DetectionWires">
+		<xs:annotation>
+			<xs:documentation>Een verzameling Detectiedraden</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="DetectionWire" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="DetectionWire">
+		<xs:annotation>
+			<xs:documentation>Rijdraad die parallel aan de voedende rijdraad wordt gemonteerd zodat een opstaande stroomafnemer contact maakt met beide rijdraden.</xs:documentation>
+			<xs:documentation xml:lang="NL">Detectiedraad</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tWire"/>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="OverheadLineGroups">
+		<xs:annotation>
+			<xs:documentation>Een verzameling bovenleidingsgroepen</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="OverheadLineGroup" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="OverheadLineGroup">
+		<xs:annotation>
+			<xs:documentation>Verzameling van met elkaar elektrisch doorverbonden geleidende elementen in de bovenleiding die niet door schakelhandelingen te scheiden zijn. Voedingssecties is een lijstje van bovenleidingsgroepen (standaard)</xs:documentation>
+			<xs:documentation xml:lang="NL">Bovenleidingsgroep</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tObjectDemarcation">
+					<xs:sequence>
+						<xs:element name="DemarcationObject" minOccurs="1" maxOccurs="unbounded">
+							<xs:complexType>
+								<xs:attribute name="objectRef" type="tUUIDRef" use="required">
+									<xs:annotation>
+										<xs:documentation>Een PUIC verwijzing naar een bovenleidingsgroepbegrenzer.</xs:documentation>
+										<xs:appinfo>
+											<ObjectTypeRef>Insulator</ObjectTypeRef>
+											<ObjectTypeRef>SectionInsulator</ObjectTypeRef>
+											<ObjectTypeRef>ConductorRailTransition</ObjectTypeRef>
+											<ObjectTypeRef>BridgeOverheadLinePowerSwitch</ObjectTypeRef>
+											<!-- De drie specialisaties van Bovenleidingschakelaar -->
+											<ObjectTypeRef>ThreePolePowerSwitch</ObjectTypeRef>
+											<ObjectTypeRef>FourPolePowerSwitch</ObjectTypeRef>
+											<ObjectTypeRef>OverheadLineFeederPowerSwitch</ObjectTypeRef>
+											<ObjectTypeRef>SingleOverheadLinePowerSwitch</ObjectTypeRef>
+											<!-- Kortsluitpunt-BVL -->
+											<ObjectTypeRef>GroundingPoint</ObjectTypeRef>
+											<ObjectTypeRef>MinusPoint</ObjectTypeRef>
+										</xs:appinfo>
+									</xs:annotation>
+								</xs:attribute>
+								<xs:attribute name="direction" type="tFunctionalDirectionEnum" use="required">
+									<xs:annotation>
+										<xs:documentation>De richting van de begrenzer ten opzichte van de normaalrichting van de functionele-spoortak. Begrenzers wijzen altijd naar de binnenkant van het gebied.</xs:documentation>
+									</xs:annotation>
+								</xs:attribute>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+					<xs:attribute name="color" type="tOverheadLineGroupColorEnum" use="required">
+						<xs:annotation>
+							<xs:documentation>De ontworpen kleur van de bovenleidingsgroep.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="overheadLineGroupType" type="tOverheadLineGroupTypeEnum" use="required">
+						<xs:annotation>
+							<xs:documentation>Het type bovenleidingsgroep.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SectionInsulators">
+		<xs:annotation>
+			<xs:documentation>Een verzameling leidingonderbrekers.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="SectionInsulator" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SectionInsulator">
+		<xs:annotation>
+			<xs:documentation>Een leidingonderbreker is een groepenscheiding, gemonteerd in een rijdraad, die bij elke treinpassage met baanvaksnelheid of minder en niet gestreken stroomafnemer gepasseerd kan worden terwijl het krachtvoertuig tractiestroom vraagt.</xs:documentation>
+			<xs:documentation xml:lang="NL">Leidingonderbreker</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tOverheadLinePointTrackAsset">
+					<xs:annotation>
+						<xs:documentation>Voor leidingonderbreker is de spoortak relatie verplicht</xs:documentation>
+					</xs:annotation>
+					<xs:attribute name="isExtended" type="tTrueFalseEnum" use="required">
+						<xs:annotation>
+							<xs:documentation>Indicatie of de leidingonderbreker verlengd is.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="PowerSwitches">
+		<xs:annotation>
+			<xs:documentation>Een verzameling schakelaars</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ShortCircuitPowerSwitches" minOccurs="0"/>
+				<xs:element ref="HighSpeedCircuitBreakers" minOccurs="0"/>
+				<xs:element ref="BridgeBypassPowerSwitches" minOccurs="0"/>
+				<xs:element ref="ThreePolePowerSwitches" minOccurs="0"/>
+				<xs:element ref="FourPolePowerSwitches" minOccurs="0"/>
+				<xs:element ref="SingleOverheadLinePowerSwitches" minOccurs="0"/>
+				<xs:element ref="OverheadLineFeederPowerSwitches" minOccurs="0"/>
+				<xs:element ref="BridgeOverheadLinePowerSwitches" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ShortCircuitPowerSwitches">
+		<xs:annotation>
+			<xs:documentation>Een verzameling kortsluitschakelaars.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ShortCircuitPowerSwitch" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ShortCircuitPowerSwitch">
+		<xs:annotation>
+			<xs:documentation>Een schakelaar die de bovenleiding aan aarde (25 kV) of minus (1500V) legt. Een specifieke kortsluitschakelaar wordt gebruikt bij het afhandelen van een calamiteit in een tunnel. Het betreft hier een (extra) veiligheidsfunctie waarbij de brandweer met deze schakelaar handmatig een bovenleidingroep aard, nadat deze (door SMC) spanningsloos is gemaakt door het openen van bovenleidingschakelaar(s). De aardingschakelaar zit dus (lokaal) in een tunnel, maar niet in de bovenleiding zelf.</xs:documentation>
+			<xs:documentation xml:lang="NL">Kortsluitschakelaar</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tPowerSwitch"/>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="HighSpeedCircuitBreakers">
+		<xs:annotation>
+			<xs:documentation>Een verzameling snelschakelaars.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="HighSpeedCircuitBreaker" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="HighSpeedCircuitBreaker">
+		<xs:annotation>
+			<xs:documentation>Vermogensschakelaar in de Gelijkspanningsverdeelinrichting.</xs:documentation>
+			<xs:documentation xml:lang="NL">Snelschakelaar</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tPowerSwitch">
+					<xs:attribute name="powerSwitchRef" type="tUUIDRef">
+						<xs:annotation>
+							<xs:documentation>Een optionele PUIC verwijzing naar een schakelaar. Een snelschakelaar is gekoppeld met de voorliggende of achterliggende schakelaar.</xs:documentation>
+							<xs:appinfo>
+								<ObjectTypeRef>ShortCircuitPowerSwitch</ObjectTypeRef>
+								<ObjectTypeRef>HighSpeedCircuitBreaker</ObjectTypeRef>
+								<ObjectTypeRef>BridgeBypassPowerSwitch</ObjectTypeRef>
+								<ObjectTypeRef>ThreePolePowerSwitch</ObjectTypeRef>
+								<ObjectTypeRef>FourPolePowerSwitch</ObjectTypeRef>
+								<ObjectTypeRef>SingleOverheadLinePowerSwitch</ObjectTypeRef>
+								<ObjectTypeRef>OverheadLineFeederPowerSwitch</ObjectTypeRef>
+								<ObjectTypeRef>BridgeOverheadLinePowerSwitch</ObjectTypeRef>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="directCurrentVoltageDistributorRef" type="tUUIDRef">
+						<xs:annotation>
+							<xs:documentation>Een optionele PUIC verwijzing naar een gelijkspanningsverdeelinrichting. Een gelijkspanningsverdeelinrichting is gekoppeld aan een of meerdere snelschakelaars.</xs:documentation>
+							<xs:appinfo>
+								<ObjectTypeRef>DirectCurrentVoltageDistributor</ObjectTypeRef>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="controlStationRef" type="tUUIDRef">
+						<xs:annotation>
+							<xs:documentation>Een PUIC verwijzing naar het station waaruit de schakelaar wordt bediend. onderstation, van waaruit de schakelaar wordt bediend.</xs:documentation>
+							<xs:appinfo>
+								<ObjectTypeRef>Substation</ObjectTypeRef>
+								<ObjectTypeRef>SwitchingStation</ObjectTypeRef>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="powerSwitchRelation" type="tPowerSwitchRelationEnum" use="required">
+						<xs:annotation>
+							<xs:documentation>Type Snelschakelaarrelatie. Een lijst met opties is voorgedefinieerd</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="BridgeBypassPowerSwitches">
+		<xs:annotation>
+			<xs:documentation>Een verzameling Langskoppelschakelaars-Brug</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="BridgeBypassPowerSwitch" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="BridgeBypassPowerSwitch">
+		<xs:annotation>
+			<xs:documentation>Schakelaar, die de doorgaande voeding verzorgt, wanneer een brug geopend is/niet geschikt is voor treinverkeer. Wanneer een brug dicht is, verdeelt de stroom zich over de brugschakelaars en de (via de langskoppelaarschakelaars aangesloten waterkabel/zinkerkabel.</xs:documentation>
+			<xs:documentation xml:lang="NL">Langskoppelschakelaar-Brug</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tPowerSwitch">
+					<xs:attribute name="bridgeBypassPowerSwitchRef" type="tUUIDRef">
+						<xs:annotation>
+							<xs:documentation>Een optionele PUIC verwijzing naar een Langskoppelschakelaar-Brug. De schakelaars verzorgen de doorgaande voeding als de brug open (niet geschikt voor treinverkeer) is en als hij dicht is verdeeld de stroom zich over de brugschakelaars (in de bovenleiding) en de waterkabel/zinkerkabel.</xs:documentation>
+							<xs:appinfo>
+								<ObjectTypeRef>BridgeBypassPowerSwitch</ObjectTypeRef>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ThreePolePowerSwitches">
+		<xs:annotation>
+			<xs:documentation>Een verzameling driepolige schakelaars.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ThreePolePowerSwitch" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ThreePolePowerSwitch">
+		<xs:annotation>
+			<xs:documentation>Driepolige schakelaar. Schakelaar met drie polen, waarbij een van de polen kan worden verbonden met een minus of een grounding.</xs:documentation>
+			<xs:documentation xml:lang="NL">Driepolige schakelaar</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tOverheadLinePowerSwitchFeedingOrConnecting">
+					<xs:attribute name="connectingOverheadLinePowerSwitchRef" type="tUUIDRef">
+						<xs:annotation>
+							<xs:documentation>Een PUIC verwijzing naar een bovenleidingschakelaar met de functie koppelen. Een koppelende bovenleidingschakelaar is parallel geschakeld over een bovenleidingsgroepbegrenzer.</xs:documentation>
+							<xs:appinfo>
+								<ObjectTypeRef>ThreePolePowerSwitch</ObjectTypeRef>
+								<ObjectTypeRef>FourPolePowerSwitch</ObjectTypeRef>
+								<ObjectTypeRef>OverheadLineFeederPowerSwitch</ObjectTypeRef>
+								<ObjectTypeRef>SingleOverheadLinePowerSwitch</ObjectTypeRef>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="FourPolePowerSwitches">
+		<xs:annotation>
+			<xs:documentation>Een verzameling vierpolige schakelaars.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="FourPolePowerSwitch" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="FourPolePowerSwitch">
+		<xs:annotation>
+			<xs:documentation>Vierpolige schakelaar. Schakelaar met vier polen, speciale uitvoering welke alleen wordt toegepast in Venlo</xs:documentation>
+			<xs:documentation xml:lang="NL">Vierpolige schakelaar</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tOverheadLinePowerSwitchFeedingOrConnecting">
+					<xs:attribute name="connectingOverheadLinePowerSwitchRef" type="tUUIDRef">
+						<xs:annotation>
+							<xs:documentation>Een PUIC verwijzing naar een bovenleidingschakelaar met de functie koppelen. Een koppelende bovenleidingschakelaar is parallel geschakeld over een bovenleidingsgroepbegrenzer.</xs:documentation>
+							<xs:appinfo>
+								<ObjectTypeRef>ThreePolePowerSwitch</ObjectTypeRef>
+								<ObjectTypeRef>FourPolePowerSwitch</ObjectTypeRef>
+								<ObjectTypeRef>OverheadLineFeederPowerSwitch</ObjectTypeRef>
+								<ObjectTypeRef>SingleOverheadLinePowerSwitch</ObjectTypeRef>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SingleOverheadLinePowerSwitches">
+		<xs:annotation>
+			<xs:documentation>Een verzameling bovenleidingschakelaars-Enkel.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="SingleOverheadLinePowerSwitch" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SingleOverheadLinePowerSwitch">
+		<xs:annotation>
+			<xs:documentation>Type bovenleidingschakelaar, die wordt toegepast bij een voltage van 1500V</xs:documentation>
+			<xs:documentation xml:lang="NL">Bovenleidingschakelaar-Enkel</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tOverheadLinePowerSwitchFeedingOrConnecting">
+					<xs:attribute name="connectingOverheadLinePowerSwitchRef" type="tUUIDRef">
+						<xs:annotation>
+							<xs:documentation>Een PUIC verwijzing naar een bovenleidingschakelaar met de functie koppelen. Een koppelende bovenleidingschakelaar is parallel geschakeld over een bovenleidingsgroepbegrenzer.</xs:documentation>
+							<xs:appinfo>
+								<ObjectTypeRef>ThreePolePowerSwitch</ObjectTypeRef>
+								<ObjectTypeRef>FourPolePowerSwitch</ObjectTypeRef>
+								<ObjectTypeRef>OverheadLineFeederPowerSwitch</ObjectTypeRef>
+								<ObjectTypeRef>SingleOverheadLinePowerSwitch</ObjectTypeRef>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="OverheadLineFeederPowerSwitches">
+		<xs:annotation>
+			<xs:documentation>Een verzameling bovenleidingschakelaars-Feeder.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="OverheadLineFeederPowerSwitch" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="OverheadLineFeederPowerSwitch">
+		<xs:annotation>
+			<xs:documentation>Type bovenleidingschakelaar, die wordt toegepast bij een voltage van 25KV</xs:documentation>
+			<xs:documentation xml:lang="NL">Bovenleidingschakelaar-Feeder</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tOverheadLinePowerSwitchFeedingOrConnecting">
+					<xs:sequence>
+						<xs:element ref="ParallelConnectionInfo" minOccurs="0"/>
+					</xs:sequence>
+					<xs:attribute name="connectingOverheadLinePowerSwitchRef" type="tUUIDRef">
+						<xs:annotation>
+							<xs:documentation>Een PUIC verwijzing naar een bovenleidingschakelaar met de functie koppelen. Een koppelende bovenleidingschakelaar is parallel geschakeld over een bovenleidingsgroepbegrenzer.</xs:documentation>
+							<xs:appinfo>
+								<ObjectTypeRef>ThreePolePowerSwitch</ObjectTypeRef>
+								<ObjectTypeRef>FourPolePowerSwitch</ObjectTypeRef>
+								<ObjectTypeRef>OverheadLineFeederPowerSwitch</ObjectTypeRef>
+								<ObjectTypeRef>SingleOverheadLinePowerSwitch</ObjectTypeRef>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="connectionMethod" type="tOverheadLineConnectionMethodEnum" use="required">
+						<xs:annotation>
+							<xs:documentation>Verbindingswijze. De lijst van opties is voorgedefinieerd. Dit attribuut is alleen relevant wanneer het type een bovenleidingschakelaar-feeder betreft.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ParallelConnectionInfo">
+		<xs:annotation>
+			<xs:documentation>Type parallelle verbinding. Dit element doet alleen ter zake wanneer connectionMethod de waarde 'parallel' heeft.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="overheadLineFeederPowerSwitchRef" type="tUUIDRef" use="required">
+				<xs:annotation>
+					<xs:documentation>Een PUIC verwijzing naar de bovenleidingschakelaar-feeder, waarmee het een parallelle verbinding vormt.</xs:documentation>
+					<xs:appinfo>
+						<ObjectTypeRef>OverheadLineFeederPowerSwitch</ObjectTypeRef>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="connectionType" type="tFeederConnectionTypeEnum" use="required">
+				<xs:annotation>
+					<xs:documentation>Type verbinding. De lijst van opties is voorgedefinieerd.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="applicationParallelConnection" type="tApplicationParallelConnectionTypeEnum" use="required">
+				<xs:annotation>
+					<xs:documentation>Toepassing verbinding. De lijst van opties is voorgedefinieerd.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="BridgeOverheadLinePowerSwitches">
+		<xs:annotation>
+			<xs:documentation>Een verzameling bovenleiding-Brugschakelaars.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="BridgeOverheadLinePowerSwitch" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="BridgeOverheadLinePowerSwitch">
+		<xs:annotation>
+			<xs:documentation>De bovenleiding brugschakelaar wordt in de bovenleiding toegepast voor de functie scheiden bovenleiding bij beweegbare bruggen (bovenleiding moet (los) gekoppeld moet worden bij openen brug). Let op dat deze verplicht spoortakgerelateerd is.</xs:documentation>
+			<xs:documentation xml:lang="NL">Bovenleiding-Brugschakelaar</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tPowerSwitch">
+					<xs:attribute name="bridgeOverheadLinePowerSwitchRef" type="tUUIDRef">
+						<xs:annotation>
+							<xs:documentation>Een optionele PUIC verwijzing naar een Brugschakelaarkoppeling. Een brugschakelaarkoppeling is indien de brug dicht ligt binnen dezelfde bovenleidingsgroep gekoppeld.</xs:documentation>
+							<xs:appinfo>
+								<ObjectTypeRef>BridgeOverheadLinePowerSwitch</ObjectTypeRef>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="MotorCabinets">
+		<xs:annotation>
+			<xs:documentation>Een verzameling motorkasten</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="MotorCabinet" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="MotorCabinet">
+		<xs:annotation>
+			<xs:documentation>een kast waarvan het stuursignaal wordt ontvangen en daarmee een bovenleidingschakelaar in een bepaalde stand wordt gestuurd. Meestal is deze kast op de (dichtstbijzijnde) bovenleiding paal gemonteerd waar ook de bovenleidingschakelaar (op de daarbij behorende balk/arm) is gemonteerd.</xs:documentation>
+			<xs:documentation xml:lang="NL">Motorkast</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tPointObject">
+					<xs:attribute name="motorCabinetType" type="tMotorCabinetTypeEnum" use="required">
+						<xs:annotation>
+							<xs:documentation>Type motorkast. De lijst van opties is voorgedefinieerd.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="controllingRailwayBuildingRef" type="tUUIDRef">
+						<xs:annotation>
+							<xs:documentation>PUIC verwijzing naar het onderkomen van waaruit de motorkast aangestuurd wordt.</xs:documentation>
+							<xs:appinfo>
+								<ObjectTypeRef>RemoteStation</ObjectTypeRef>
+								<ObjectTypeRef>PowerSwitchControlBuilding</ObjectTypeRef>
+								<ObjectTypeRef>DistributionStation</ObjectTypeRef>
+								<ObjectTypeRef>RailinfraSystemBuilding</ObjectTypeRef>
+								<ObjectTypeRef>CompactTrafoStation</ObjectTypeRef>
+								<ObjectTypeRef>AutoTransformerStation</ObjectTypeRef>
+								<ObjectTypeRef>Substation</ObjectTypeRef>
+								<ObjectTypeRef>SwitchingStation</ObjectTypeRef>
+								<ObjectTypeRef>RemoteControlCabinet</ObjectTypeRef>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="RemoteControlCabinets">
+		<xs:annotation>
+			<xs:documentation>Een verzameling EV-afstandskasten</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="RemoteControlCabinet" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="RemoteControlCabinet">
+		<xs:annotation>
+			<xs:documentation>Een kast waar een stuursignaal om een bovenleidingschakelaar te bedienen wordt versterkt. Dit in het geval als er een te grote afstand moet worden overbrugd tussen het 'centrale' besturingspunt en deze schakelaar.</xs:documentation>
+			<xs:documentation xml:lang="NL">EV-afstandskast</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tPointObject"/>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ContactWireParts">
+		<xs:annotation>
+			<xs:documentation>Een verzameling Rijdraaddelen.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ContactWirePart" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ContactWirePart">
+		<xs:annotation>
+			<xs:documentation>Een rijdraaddeel is een deel van een rijdraad/rijdraadsectie dat in het EV-netwerk een rol speelt als link, welke afgebakend is tussen twee nodes die ingevuld worden door bijvoorbeeld isolatoren of leidingonderbrekers.</xs:documentation>
+			<xs:documentation xml:lang="NL">Rijdraaddeel</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tWirePart">
+					<xs:sequence>
+						<xs:element name="ElectricalConnectedContactWirePartRefs" type="tUUIDRefList" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Een optionele lijst met PUIC verwijzingen naar een of meerdere rijdraaddelen, waarmee een rijdraaddeel elektrisch mee verbonden is.</xs:documentation>
+								<xs:appinfo>
+									<ObjectTypeRef>ContactWirePart</ObjectTypeRef>
+								</xs:appinfo>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+					<xs:attribute name="isRegulatedUpwards" type="tTrueFalseEnum" use="required">
+						<xs:annotation>
+							<xs:documentation>Indicator of rijdraaddeel omhooggereguleerd is</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="overheadLineGroupRef" type="tUUIDRef">
+						<xs:annotation>
+							<xs:documentation>Een PUIC verwijzing naar een bovenleidingsgroep, waar het rijdraaddeel onderdeel van uit maakt.</xs:documentation>
+							<xs:appinfo>
+								<ObjectTypeRef>OverheadLineGroup</ObjectTypeRef>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ParallelWires">
+		<xs:annotation>
+			<xs:documentation>Overnameveld.</xs:documentation>
+			<xs:documentation xml:lang="NL">Overnameveld</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tPointDemarcation">
+					<xs:sequence>
+						<xs:element ref="WirePartInfo" minOccurs="2" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Het gedeelte van het rijdraaddeel dat als overnameveld functioneert.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SlopingWires">
+		<xs:annotation>
+			<xs:documentation>Uitloopveld</xs:documentation>
+			<xs:documentation xml:lang="NL">Uitloopveld</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tPointDemarcation">
+					<xs:sequence>
+						<xs:element ref="WirePartInfo">
+							<xs:annotation>
+								<xs:documentation>Het gedeelte van het rijdraaddeel dat als uitloopveld functioneert.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="WireMaterialInfo">
+		<xs:annotation>
+			<xs:documentation>Het type materiaal van een stuk draad.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="wireMaterial" type="tString50" use="required">
+				<xs:annotation>
+					<xs:documentation>Het type materiaal.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="fromMeasure" type="xs:double" use="required">
+				<xs:annotation>
+					<xs:documentation>De startpositie van het event op het lijnstuk. Het aantal meters vanaf het begin van de lijn.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="toMeasure" type="xs:double" use="required">
+				<xs:annotation>
+					<xs:documentation>De eindpositie van het event op het lijnstuk. Het aantal meters vanaf het begin van de lijn.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Accommodations">
+		<xs:annotation>
+			<xs:documentation>Een verzameling onderkomens.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="RailwayBuildings" minOccurs="0"/>
+				<xs:element ref="Cabinets" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="RailwayBuildings">
+		<xs:annotation>
+			<xs:documentation>Een verzameling spoorgebouwen</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="RemoteStations" minOccurs="0"/>
+				<xs:element ref="PowerSwitchControlBuildings" minOccurs="0"/>
+				<xs:element ref="DistributionStations" minOccurs="0"/>
+				<xs:element ref="RailinfraSystemBuildings" minOccurs="0"/>
+				<xs:element ref="CompactTrafoStations" minOccurs="0"/>
+				<xs:element ref="AutoTransformerStations" minOccurs="0"/>
+				<xs:element ref="Substations" minOccurs="0"/>
+				<xs:element ref="SwitchingStations" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="RemoteStations">
+		<xs:annotation>
+			<xs:documentation>Een verzameling onderposten</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="RemoteStation" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="RemoteStation">
+		<xs:annotation>
+			<xs:documentation>Type Spoorgebouw. De onderpost vertaalt meldingen van TEV- en TBB-objecten naar telegrammen en stuurt deze via een communicatieverbinding naar het centrale bedrijfsvoeringssysteem van het SMC (en indien van toepassing naar lokale PC bediening).</xs:documentation>
+			<xs:documentation xml:lang="NL">Onderpost</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tAccommodation"/>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="PowerSwitchControlBuildings">
+		<xs:annotation>
+			<xs:documentation>Een verzameling omschakelgebouwen</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="PowerSwitchControlBuilding" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="PowerSwitchControlBuilding">
+		<xs:annotation>
+			<xs:documentation>Type spoorgebouw</xs:documentation>
+			<xs:documentation xml:lang="NL">Omschakelgebouw</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tAccommodation"/>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="DistributionStations">
+		<xs:annotation>
+			<xs:documentation>Een verzameling verdeelstations</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="DistributionStation" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="DistributionStation">
+		<xs:annotation>
+			<xs:documentation>Type spoorgebouw</xs:documentation>
+			<xs:documentation xml:lang="NL">Verdeelstation</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tAccommodation"/>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="RailinfraSystemBuildings">
+		<xs:annotation>
+			<xs:documentation>Een verzameling railinfrasysteemgebouwen</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="RailinfraSystemBuilding" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="RailinfraSystemBuilding">
+		<xs:annotation>
+			<xs:documentation>Type spoorgebouw ten behoeve van treinbeveiliging/treinbeheersing</xs:documentation>
+			<xs:documentation xml:lang="NL">Railinfrasysteemgebouw</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tAccommodation">
+					<xs:attribute name="railinfraSystemBuildingType" type="tRailinfraSystemBuildingEnum" use="required">
+						<xs:annotation>
+							<xs:documentation>Het type Railinfrasysteemgebouw</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="CompactTrafoStations">
+		<xs:annotation>
+			<xs:documentation>Een verzameling Compact Trafo Stations</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="CompactTrafoStation" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="CompactTrafoStation">
+		<xs:annotation>
+			<xs:documentation>Type spoorgebouw</xs:documentation>
+			<xs:documentation xml:lang="NL">Compact Trafo Station</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tAccommodation"/>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Cabinets">
+		<xs:annotation>
+			<xs:documentation>Een verzameling Kasten</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="MotorCabinets" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="RemoteControlCabinets" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="AutoTransformerStations">
+		<xs:annotation>
+			<xs:documentation>Een verzameling AT-Stations</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="AutoTransformerStation" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="AutoTransformerStation">
+		<xs:annotation>
+			<xs:documentation>Type spoorgebouw met Autotransformatorsysteem. Dit is systeem waarbij de energie getransporteerd wordt langs het baanvak met behulp van een extra geleider, de negatieve feeder.</xs:documentation>
+			<xs:documentation xml:lang="NL">Autotransformatorsysteem-station</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tTractionPowerStation"/>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Substations">
+		<xs:annotation>
+			<xs:documentation>Een verzameling onderstations</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="Substation" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Substation">
+		<xs:annotation>
+			<xs:documentation>Type spoorgebouw, waar elektrisch vermogen van het energiebedrijf wordt getransformeerd/omgezet en vanaf een verzamelrail wordt gedistribueerd en getransporteerd naar een aantal voedingsecties van de bovenleiding.</xs:documentation>
+			<xs:documentation xml:lang="NL">Onderstation</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tTractionPowerStation">
+					<xs:sequence>
+						<xs:element name="HighVoltageDistributionDeviceRefs" type="tUUIDRefList">
+							<xs:annotation>
+								<xs:documentation>Een verzameling verdeelinrichtingen in dit onderstation.</xs:documentation>
+								<xs:appinfo>
+									<ObjectTypeRef>HighVoltageDistributionDevice</ObjectTypeRef>
+								</xs:appinfo>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+					<xs:attribute name="gridOperator" type="tString50">
+						<xs:annotation>
+							<xs:documentation>Het onderstation is aangesloten op het energienetwerk van deze Netbeheerder.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="energyMeterEan" type="EANCode">
+						<xs:annotation>
+							<xs:documentation>EAN-nummer van de energiemeter, waar het onderstation op aangesloten is.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SwitchingStations">
+		<xs:annotation>
+			<xs:documentation>Een verzameling schakelstations</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="SwitchingStation" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SwitchingStation">
+		<xs:annotation>
+			<xs:documentation>Type Spoorgebouw met voorziening in het TEV-systeem, opgesteld langs de spoorbaan, voorzien van een verzamelrail die gevoed wordt vanuit de bovenleiding en vanwaar een of meerdere voedingssecties gevoed worden via een vermogenschakelaar.</xs:documentation>
+			<xs:documentation xml:lang="NL">Schakelstation</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tTractionPowerStation">
+					<xs:sequence>
+						<xs:element name="SubstationRefs" type="tUUIDRefList" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Een lijst met PUIC verwijzingen naar een of meerdere onderstations met een voltage van 1500V, waarmee het schakelstation mee is gekoppeld.</xs:documentation>
+								<xs:appinfo>
+									<ObjectTypeRef>Substation</ObjectTypeRef>
+								</xs:appinfo>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="DirectCurrentVoltageDistributors">
+		<xs:annotation>
+			<xs:documentation>Een verzameling gelijkspanningverdeelinrichting</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="DirectCurrentVoltageDistributor" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="DirectCurrentVoltageDistributor">
+		<xs:annotation>
+			<xs:documentation>Verdeelinrichting opgesteld in een onder- of schakelstation, aangesloten op de gelijkspanning met de functie het elektrische tractie-energie te verdelen en distribueren.</xs:documentation>
+			<xs:documentation xml:lang="NL">Gelijkspanningsverdeelinrichting</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tPointObject">
+					<xs:attribute name="stationRef" type="tUUIDRef" use="required">
+						<xs:annotation>
+							<xs:documentation>Een PUIC verwijzing naar het onderstation of schakelstation, waarin het object zich bevindt.</xs:documentation>
+							<xs:appinfo>
+								<ObjectTypeRef>Substation</ObjectTypeRef>
+								<ObjectTypeRef>SwitchingStation</ObjectTypeRef>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="TractionRectifiers">
+		<xs:annotation>
+			<xs:documentation>Een verzameling tractiegelijkrichters</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="TractionRectifier" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="TractionRectifier">
+		<xs:annotation>
+			<xs:documentation>Component gebruikt voor het gelijkrichten van de door de tractietransformator geleverde elektrische energie naar een voor tractiedoeleinden geschikte spanning.</xs:documentation>
+			<xs:documentation xml:lang="NL">Tractiegelijkrichter</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tPointObject">
+					<xs:attribute name="subStationRef" type="tUUIDRef" use="required">
+						<xs:annotation>
+							<xs:documentation>Een PUIC verwijzing naar het station, waarin het object zich bevindt.</xs:documentation>
+							<xs:appinfo>
+								<ObjectTypeRef>Substation</ObjectTypeRef>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="directCurrentVoltageDistributorRef" type="tUUIDRef">
+						<xs:annotation>
+							<xs:documentation>Een optionele PUIC verwijzing naar het gelijkspanningsverdeelinrichting. Een tractiegelijkrichter komt voor in een gelijkspanningsverdeelinrichting.</xs:documentation>
+							<xs:appinfo>
+								<ObjectTypeRef>DirectCurrentVoltageDistributor</ObjectTypeRef>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Transformers">
+		<xs:annotation>
+			<xs:documentation>Een verzameling transformatoren</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="Transformer" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Transformer">
+		<xs:annotation>
+			<xs:documentation>Algemene term uit de NEN 1010 waarmee een transformator voor de voeding van elektrische netten en installaties of delen daarvan onderscheiden wordt van transformatoren voor hulpstroomketens, meettransformatoren, veiligheidstransformatoren en beschermingstransformatoren.</xs:documentation>
+			<xs:documentation xml:lang="NL">Transformator</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tPointObject">
+					<xs:attribute name="subStationRef" type="tUUIDRef" use="required">
+						<xs:annotation>
+							<xs:documentation>Een PUIC verwijzing naar het station, waarin het object zich bevindt.</xs:documentation>
+							<xs:appinfo>
+								<ObjectTypeRef>Substation</ObjectTypeRef>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="tractionRectifierRef" type="tUUIDRef">
+						<xs:annotation>
+							<xs:documentation>Een optionele PUIC verwijzing naar een tractiegelijkrichter. Een transformator is gekoppeld aan een tractiegelijkrichter.</xs:documentation>
+							<xs:appinfo>
+								<ObjectTypeRef>TractionRectifier</ObjectTypeRef>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="VoltageTransitions">
+		<xs:annotation>
+			<xs:documentation>Een lijst van Spanningssluizen.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="VoltageTransition" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="VoltageTransition">
+		<xs:annotation>
+			<xs:documentation>Een spanningssluis is een stuk van het bovenleidingsnetwerk waar een elektrische trein die voor twee spanningen geschikt is overgaat van de ene op de andere spanning. Er is daar een korte onderbreking in de bovenleiding.</xs:documentation>
+			<xs:documentation xml:lang="NL">Spanningsluis</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tOverheadLineDemarcation">
+					<xs:attribute name="fromVoltage" type="xs:int" use="required">
+						<xs:annotation>
+							<xs:documentation>Het voltage bij naderen van de spanningsluis.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="toVoltage" type="xs:int" use="required">
+						<xs:annotation>
+							<xs:documentation>Het voltage bij het verlaten van de spanningsluis.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="OverheadLineSupports">
+		<xs:annotation>
+			<xs:documentation>Een verzameling bovenleiding-draagconstructies</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="OverheadLineSupport" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Column">
+		<xs:annotation>
+			<xs:documentation>Afspanpunt in de vorm van een constructie op een plafond of muur in een tunnel.</xs:documentation>
+			<xs:documentation xml:lang="NL">Kolom</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tPointObject">
+					<xs:attribute name="tunnelTubeRef" type="tUUIDRef">
+						<xs:annotation>
+							<xs:documentation>Een PUIC verwijzing naar een Tunnelbuis waarbinnen de kolom is geplaatst.</xs:documentation>
+							<xs:appinfo>
+								<ObjectTypeRef>TunnelTube</ObjectTypeRef>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="OverheadLineSupport">
+		<xs:annotation>
+			<xs:documentation>Bovenleiding draagconstructie</xs:documentation>
+			<xs:documentation xml:lang="NL">Bovenleiding-draagconstructie</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tPointObject">
+					<xs:sequence>
+						<xs:element ref="Girder" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element ref="Pole" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element ref="Arm" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element ref="Shore" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element ref="Column" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+					<xs:attribute name="voltageClass" type="tVoltageClassEnum" use="required">
+						<xs:annotation>
+							<xs:documentation>Spanning</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="hasDropArm" type="tTrueFalseEnum" use="required">
+						<xs:annotation>
+							<xs:documentation>Indicator of het bovenleidingsportaal een hangsteun heeft.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Shore">
+		<xs:annotation>
+			<xs:documentation>Schoorafspanning</xs:documentation>
+			<xs:documentation xml:lang="NL">Schoorafspanning</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tLineObject">
+					<xs:attribute name="shoreType" type="tShoreTypeEnum" use="required"/>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Arm">
+		<xs:annotation>
+			<xs:documentation>Arm</xs:documentation>
+			<xs:documentation xml:lang="NL">Arm</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tLineObject">
+					<xs:attribute name="armType" type="tString50">
+						<xs:annotation>
+							<xs:documentation>Type arm</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="OverheadLineConnectionPoints">
+		<xs:annotation>
+			<xs:documentation>Een verzameling Elektrische-Verbindingen-Bovenleiding</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="MinusPoints" minOccurs="0"/>
+				<xs:element ref="GroundingPoints" minOccurs="0"/>
+				<xs:element ref="FeedingPoints" minOccurs="0"/>
+				<xs:element ref="ConnectionPoints" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="MinusPoints">
+		<xs:annotation>
+			<xs:documentation>Een verzameling Minus-punten</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="MinusPoint" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="MinusPoint">
+		<xs:annotation>
+			<xs:documentation>De minus is de spoorstaaf die de retourstromen afvoert in het 1500V systeem.</xs:documentation>
+			<xs:documentation xml:lang="NL">Minus</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tShortCircuitPoint"/>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="GroundingPoints">
+		<xs:annotation>
+			<xs:documentation>Een verzameling Aard-punten</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="GroundingPoint" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="GroundingPoint">
+		<xs:annotation>
+			<xs:documentation>De grounding (aarde) zijn o.a. de spoorstaven, kabels, etc. die de retourstromen afvoeren in het 25kV systeem.</xs:documentation>
+			<xs:documentation xml:lang="NL">Aarde</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tShortCircuitPoint"/>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="tShortCircuitPoint" abstract="true">
+		<xs:annotation>
+			<xs:documentation>Een punt in de bovenleiding waar een kortsluitverbinding wordt gemaakt, al dan niet via andere verbindingen of onderdelen.</xs:documentation>
+			<xs:documentation xml:lang="NL">Kortsluitpunt-BVL</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="tOverheadLineConnectionPoint">
+				<xs:attribute name="shortCircuitPowerSwitchRef" type="tUUIDRef">
+					<xs:annotation>
+						<xs:documentation>Een optionele PUIC verwijzing naar een kortsluitschakelaar. Een kortsluitschakelaar is verbonden met een kortsluitpunt-BVL.</xs:documentation>
+						<xs:appinfo>
+							<ObjectTypeRef>ShortCircuitPowerSwitch</ObjectTypeRef>
+							<ObjectTypeRef>ThreePolePowerSwitch</ObjectTypeRef>
+							<ObjectTypeRef>FourPolePowerSwitch</ObjectTypeRef>
+						</xs:appinfo>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="connectingOverheadLinePowerSwitchRef" type="tUUIDRef">
+					<xs:annotation>
+						<xs:documentation>Een PUIC verwijzing naar een bovenleidingschakelaar met de functie koppelen. Een koppelende bovenleidingschakelaar is parallel geschakeld over een bovenleidingsgroepbegrenzer.</xs:documentation>
+						<xs:appinfo>
+							<ObjectTypeRef>ThreePolePowerSwitch</ObjectTypeRef>
+							<ObjectTypeRef>FourPolePowerSwitch</ObjectTypeRef>
+							<ObjectTypeRef>OverheadLineFeederPowerSwitch</ObjectTypeRef>
+							<ObjectTypeRef>SingleOverheadLinePowerSwitch</ObjectTypeRef>
+						</xs:appinfo>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="FeedingPoints">
+		<xs:annotation>
+			<xs:documentation>Een verzameling voedingspunten-BVL</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="FeedingPoint" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="FeedingPoint">
+		<xs:annotation>
+			<xs:documentation>Een voedingspunt is het onderdeel van een voedingsinstallatie dat de aansluiting is met een energieleverend systeem. Een voedingspunt-BL is een punt in de bovenleiding</xs:documentation>
+			<xs:documentation xml:lang="NL">Voedingspunt-BVL</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tOverheadLineConnectionPoint">
+					<xs:attribute name="feedingOverheadLinePowerSwitchRef" type="tUUIDRef" use="required">
+						<xs:annotation>
+							<xs:documentation>Een PUIC verwijzing naar een schakelaar met de functie voeden (Bovenleidingschakelaar-Enkel en Bovenleidingschakelaar-Feeder). Een voedende bovenleidingschakelaar is verbonden met een voedingspunt_BVL.</xs:documentation>
+							<xs:appinfo>
+								<ObjectTypeRef>ThreePolePowerSwitch</ObjectTypeRef>
+								<ObjectTypeRef>FourPolePowerSwitch</ObjectTypeRef>
+								<ObjectTypeRef>OverheadLineFeederPowerSwitch</ObjectTypeRef>
+								<ObjectTypeRef>SingleOverheadLinePowerSwitch</ObjectTypeRef>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ConnectionPoints">
+		<xs:annotation>
+			<xs:documentation>Een verzameling koppelpunten-BVL</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ConnectionPoint" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ConnectionPoint">
+		<xs:annotation>
+			<xs:documentation>Een punt in de bovenleiding waar twee draden gekoppeld worden.</xs:documentation>
+			<xs:documentation xml:lang="NL">Koppelpunt-BVL</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tOverheadLineConnectionPoint"/>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ContactWireBraces">
+		<xs:annotation>
+			<xs:documentation>Een verzameling richtconstructies</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ContactWireBrace" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ContactWireBrace">
+		<xs:annotation>
+			<xs:documentation>Dit is een hulpconstructie om op elke gewenste plaats de rijdraad en draagkabel in de juiste verschuiving te krijgen zodat elk wissel op welke plek dan ook berijdbaar is.</xs:documentation>
+			<xs:documentation xml:lang="NL">Richtconstructie</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tPointObject">
+					<xs:sequence>
+						<xs:element name="ContactWireBraceConnectionPointRefs" type="tUUIDRefList" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Een lijst met PUIC verwijzingen naar een of meerdere richtconstructie aansluitpunten.</xs:documentation>
+								<xs:appinfo>
+									<ObjectTypeRef>ContactWireBraceConnectionPoint</ObjectTypeRef>
+								</xs:appinfo>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="ContactWireBraceRefs" type="tUUIDRefList" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Een lijst met PUIC verwijzingen naar een of meerdere andere richtconstructies waarmee deze richtconstructie elektrisch is verbonden.</xs:documentation>
+								<xs:appinfo>
+									<ObjectTypeRef>ContactWireBrace</ObjectTypeRef>
+								</xs:appinfo>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ContactWireBraceConnectionPoints">
+		<xs:annotation>
+			<xs:documentation>Een verzameling richtconstructie aansluitpunten</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ContactWireBraceConnectionPoint" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ContactWireBraceConnectionPoint">
+		<xs:annotation>
+			<xs:documentation>Dit is een aansluitpunt van een richtconstructie.</xs:documentation>
+			<xs:documentation xml:lang="NL">Richtconstructie-Aansluitpunt</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tPointObject">
+					<xs:sequence>
+						<xs:element ref="WirePartShiftingInfo" maxOccurs="unbounded"/>
+						<xs:element name="SeparatorRefs" type="tUUIDRefList">
+							<xs:annotation>
+								<xs:documentation>Een lijst met PUIC verwijzingen naar een of meerdere richtconstructiescheiders.</xs:documentation>
+								<xs:appinfo>
+									<ObjectTypeRef>Insulator</ObjectTypeRef>
+								</xs:appinfo>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="WirePartShiftingInfo">
+		<xs:annotation>
+			<xs:documentation>De mate van verschuiving van een rijdraaddeel door middel van een richtconstructie.</xs:documentation>
+			<xs:documentation xml:lang="NL">Verschuiving</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tWirePartInfo">
+					<xs:attribute name="shiftedDistance" type="xs:double" use="required">
+						<xs:annotation>
+							<xs:documentation>De mate van verschuiving in aantal meters.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ObiOperatingAreas">
+		<xs:annotation>
+			<xs:documentation>Een verzameling OBI-bediengebieden</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ObiOperatingArea" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ObiOperatingArea">
+		<xs:annotation>
+			<xs:documentation>Het bovenleidingsgebied dat vanuit het OBI(-gebied) bediend wordt. OBI bediengebied, welke bestaat uit een noord- en een zuidgebied. Waarbij in het noordgebied regio’s noord-oost en randstad-noord geschakeld wordt en het zuidgebied de regio’s randstad-zuid en Eindhoven geschakeld wordt. OBI betekent Operationeel Besturingscentrum Infra.</xs:documentation>
+			<xs:documentation xml:lang="NL">OBI-bediengebied</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tArea"/>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="WirePartInfo">
+		<xs:annotation>
+			<xs:documentation>Dit element geeft de positie op een draaddeel aan.</xs:documentation>
+			<xs:documentation xml:lang="NL">Draaddeel relatie</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="tWirePartInfo"/>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="tOverheadLineConnectionPoint" abstract="true">
+		<xs:annotation>
+			<xs:documentation>Een Elektrische-Verbinding-BVL</xs:documentation>
+			<xs:documentation xml:lang="NL">Elektrische-Verbinding-BVL</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="tOverheadLinePointTrackAsset">
+				<xs:sequence>
+					<xs:element ref="WirePartInfo" minOccurs="0"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="tPowerSwitch" abstract="true">
+		<xs:annotation>
+			<xs:documentation>Een toestel om een elektrische stroomketen te sluiten of te onderbreken. tSimplePowerSwitch bevat geen Ref naar onderstation1500V en schakelstation.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="tOverheadLinePointTrackAsset">
+				<xs:attribute name="motorCabinetRef" type="tUUIDRef">
+					<xs:annotation>
+						<xs:documentation>Een optionele PUIC verwijzing naar de motorkast die de schakelaar schakelt.</xs:documentation>
+						<xs:appinfo>
+							<ObjectTypeRef>MotorCabinet</ObjectTypeRef>
+						</xs:appinfo>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="powerSwitchOperatingType" type="tPowerSwitchOperatingTypeEnum" use="required">
+					<xs:annotation>
+						<xs:documentation>Type bedienpunt van de schakelaar. De lijst van opties is voorgedefinieerd.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="defaultPowerSwitchPosition" type="tDefaultPowerSwitchPositionEnum" use="required">
+					<xs:annotation>
+						<xs:documentation>Enumeratie die aangeeft wat de default stand is van de schakelaar. De lijst van opties is voorgedefinieerd.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="fixedPortIndex" type="xs:int">
+					<xs:annotation>
+						<xs:documentation>De vaste nodepoort van een schakelaar</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="switchablePortIndex" type="xs:int">
+					<xs:annotation>
+						<xs:documentation>De schakelende nodepoort van een schakelaar</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="tOverheadLinePowerSwitchFeedingOrConnecting" abstract="true">
+		<xs:annotation>
+			<xs:documentation>Een bovenleidingschakelaar is een schakelaar geschikt voor montage op of aan de draagconstructie en bedoeld voor het koppelen dan wel scheiden van voedingskabels aan bovenleidinggroepen en van bovenleidinggroepen onderling.</xs:documentation>
+			<xs:documentation xml:lang="NL">Bovenleidingschakelaar</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="tPowerSwitch">
+				<xs:choice minOccurs="0">
+					<xs:element name="Feed">
+						<xs:complexType>
+							<xs:attribute name="overheadLineGroupRef" type="tUUIDRef" use="required">
+								<xs:annotation>
+									<xs:documentation>Een PUIC verwijzing naar de voedende bovenleidingschakelaar voedt de bovenleidingsgroep.</xs:documentation>
+									<xs:appinfo>
+										<ObjectTypeRef>OverheadLineGroup</ObjectTypeRef>
+									</xs:appinfo>
+								</xs:annotation>
+							</xs:attribute>
+							<xs:attribute name="overVoltageArresterAtCableTerminationRef" type="tUUIDRef">
+								<xs:annotation>
+									<xs:documentation>Een PUIC verwijzing naar de overspanningsafleider bij kabeleindsluiting die voedende bovenleidingschakelaar beschermd tegen een te hoge spanning.</xs:documentation>
+									<xs:appinfo>
+										<ObjectTypeRef>OverVoltageArresterAtCableTermination</ObjectTypeRef>
+									</xs:appinfo>
+								</xs:annotation>
+							</xs:attribute>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="Connect">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="OverheadLineGroupDemarcationRefs" type="tUUIDRefList">
+									<xs:annotation>
+										<xs:documentation>Een lijst van PUIC verwijzingen naar bovenleidingsgroepbegrenzers.</xs:documentation>
+										<xs:documentation xml:lang="NL">Bovenleidingsgroepbegrenzer</xs:documentation>
+										<xs:appinfo>
+											<ObjectTypeRef>Insulator</ObjectTypeRef>
+											<ObjectTypeRef>SectionInsulator</ObjectTypeRef>
+											<ObjectTypeRef>ConductorRailTransition</ObjectTypeRef>
+											<ObjectTypeRef>BridgeOverheadLinePowerSwitch</ObjectTypeRef>
+											<!-- De drie specialisaties van Bovenleidingschakelaar -->
+											<ObjectTypeRef>ThreePolePowerSwitch</ObjectTypeRef>
+											<ObjectTypeRef>FourPolePowerSwitch</ObjectTypeRef>
+											<ObjectTypeRef>OverheadLineFeederPowerSwitch</ObjectTypeRef>
+											<ObjectTypeRef>SingleOverheadLinePowerSwitch</ObjectTypeRef>
+											<!-- Kortsluitpunt-BVL -->
+											<ObjectTypeRef>GroundingPoint</ObjectTypeRef>
+											<ObjectTypeRef>MinusPoint</ObjectTypeRef>
+										</xs:appinfo>
+									</xs:annotation>
+								</xs:element>
+								<xs:choice minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>Alleen als het een (koppelende) langs- en lucht geïsoleerde bovenleidingschakelaar betreft, dan is één van de volgende kenmerken verplicht.</xs:documentation>
+									</xs:annotation>
+									<xs:element name="OverheadLineSectionBreak">
+										<xs:complexType>
+											<xs:attribute name="overheadLineSectionBreakRef" type="tUUIDRef" use="required">
+												<xs:annotation>
+													<xs:documentation>Een PUIC verwijzing naar een open (!) spaninrichting. Het kenmerk 'overheadLineSectionBreakType' moet gelijk zijn aan 'Open'.</xs:documentation>
+													<xs:appinfo>
+														<ObjectTypeRef>OverheadLineSectionBreak</ObjectTypeRef>
+													</xs:appinfo>
+												</xs:annotation>
+											</xs:attribute>
+										</xs:complexType>
+									</xs:element>
+									<xs:element name="OverheadLineGroup">
+										<xs:complexType>
+											<xs:attribute name="fromOverheadLineGroupRef" type="tUUIDRef" use="required">
+												<xs:annotation>
+													<xs:documentation>Een PUIC verwijzing naar de eerste van de twee gekoppelde bovenleidinsgroepen waar deze langs- en lucht geïsoleerde bovenleidingschakelaar tussen zit.</xs:documentation>
+													<xs:appinfo>
+														<ObjectTypeRef>OverheadLineGroup</ObjectTypeRef>
+													</xs:appinfo>
+												</xs:annotation>
+											</xs:attribute>
+											<xs:attribute name="toOverheadLineGroupRef" type="tUUIDRef" use="required">
+												<xs:annotation>
+													<xs:documentation>Een PUIC verwijzing naar de tweede van de twee gekoppelde bovenleidinsgroepen waar deze langs- en lucht geïsoleerde bovenleidingschakelaar tussen zit.</xs:documentation>
+													<xs:appinfo>
+														<ObjectTypeRef>OverheadLineGroup</ObjectTypeRef>
+													</xs:appinfo>
+												</xs:annotation>
+											</xs:attribute>
+										</xs:complexType>
+									</xs:element>
+								</xs:choice>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:choice>
+				<xs:attribute name="overheadLinePowerSwitchFunction" type="tOverheadLinePowerSwitchFunctionEnum" use="required">
+					<xs:annotation>
+						<xs:documentation>Deze waarde moet overeenkomen met het "Feed" of "Connect"element.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="tOverheadLinePowerSwitch" abstract="true">
+		<xs:annotation>
+			<xs:documentation>Een bovenleidingschakelaar is een schakelaar geschikt voor montage op of aan de draagconstructie en bedoeld voor het koppelen dan wel scheiden van voedingskabels aan bovenleidinggroepen en van bovenleidinggroepen onderling.</xs:documentation>
+			<xs:documentation xml:lang="NL">Bovenleidingschakelaar</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="tPowerSwitch">
+				<xs:attribute name="function" type="tOverheadLinePowerSwitchFunctionEnum" use="required">
+					<xs:annotation>
+						<xs:documentation>Functie van de bovenleidingschakelaar. Dit attribuut is alleen relevenant bij bovenleidingschakelaar-Enkel en bovenleidingschakelaar-Feeder. Een bovenleiding-Brugschakelaar is altijd koppelend.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="feedingRailWayBuildingRef" type="tUUIDRef">
+					<xs:annotation>
+						<xs:documentation>Een PUIC verwijzing naar het TEV-gebouw, van waaruit de voedende bovenleidingschakelaar wordt gevoed. Dit attribuut is alleen relevenant wanneer de schakelaar de functie voedend heeft.</xs:documentation>
+						<xs:appinfo>
+							<ObjectTypeRef>AutoTransformerStation</ObjectTypeRef>
+							<ObjectTypeRef>Substation</ObjectTypeRef>
+							<ObjectTypeRef>SwitchingStation</ObjectTypeRef>
+						</xs:appinfo>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="tOverheadLinePointTrackAsset" abstract="true">
+		<xs:annotation>
+			<xs:documentation>Generiek type voor een puntvormig bovenleidingsobject dat mogelijk spoortak gerelateerd is.</xs:documentation>
+			<xs:documentation xml:lang="NL">EV-Punt-Object</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="tPointObject">
+				<xs:sequence>
+					<xs:element ref="RailConnectionInfo" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="tWire" abstract="true">
+		<xs:annotation>
+			<xs:documentation>Type voor een Draad; Een draad zijn in elkaar gesponnen vezels van een bepaald materiaaltype. Het gebruikte materiaaltype hangt af van de draadfunctie.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="tLineObject">
+				<xs:sequence>
+					<xs:element ref="RailConnectionInfo" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element ref="WireMaterialInfo" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:attribute name="wireCompositionType" type="tString50">
+					<xs:annotation>
+						<xs:documentation>Type samenstelling van draad. Geldige waarden dienen conform OVS00024 te zijn.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="wireLength" type="xs:double" use="required">
+					<xs:annotation>
+						<xs:documentation>Lengte van de draad in aantal meters.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="fromTensionPointObjectRef" type="tUUIDRef">
+					<xs:annotation>
+						<xs:documentation>Een PUIC verwijzing naar een afspanpuntobject dat dienst doet als beginpunt van de loop/ophanging van de draad.</xs:documentation>
+						<xs:appinfo>
+							<ObjectTypeRef>Pole</ObjectTypeRef>
+							<ObjectTypeRef>Column</ObjectTypeRef>
+							<ObjectTypeRef>Girder</ObjectTypeRef>
+							<ObjectTypeRef>CivilConstruction</ObjectTypeRef>
+						</xs:appinfo>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="toTensionPointObjectRef" type="tUUIDRef">
+					<xs:annotation>
+						<xs:documentation>Een PUIC verwijzing naar een afspanpuntobject dat dienst doet als eindpunt van de loop/ophanging van de draad.</xs:documentation>
+						<xs:appinfo>
+							<ObjectTypeRef>Pole</ObjectTypeRef>
+							<ObjectTypeRef>Column</ObjectTypeRef>
+							<ObjectTypeRef>Girder</ObjectTypeRef>
+							<ObjectTypeRef>CivilConstruction</ObjectTypeRef>
+						</xs:appinfo>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="energySupplySystemType" type="tEnergySupplySystemTypeEnum" use="required">
+					<xs:annotation>
+						<xs:documentation>EV-systeemtype waarop het EV-systeem gebaseerd is. Een lijst met opties is voorgedefinieerd.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="tAccommodation" abstract="true">
+		<xs:annotation>
+			<xs:documentation>Type voor een onderkomen.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="tPointObject">
+				<xs:attribute name="technicalFunction" type="tString50">
+					<xs:annotation>
+						<xs:documentation>Omschrijving van een technische functie</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="tTractionPowerStation" abstract="true">
+		<xs:annotation>
+			<xs:documentation>Type voor een TEV-gebouw; Gebouw langs de spoorbaan waarin benodigde apparatuur en opstellingen is ondergebracht voor tractie voedingssysteem.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="tAccommodation">
+				<xs:attribute name="tractionPowerSystemVoltageType" type="tVoltageClassEnum" use="required">
+					<xs:annotation>
+						<xs:documentation>Een tractie energievoorzieningsysteem is een systeem, onderdeel uitmakend van de railinfrastructuur, ten behoeve van de tractie-energievoorziening.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="tWirePartInfo" abstract="true">
+		<xs:annotation>
+			<xs:documentation>Type voor verwijzing naar een draaddeel met richting en projectie</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="wirePartRef" type="tUUIDRef" use="required">
+			<xs:annotation>
+				<xs:documentation>Een PUIC verwijzing naar een draaddeel</xs:documentation>
+				<xs:appinfo>
+					<ObjectTypeRef>ContactWirePart</ObjectTypeRef>
+					<ObjectTypeRef>EquipotentialPart</ObjectTypeRef>
+					<ObjectTypeRef>NegativeFeederPart</ObjectTypeRef>
+					<ObjectTypeRef>PositiveFeederPart</ObjectTypeRef>
+				</xs:appinfo>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="atMeasure" type="xs:double">
+			<xs:annotation>
+				<xs:documentation>De positie van het event op het lijnstuk. Het aantal meters vanaf het begin van de lijn.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="fromMeasure" type="xs:double">
+			<xs:annotation>
+				<xs:documentation>De positie van het begin van het event op het lijnstuk. Het aantal meters vanaf het begin van de lijn.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="toMeasure" type="xs:double">
+			<xs:annotation>
+				<xs:documentation>De positie van het einde van het event op het lijnstuk. Het aantal meters vanaf het begin van de lijn.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="tWirePart" abstract="true">
+		<xs:annotation>
+			<xs:documentation>Type voor draaddeel</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="tLineObject">
+				<xs:sequence>
+					<xs:element ref="RailConnectionInfo" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="WirePartDemarcationRefs" type="tUUIDRefList">
+						<xs:annotation>
+							<xs:documentation>Een lijst van PUIC verwijzingen naar draaddeelbegrenzers.</xs:documentation>
+							<xs:appinfo>
+								<ObjectTypeRef>Insulator</ObjectTypeRef>
+								<ObjectTypeRef>SectionInsulator</ObjectTypeRef>
+								<ObjectTypeRef>Tensioner</ObjectTypeRef>
+								<ObjectTypeRef>ConductorRailTransition</ObjectTypeRef>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="PowerSwitchRefs" type="tUUIDRefList" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Een optionele PUIC verwijzing naar een of meer schakelaars.</xs:documentation>
+							<xs:appinfo>
+								<ObjectTypeRef>ShortCircuitPowerSwitch</ObjectTypeRef>
+								<ObjectTypeRef>HighSpeedCircuitBreaker</ObjectTypeRef>
+								<ObjectTypeRef>BridgeBypassPowerSwitch</ObjectTypeRef>
+								<ObjectTypeRef>ThreePolePowerSwitch</ObjectTypeRef>
+								<ObjectTypeRef>FourPolePowerSwitch</ObjectTypeRef>
+								<ObjectTypeRef>SingleOverheadLinePowerSwitch</ObjectTypeRef>
+								<ObjectTypeRef>OverheadLineFeederPowerSwitch</ObjectTypeRef>
+								<ObjectTypeRef>BridgeOverheadLinePowerSwitch</ObjectTypeRef>
+							</xs:appinfo>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+				<xs:attribute name="wireRef" type="tUUIDRef" use="required">
+					<xs:annotation>
+						<xs:documentation>Een PUIC verwijzing naar de draad, waar het draaddeel onderdeel van uit maakt. Business Rule: Dit kan alleen een PUIC zijn van een overeenkomstig type.</xs:documentation>
+						<xs:appinfo>
+							<ObjectTypeRef>ContactWire</ObjectTypeRef>
+							<ObjectTypeRef>Equipotential</ObjectTypeRef>
+							<ObjectTypeRef>NegativeFeeder</ObjectTypeRef>
+							<ObjectTypeRef>PositiveFeeder</ObjectTypeRef>
+						</xs:appinfo>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="tOverheadLineDemarcation" abstract="true">
+		<xs:annotation>
+			<xs:documentation>Type voor een gebiedsafbakening in de bovenleidingstopologie</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="tPointDemarcation">
+				<xs:sequence>
+					<xs:element ref="OverheadLineDemarcationMarkers"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="tOverVoltageArrester" abstract="true">
+		<xs:annotation>
+			<xs:documentation>Object dat overspanning als gevolg van bijvoorveeld piekspanningen of blikseminslag kortstondig afvoert naar aardpotentiaal.</xs:documentation>
+			<xs:documentation xml:lang="NL">Overspanningsafleider</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="tPointObject">
+				<xs:attribute name="groundElectrodeRef" type="tUUIDRef">
+					<xs:annotation>
+						<xs:documentation>Een PUIC verwijzing naar een aardelektrode</xs:documentation>
+						<xs:appinfo>
+							<ObjectTypeRef>GroundElectrode</ObjectTypeRef>
+						</xs:appinfo>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:simpleType name="tOverheadLineSectionBreakEnum">
+		<xs:annotation>
+			<xs:documentation>Enumeratie van soorten spaninrichtingen.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Unknown">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Onbekend</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Open">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Open</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Closed">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Gesloten</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="NormallyClosedOpen">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Normaal Gesloten Open</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="tOverheadLineGroupTypeEnum">
+		<xs:annotation>
+			<xs:documentation>Enumeratie van soorten bovenleidingsgroepen</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Unknown">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Onbekend</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Grounding">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Aarde</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Minus">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Minus</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Neutral">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Neutraal</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Power">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Vermogen</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="tOverheadLineGroupColorEnum">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Unknown">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Onbekend</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Blue">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Blauw - Vermogen</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Yellow">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Geel - Vermogen</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Green">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Groen - Vermogen</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Red">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Rood - Vermogen</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Cyan">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Cyaan - Vermogen</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Purple">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Paars - Vermogen</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Grey">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Grijs - Minus/Aarde</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Pink">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Roze - Neutraal</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="tPowerSwitchOperatingTypeEnum">
+		<xs:annotation>
+			<xs:documentation>Enumeratie van type Schakelaars</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Unknown">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Onbekend</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Local">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Lokaal</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Central">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Centraal</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="tDefaultPowerSwitchPositionEnum">
+		<xs:annotation>
+			<xs:documentation>Enumeratie van default standen van de schakelaar</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Unknown">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Onbekend</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Open">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Open</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Closed">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Gesloten</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ClosedToGroundOrMinus">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Gesloten aan aarde of minus</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="tOverheadLinePowerSwitchFunctionEnum">
+		<xs:annotation>
+			<xs:documentation>Enumeratie van bovenleidingschakelaar functies</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Unknown">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Onbekend</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="None">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Niet van toepassing</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Connect">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Koppelen</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Feed">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Voeden</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="tOverheadLineConnectionMethodEnum">
+		<xs:annotation>
+			<xs:documentation>Enumeratie van type verbindingswijzen tussen twee bovenleidingschakelaars</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Unknown">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Onbekend</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="None">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Niet van toepassing</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Parallel">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Parallel</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Serial">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Serieel</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="tMotorCabinetTypeEnum">
+		<xs:annotation>
+			<xs:documentation>Enumeratie van default standen van de schakelaar</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Unknown">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Onbekend</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Faba">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Faba</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="None">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Geen</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Hazemeijer">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Hazemeijer</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Siemens">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Siemens</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="HAF">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">H.A.F.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="tFeederConnectionTypeEnum">
+		<xs:annotation>
+			<xs:documentation>Enumeratie van type verbindingswijzen tussen twee bovenleidingschakelaars</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Unknown">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Onbekend</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Cable">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Kabel</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="OverheadLineWire">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Luchtlijn</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="tApplicationParallelConnectionTypeEnum">
+		<xs:annotation>
+			<xs:documentation>Enumeratie van toepassingen parallelle verbindingen tussen twee bovenleidingschakelaar-feeders</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Unknown">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Onbekend</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="MovableBridge">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Beweegbare brug</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="OverheadLineGroups">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Bovenleidingsgroepen</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="tTensionerTypeEnum">
+		<xs:annotation>
+			<xs:documentation>Enumeratie van typen afspanningen</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Unknown">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Onbekend</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Fixed">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Vast</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Gas">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Gasafspanning</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Roll">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Rolafspanning</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Spring">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Veerafspanning</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Wheel">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Wielafspanning</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="tRailinfraSystemBuildingEnum">
+		<xs:annotation>
+			<xs:documentation>Enumeratie van typen Railinfrasysteemgebouwen</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Unknown">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Onbekend</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="IVS">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Integraal Voeding Systeem</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Og_gebouw">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Omvormer_gebouw</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="tShoreTypeEnum">
+		<xs:annotation>
+			<xs:documentation>Enumeratie van schoortypes</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Unknown">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Onbekend</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Strut">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Drukschoor</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="GuyWire">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Trekschoor</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="tPowerSwitchRelationEnum">
+		<xs:annotation>
+			<xs:documentation>Enumeratie van typen snelschakelaarrelatie</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Unknown">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Onbekend</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Front">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Voorliggend</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Back">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Achterliggend</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="EANCode">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="20"/>
+			<xs:pattern value="[0-9]*"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="tFixedPointTypeEnum">
+		<xs:annotation>
+			<xs:documentation>Enumeratie van typen Vastpunt.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Unknown">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Onbekend</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="One-sided">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Eenzijdig</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Double sided">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Tweezijdig</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="tEnergySupplySystemTypeEnum">
+		<xs:annotation>
+			<xs:documentation>Enumeratie van Energie-Voorziening systeemtypes</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Unknown">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Onbekend</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="B1">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">B1: 1500 V</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="B1+">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">B1+: 25 kV</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="B2">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">B2: 1500 V</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="B3">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">B3: 'oude' systemen zoals DA, DAB, BA, BAB, BA-vast, TAG, Velsertunnel</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="B4">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">B4: 1500 V</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="B5">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">B5: 25 kV</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="B8">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">B8: 25 kV</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DB">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">DB: 15 kV</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="HSL">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">HSL: 1500 V (Sicat systeem in RAS gebieden)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ConductorRail">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Stroomrail: 1500 V of 25 kV</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Other">
+				<xs:annotation>
+					<xs:documentation xml:lang="NL">Overig</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

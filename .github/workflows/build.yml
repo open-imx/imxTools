@@ -1,0 +1,43 @@
+name: Build
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    permissions:
+      contents: read
+
+    strategy:
+      matrix:
+        os: [windows-latest]
+        python-version: ["3.13"]
+
+    steps:
+      - name: 📥 Checkout source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v5
+        if: ${{ !env.ACT }}
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: 📦 Install uv
+        run: pip install uv
+
+      - name: 🗂️ Create virtual environment
+        run: uv venv
+
+      - name: 📦 Install dependencies
+        run: uv pip install --group dev --group gui .
+
+      - name: 🛠️ Build project with uv
+        run: uv build
+
+      - name: 🖥️ Run GUI build script
+        run: uv run --active python build-gui-app.py

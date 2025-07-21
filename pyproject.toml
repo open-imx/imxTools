@@ -1,0 +1,117 @@
+[project]
+name = "imxTools"
+description = "....."
+readme = "README.md"
+authors = [
+  { name = "Hazedd", email = "Hazedd@users.noreply.github.com" },
+]
+license = "MIT"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: End Users/Desktop",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+dynamic = ["version"]
+dependencies = [
+    "xmlschema==4.1.0",
+    "pandas==2.3.1",
+    "types-lxml==2025.3.30",
+    "openpyxl==3.1.5",
+    "kmService==0.0.2.dev2",
+    "imxinsights>=0.2.1a6",
+    "dateparser>=1.2.1",
+]
+requires-python = ">=3.10"
+
+[project.urls]
+Source = "https://github.com/open-imx/imxTools"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[dependency-groups]
+dev = [
+    "ty>=0.0.1a11",
+    "ruff==0.12.2",
+    "zizmor==1.9.0",
+    "pytest==8.4.1",
+    "pytest-asyncio==1.0.0",
+    "build==1.2.2.post1",
+    "pre-commit==4.2.0",
+    "bump-my-version>=1.2.0",
+    "pyinstaller>=6.14.2",
+    "git-cliff>=2.9.1",
+]
+
+gui = [
+    "nicegui==2.18.0",
+]
+
+[tool.setuptools.dynamic]
+version = { attr = "imxTools.__version__" }
+
+[tool.setuptools]
+packages = ["imxTools"]
+package-dir = { "" = "src" }
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+exclude = [".venv", "build", "dist", "src/data/", "apps/gui/"]
+
+[tool.ty.src]
+root = "."
+exclude = ["tests/", "**/__init__.py", ".venv", "apps/gui/", "build-gui-app.py"]
+
+[tool.bumpversion]
+current_version = "0.0.1"
+
+parse = '''(?x)
+    (?P<major>0|[1-9]\d*)\.
+    (?P<minor>0|[1-9]\d*)\.
+    (?P<patch>0|[1-9]\d*)
+    (?:
+        \.                             # dot separator for pre-release section
+        (?P<pre_l>[a-zA-Z]+)           # pre-release label
+        (?P<pre_n>0|[1-9]\d*)          # pre-release version number
+    )?
+'''
+
+serialize = [
+    "{major}.{minor}.{patch}.{pre_l}{pre_n}",
+    "{major}.{minor}.{patch}",
+]
+
+search = "{current_version}"
+replace = "{new_version}"
+regex = false
+ignore_missing_version = false
+ignore_missing_files = false
+tag = true
+sign_tags = false
+tag_name = "v{new_version}"
+tag_message = "Bump version: {current_version} → {new_version}"
+allow_dirty = false
+commit = true
+message = "Bump version: {current_version} → {new_version}"
+moveable_tags = []
+commit_args = ""
+setup_hooks = []
+pre_commit_hooks = []
+post_commit_hooks = []
+
+[[tool.bumpversion.files]]
+filename = "src/imxTools/__init__.py"
+search = '__version__ = "{current_version}"'
+replace = '__version__ = "{new_version}"'
+regex = false
+ignore_missing_version = false
+ignore_missing_files = false
+
+[tool.bumpversion.parts.pre_l]
+values = ["dev", "rc", "final"]
+optional_value = "final"
