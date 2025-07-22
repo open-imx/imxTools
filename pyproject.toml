@@ -70,7 +70,7 @@ exclude = ["tests/", "**/__init__.py", ".venv", "apps/gui/", "build-gui-app.py"]
 
 # bumpversion
 [tool.bumpversion]
-current_version = "0.0.2.rc0"
+current_version = "0.0.2"
 
 parse = '''(?x)
     (?P<major>0|[1-9]\d*)\.
