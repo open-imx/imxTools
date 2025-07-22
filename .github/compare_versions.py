@@ -2,6 +2,7 @@ import os
 import sys
 from packaging.version import Version, InvalidVersion
 
+
 def main():
     current_version = os.getenv("CURRENT_VERSION")
     latest_release = os.getenv("LATEST_RELEASE")
@@ -39,11 +40,14 @@ def main():
             sys.exit(1)
         else:
             print("SHOULD_RELEASE=false")
-            print(f"::error:: Version is older than baseline ({v_current} < {v_latest}).")
+            print(
+                f"::error:: Version is older than baseline ({v_current} < {v_latest})."
+            )
             sys.exit(1)
     else:
         print(f"::error::Unsupported MODE value: {mode}")
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

@@ -9,7 +9,8 @@ import nicegui
 from apps.build_helpers import (
     insert_readable_metadata,
     zip_result,
-    remove_folder_safely, print_unicode_safe,
+    remove_folder_safely,
+    print_unicode_safe,
 )
 from imxTools import __version__ as imxTools_version
 
@@ -35,7 +36,9 @@ if CLEAN_BUILD_FOLDER and BUILD_FOLDER.exists():
 
 
 def build_nicegui_app():
-    print_unicode_safe(f'Building NiceGUI app "{EXECUTABLE_NAME}" in isolated temp environment...')
+    print_unicode_safe(
+        f'Building NiceGUI app "{EXECUTABLE_NAME}" in isolated temp environment...'
+    )
 
     remove_folder_safely(BUILD_FOLDER)
     BUILD_FOLDER.mkdir(parents=True, exist_ok=True)
