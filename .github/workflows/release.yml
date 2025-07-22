@@ -6,7 +6,8 @@ on:
 
 jobs:
   release:
-    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'
+    if: github.event.pull_request.merged == true && 
+      (github.event.pull_request.base.ref == 'master' || github.event.pull_request.base.ref == 'develop')
     runs-on: windows-latest
     permissions:
       contents: write
@@ -103,7 +104,7 @@ jobs:
           tag: "v${{ env.CURRENT_VERSION }}"
           name: "Release v${{ env.CURRENT_VERSION }}"
           bodyFile: "RELEASE_NOTES.md"
-          prerelease: ${{ github.event.pull_request.base.ref == 'dev' }}
+          prerelease: ${{ github.event.pull_request.base.ref == 'develop' }}
           artifacts: |
             dist/*.zip
             dist/*.tar.gz
