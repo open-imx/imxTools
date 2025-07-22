@@ -2,6 +2,7 @@ import importlib.metadata
 
 from nicegui import ui
 
+from apps.gui.components.widgets.versionCheckDialog import version_stage_warning, new_version_release_dialog
 from apps.gui.pages.add_km_excel_page import AddKmExcelPage
 # from apps.gui.pages.comment_page import CommentPage
 from apps.gui.pages.diff_page import DiffPage
@@ -15,14 +16,21 @@ from src.imxTools import __version__ as imx_tools_version
 from src.imxTools import __version__ as build_version
 
 
-def layout():
-    with ui.header().classes("bg-base-200 text-base-content"):
-        ui.button("🛠️", on_click=lambda: menu.toggle()).props(
-            "flat dense icon=menu"
-        ).classes("ml-2")
-        ui.label("IMX Tools").classes("text-xl font-bold ml-4")
-        with ui.row().classes("ml-auto mr-4"):
-            pass  # No dark mode switch here anymore
+async def layout():
+    with ui.header().classes("bg-base-200 text-base-content shadow-md"):
+        with ui.row().classes("w-full items-center justify-between"):
+
+            with ui.row().classes("items-center gap-2 ml-2"):
+                ui.button("🛠️", on_click=lambda: menu.toggle()).props(
+                    "flat dense icon=menu"
+                ).classes("text-lg")
+                ui.label("IMX Tools").classes("text-2xl font-bold")
+
+            with ui.row().classes("items-center mr-4 gap-2"):
+                await version_stage_warning()
+                await new_version_release_dialog(as_button=True)
+                # here can we add dark light and profile icons.
+
 
     with ui.drawer(side="left") as menu:
         with ui.column().classes("p-4"):
@@ -47,12 +55,17 @@ def layout():
             ui.label(
                 f"using ImxInsights v{importlib.metadata.version('imxInsights')}"
             ).classes("text-xs mt-1").style("line-height: 1")
+        # await new_version_release_dialog(as_button=True)
 
 
 @ui.page("/")
-def home_page():  # noqa: F811
-    layout()
+async def home_page():  # noqa: F811
+    await version_stage_warning()
+    await new_version_release_dialog()
+    await layout()
+
     ui.label("Welcome to IMX Tools").classes("text-2xl p-4")
+
 
     ui.add_body_html(
         '<script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>'
@@ -61,55 +74,54 @@ def home_page():  # noqa: F811
     src = "https://lottie.host/838bfce2-f68e-4cd4-a14a-fe2ae95b7e2f/gfeOVDiswh.json"
     ui.html(f'<lottie-player src="{src}" loop autoplay />').classes("w-full")
 
-    with ui.column().classes("w-full h-screen items-center justify-center"):
+    with ui.column().classes("w-full items-center justify-center"):
         ui.label(f"v{build_version}: Texas Twinkies").classes("text-4xl p-4")
 
-
 @ui.page("/diff")
-def diff_page():  # noqa: F811
-    layout()
+async def diff_page():  # noqa: F811
+    await layout()
     DiffPage()
 
 
 @ui.page("/population")
-def population_page():  # noqa: F811
-    layout()
+async def population_page():  # noqa: F811
+    await layout()
     PopulationPage()
 
 
 # @ui.page("/comments")
-# def revision_page():  # noqa: F811
-#     layout()
+# async def revision_page():  # noqa: F811
+#     await layout()
 #     CommentPage()
 
 
 @ui.page("/revision")
-def revision_page():  # noqa: F811
-    layout()
+async def revision_page():  # noqa: F811
+    await layout()
     RevisionPage()
 
 
 @ui.page("/km")
-def km_page():  # noqa: F811
-    layout()
+async def km_page():  # noqa: F811
+    await layout()
     KmPage()
 
 
 @ui.page("/km-excel")
-def km_page():  # noqa: F811
-    layout()
+async def km_page():  # noqa: F811
+    await layout()
     AddKmExcelPage()
 
 
 @ui.page("/measure")
-def measure_page():  # noqa: F811
-    layout()
+async def measure_page():  # noqa: F811
+    await layout()
     MeasurePage()
 
 
 @ui.page("/measure-correction-flow")
-def km_page():  # noqa: F811
-    layout()
+async def km_page():  # noqa: F811
+    await layout()
     MeasureCorrectionFlowPage()
 
 
