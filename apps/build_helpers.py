@@ -15,7 +15,7 @@ def print_unicode_safe(msg: str):
     try:
         print(msg)
     except UnicodeEncodeError:
-        print(msg.encode('ascii', 'ignore').decode())
+        print(msg.encode("ascii", "ignore").decode())
 
 
 def insert_readable_metadata(file_path: Path, app_name: str):
