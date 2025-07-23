@@ -4,7 +4,7 @@ from nicegui import ui
 
 from apps.gui.components.widgets.versionCheckDialog import version_stage_warning, new_version_release_dialog
 from apps.gui.pages.add_km_excel_page import AddKmExcelPage
-# from apps.gui.pages.comment_page import CommentPage
+from apps.gui.pages.comment_page import CommentPage
 from apps.gui.pages.diff_page import DiffPage
 from apps.gui.pages.km_page import KmPage
 from apps.gui.pages.measure_correction_flow_page import MeasureCorrectionFlowPage
@@ -40,7 +40,7 @@ async def layout():
             with ui.column().classes("pl-4"):
                 ui.link("🧮 Diff Report", target="/diff")
                 ui.link("📊 Population Report", target="/population")
-                # ui.link("💬 Comments", target="/comments")
+                ui.link("💬 Comments", target="/comments")
                 ui.link("📝 Revisions", target="/revision")
                 ui.link("📐 Measure Check", target="/measure")
                 ui.link("🔧 Measure Correction", target="/measure-correction-flow")
@@ -55,7 +55,6 @@ async def layout():
             ui.label(
                 f"using ImxInsights v{importlib.metadata.version('imxInsights')}"
             ).classes("text-xs mt-1").style("line-height: 1")
-        # await new_version_release_dialog(as_button=True)
 
 
 @ui.page("/")
@@ -89,10 +88,10 @@ async def population_page():  # noqa: F811
     PopulationPage()
 
 
-# @ui.page("/comments")
-# async def revision_page():  # noqa: F811
-#     await layout()
-#     CommentPage()
+@ui.page("/comments")
+async def revision_page():  # noqa: F811
+    await layout()
+    CommentPage()
 
 
 @ui.page("/revision")
