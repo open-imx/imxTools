@@ -70,7 +70,6 @@ class KmExcelTool:
 
         except Exception as e:
             ui.notify(f"❌ Error: {e}", type="negative")
-
         finally:
             self.process_button.enable()
             self.spinner.classes(add="hidden")
@@ -100,77 +99,21 @@ class KmExcelTool:
                         continue
 
                     old_point, new_point = self._parse_gml_coordinates(gml_value)
-
                     km_results = []
-                    if old_point:
-                        old_km = km_service.get_km(old_point.x, old_point.y)
-                        km_results.append(("old", old_km))
-                    if new_point:
-                        new_km = km_service.get_km(new_point.x, new_point.y)
-                        km_results.append(("new", new_km))
 
-                    for version, km_result in km_results:
-                        if km_result and km_result.km_measures:
-                            for km_measure in km_result.km_measures:
-                                lint_name = getattr(
-                                    km_measure.km_lint, "name", "Unknown"
-                                )
-                                key = (version, lint_name)
+                    for version, point in [("old", old_point), ("new", new_point)]:
+                        if not point:
+                            continue
 
-                                if key not in column_map:
-                                    if use_simple:
-                                        display_col = next_col
-                                        sheet.cell(
-                                            row=1, column=display_col
-                                        ).value = f"km_display_{version}_{lint_name}"
-                                        column_map[key] = (display_col,)
-                                        next_col += 1
-                                    else:
-                                        hm_col = next_col
-                                        m_col = next_col + 1
-                                        name_col = next_col + 2
-
-                                        sheet.cell(
-                                            row=1, column=hm_col
-                                        ).value = f"km_hm_{version}_{lint_name}"
-                                        sheet.cell(
-                                            row=1, column=m_col
-                                        ).value = f"km_m_{version}_{lint_name}"
-                                        sheet.cell(
-                                            row=1, column=name_col
-                                        ).value = f"km_name_{version}_{lint_name}"
-
-                                        column_map[key] = (hm_col, m_col, name_col)
-                                        next_col += 3
-
-                                cols = column_map[key]
-
-                                if use_simple:
-                                    display_col = cols[0]
-                                    sheet.cell(
-                                        row=row[0].row, column=display_col
-                                    ).value = km_measure.display
-                                else:
-                                    hm_col, m_col, name_col = cols
-                                    sheet.cell(
-                                        row=row[0].row, column=hm_col
-                                    ).value = getattr(km_measure, "hm", "")
-                                    sheet.cell(
-                                        row=row[0].row, column=m_col
-                                    ).value = getattr(km_measure, "distance", "")
-                                    sheet.cell(
-                                        row=row[0].row, column=name_col
-                                    ).value = lint_name
-
-                        else:
-                            # fallback if no KM
-                            key = (version, "No_KM")
+                        try:
+                            km_result = km_service.get_km(point.x, point.y)
+                            km_results.append((version, km_result))
+                        except Exception as e:
+                            key = (version, "KM_Error")
                             if key not in column_map:
                                 if use_simple:
                                     display_col = next_col
-                                    sheet.cell(
-                                        row=1, column=display_col
-                                    ).value = f"km_display_{version}_NoKM"
+                                    sheet.cell(row=1, column=display_col).value = f"km_display_{version}_ERROR"
                                     column_map[key] = (display_col,)
                                     next_col += 1
                                 else:
@@ -178,15 +121,9 @@ class KmExcelTool:
                                     m_col = next_col + 1
                                     name_col = next_col + 2
 
-                                    sheet.cell(
-                                        row=1, column=hm_col
-                                    ).value = f"km_hm_{version}_NoKM"
-                                    sheet.cell(
-                                        row=1, column=m_col
-                                    ).value = f"km_m_{version}_NoKM"
-                                    sheet.cell(
-                                        row=1, column=name_col
-                                    ).value = f"km_name_{version}_NoKM"
+                                    sheet.cell(row=1, column=hm_col).value = f"km_hm_{version}_ERROR"
+                                    sheet.cell(row=1, column=m_col).value = f"km_m_{version}_ERROR"
+                                    sheet.cell(row=1, column=name_col).value = f"km_name_{version}_ERROR"
 
                                     column_map[key] = (hm_col, m_col, name_col)
                                     next_col += 3
@@ -195,16 +132,79 @@ class KmExcelTool:
 
                             if use_simple:
                                 display_col = cols[0]
-                                sheet.cell(
-                                    row=row[0].row, column=display_col
-                                ).value = "No KM found"
+                                sheet.cell(row=row[0].row, column=display_col).value = f"ERROR: {str(e)}"
                             else:
                                 hm_col, m_col, name_col = cols
                                 sheet.cell(row=row[0].row, column=hm_col).value = ""
                                 sheet.cell(row=row[0].row, column=m_col).value = ""
-                                sheet.cell(
-                                    row=row[0].row, column=name_col
-                                ).value = "No KM found"
+                                sheet.cell(row=row[0].row, column=name_col).value = f"ERROR: {str(e)}"
+
+                    for version, km_result in km_results:
+                        if km_result and km_result.km_measures:
+                            for km_measure in km_result.km_measures:
+                                lint_name = getattr(km_measure.km_lint, "name", "Unknown")
+                                key = (version, lint_name)
+
+                                if key not in column_map:
+                                    if use_simple:
+                                        display_col = next_col
+                                        sheet.cell(row=1,
+                                                   column=display_col).value = f"km_display_{version}_{lint_name}"
+                                        column_map[key] = (display_col,)
+                                        next_col += 1
+                                    else:
+                                        hm_col = next_col
+                                        m_col = next_col + 1
+                                        name_col = next_col + 2
+
+                                        sheet.cell(row=1, column=hm_col).value = f"km_hm_{version}_{lint_name}"
+                                        sheet.cell(row=1, column=m_col).value = f"km_m_{version}_{lint_name}"
+                                        sheet.cell(row=1, column=name_col).value = f"km_name_{version}_{lint_name}"
+
+                                        column_map[key] = (hm_col, m_col, name_col)
+                                        next_col += 3
+
+                                cols = column_map[key]
+
+                                if use_simple:
+                                    display_col = cols[0]
+                                    sheet.cell(row=row[0].row, column=display_col).value = km_measure.display
+                                else:
+                                    hm_col, m_col, name_col = cols
+                                    sheet.cell(row=row[0].row, column=hm_col).value = getattr(km_measure, "hm", "")
+                                    sheet.cell(row=row[0].row, column=m_col).value = getattr(km_measure, "distance", "")
+                                    sheet.cell(row=row[0].row, column=name_col).value = lint_name
+                        else:
+                            # fallback if no KM
+                            key = (version, "No_KM")
+                            if key not in column_map:
+                                if use_simple:
+                                    display_col = next_col
+                                    sheet.cell(row=1, column=display_col).value = f"km_display_{version}_NoKM"
+                                    column_map[key] = (display_col,)
+                                    next_col += 1
+                                else:
+                                    hm_col = next_col
+                                    m_col = next_col + 1
+                                    name_col = next_col + 2
+
+                                    sheet.cell(row=1, column=hm_col).value = f"km_hm_{version}_NoKM"
+                                    sheet.cell(row=1, column=m_col).value = f"km_m_{version}_NoKM"
+                                    sheet.cell(row=1, column=name_col).value = f"km_name_{version}_NoKM"
+
+                                    column_map[key] = (hm_col, m_col, name_col)
+                                    next_col += 3
+
+                            cols = column_map[key]
+
+                            if use_simple:
+                                display_col = cols[0]
+                                sheet.cell(row=row[0].row, column=display_col).value = "No KM found"
+                            else:
+                                hm_col, m_col, name_col = cols
+                                sheet.cell(row=row[0].row, column=hm_col).value = ""
+                                sheet.cell(row=row[0].row, column=m_col).value = ""
+                                sheet.cell(row=row[0].row, column=name_col).value = "No KM found"
 
         wb.save(output_path)
 
