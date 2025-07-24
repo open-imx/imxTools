@@ -9,9 +9,10 @@ def build_header(menu) -> None:
         with ui.row().classes("w-full items-center justify-between"):
 
             with ui.row().classes("items-center gap-2 ml-2"):
-                ui.button(on_click=lambda: menu.toggle()).props(
-                    "flat dense icon=menu"
-                ).classes("text-lg text-black")
+                ui.icon('fa-solid fa-bars').classes(
+                    "text-xl cursor-pointer hover:scale-110 transition-transform text-white"
+                ).on('click', lambda: menu.toggle()).tooltip('Toggle menu')
+
                 ui.label("IMX Tools").classes(
                     "text-2xl font-bold cursor-pointer text-white"
                 ).on("click", lambda: ui.navigate.to("/"))
@@ -20,5 +21,5 @@ def build_header(menu) -> None:
                 ui.timer(0, version_stage_warning, once=True)
                 ui.timer(0, lambda: new_version_release_dialog(as_button=True), once=True)
 
-                dark_mode = ui.dark_mode()  # page instance
+                dark_mode = ui.dark_mode()
                 create_dark_mode_toggle(dark_mode)
