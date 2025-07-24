@@ -1,6 +1,7 @@
 import importlib.metadata
+import sys
 
-from nicegui import ui
+from nicegui import ui, native
 
 from apps.gui.components.flashbang_toggle import create_dark_mode_toggle
 from apps.gui.components.widgets.versionCheckDialog import version_stage_warning, new_version_release_dialog
@@ -34,7 +35,7 @@ async def layout():
                 await version_stage_warning()
                 await new_version_release_dialog(as_button=True)
                 # here can we add dark light and profile icons.
-                # create_dark_mode_toggle()
+                create_dark_mode_toggle()
 
     with ui.drawer(side="left").classes("bg-base-200 shadow-md") as menu:
         with ui.column().classes("p-4 gap-2"):
@@ -121,4 +122,15 @@ async def km_page():  # noqa: F811
     MeasureCorrectionFlowPage()
 
 
-ui.run(title="IMX 🛠️ Tools", reload=False, dark=None)  # `None` = system default
+if __name__ == "__main__":
+    is_frozen = getattr(sys, "frozen", False)
+    chosen_port = 8003 if is_frozen else native.find_open_port()
+
+    ui.run(
+        reload=False,
+        port=chosen_port,
+        title="IMX 🛠️ Tools",
+        dark=True,
+        fastapi_docs=True,
+    )
+
