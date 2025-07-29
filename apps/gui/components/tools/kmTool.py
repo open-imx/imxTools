@@ -9,7 +9,7 @@ from nicegui.element import Element
 from shapely.geometry import Point
 from pyproj import Transformer
 
-from apps.gui.helpers.km_service_manager import get_km_service
+from imxTools.utils.km_service_manager import get_km_service
 
 # RD Amersfoort <-> WGS84 transformers
 rd2wgs = Transformer.from_crs("EPSG:28992", "EPSG:4326", always_xy=True)
