@@ -1,10 +1,11 @@
 from nicegui import ui
 from nicegui.element import Element
 
+from imxTools.utils.km_service_manager import is_km_service_running, start_km_service
+
 from apps.gui.components.layouts.toolPanelWithHelp import ToolPanelWithHelp
 from apps.gui.components.tools.kmExcelTool import KmExcelTool
 from apps.gui.helpers.io import load_markdown
-from apps.gui.helpers.km_service_manager import is_km_service_running, start_km_service
 
 
 class AddKmExcelPage:
