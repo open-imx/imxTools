@@ -181,17 +181,22 @@ async def qgis_socket(ws: WebSocket):
 
                 selected_ids = set(message.get("selected_ids", []))
                 if browser_client and global_table:
+                    row_data = global_table.options.get("rowData", [])
+                    selected_puics = [
+                        row.get("@puic") for i, row in enumerate(row_data)
+                        if i in selected_ids and "@puic" in row
+                    ]
+
                     with browser_client:
                         _silence_ui_selection_event = True
                         try:
-                            current_ids = {
-                                row["fid"]
+                            current_puics = {
+                                row["@puic"]
                                 for row in global_table.options.get("rowData", [])
                                 if row.get("_selected")
                             }
-                            if selected_ids != current_ids:
+                            if selected_puics != current_puics:
                                 current_selected_ids = selected_ids
-                                row_data = global_table.options.get("rowData", [])
                                 for row in row_data:
                                     row["_selected"] = row["fid"] in selected_ids
 
