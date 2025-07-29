@@ -106,6 +106,17 @@ def add_context_menu(grid):
 
 
 def build_table(columns):
+    # Add extra columns from data rows if not already in the schema
+    defined_fields = {col["field"] for col in columns}
+    extra_fields = set()
+
+    if global_table:
+        for row in global_table.options.get("rowData", []):
+            extra_fields.update(row.keys())
+
+    for field in extra_fields - defined_fields - {"_selected"}:
+        columns.append({"label": field.capitalize(), "field": field})
+
     create_aggrid(columns)
 
 
@@ -158,16 +169,21 @@ async def qgis_socket(ws: WebSocket):
                                 row["_selected"] = False
                             global_table.options["rowData"] = message["rows"]
                             global_table.update()
+                            global_table.run_grid_method("sizeColumnsToFit")
                         finally:
                             _silence_ui_selection_event = False
 
             elif message.get("event") == "selection_changed":
+
+
+                # TODO: we can use selected IDS,
+                #  we should use selected puics i guess.... looks like fid is not the selected rows but indexes!!!!
+
                 selected_ids = set(message.get("selected_ids", []))
                 if browser_client and global_table:
                     with browser_client:
                         _silence_ui_selection_event = True
                         try:
-                            # Only update selection if needed
                             current_ids = {
                                 row["fid"]
                                 for row in global_table.options.get("rowData", [])
