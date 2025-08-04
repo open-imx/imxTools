@@ -49,7 +49,7 @@ dev = [
 
 gui = [
     "emoji>=2.14.1",
-    "nicegui==2.18.0",
+    "nicegui==2.22.1",
 ]
 
 [tool.setuptools.dynamic]
