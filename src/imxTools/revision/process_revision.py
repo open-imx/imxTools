@@ -103,15 +103,16 @@ def _finalize(
     metadata_parents: bool,
     registration_time: str | None,
 ) -> None:
-    set_metadata(
-        element,
-        metadata_parents,
-        replace_metadata=replace_metadata,
-        add_metadata=add_metadata,
-        metadata_source=metadata_source,
-        metadata_origin=metadata_origin,
-        registration_time=registration_time,
-    )
+    if replace_metadata or add_metadata:
+        set_metadata(
+            element,
+            metadata_parents,
+            replace_metadata=replace_metadata,
+            add_metadata=add_metadata,
+            metadata_source=metadata_source,
+            metadata_origin=metadata_origin,
+            registration_time=registration_time,
+        )
     change["status"] = change.get("status", "processed")
 
 

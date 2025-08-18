@@ -89,4 +89,4 @@ async def fetch_newer_releases(
         return newer_releases
 
     except Exception as e:
-        raise RuntimeError(f"Failed to fetch releases: {e}") from e
+        print(f"Failed to fetch releases: {e}")

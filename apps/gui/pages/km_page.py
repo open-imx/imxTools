@@ -2,9 +2,10 @@ from nicegui import ui
 
 from nicegui.element import Element
 
+from imxTools.utils.km_service_manager import is_km_service_running, start_km_service
+
 from apps.gui.components.tools.kmTool import KmTool
 from apps.gui.components.layouts.toolPanelWithHelp import ToolPanelWithHelp
-from apps.gui.helpers.km_service_manager import is_km_service_running, start_km_service
 
 
 class KmPage:
