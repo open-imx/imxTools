@@ -50,7 +50,7 @@ class KmExcelProcessor:
                     sheet, row[0].row, km_data, column_map, next_col
                 )
 
-        self._autosize_columns(wb)
+        self._autosize_autofilter_columns(wb)
         wb.save(output_path)
 
     def _detect_gml_columns(self, sheet):
@@ -149,8 +149,11 @@ class KmExcelProcessor:
             )
         return "", "", "No KM found"
 
-    def _autosize_columns(self, workbook):
+    @staticmethod
+    def _autosize_autofilter_columns(workbook):
         for sheet in workbook.worksheets:
+            max_col = sheet.max_column
+            max_row = sheet.max_row
             for column_cells in sheet.columns:
                 max_length = 0
                 col_letter = get_column_letter(column_cells[0].column)
@@ -161,6 +164,9 @@ class KmExcelProcessor:
                     except Exception:
                         pass
                 sheet.column_dimensions[col_letter].width = max_length + 2
+
+            # Set or update autofilter to cover all used data
+            sheet.auto_filter.ref = f"A1:{get_column_letter(max_col)}{max_row}"
 
     def _parse_gml_coordinates(self, gml_string: str):
         s = gml_string.strip()
