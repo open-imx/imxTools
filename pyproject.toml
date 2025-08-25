@@ -17,7 +17,7 @@ classifiers = [
 dynamic = ["version"]
 dependencies = [
     "xmlschema==4.1.0",
-    "pandas==2.3.1",
+    "pandas==2.3.2",
     "types-lxml==2025.3.30",
     "openpyxl==3.1.5",
     "kmService==0.0.2.dev2",
