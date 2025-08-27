@@ -21,7 +21,7 @@ dependencies = [
     "types-lxml==2025.3.30",
     "openpyxl==3.1.5",
     "kmService==0.0.2.dev2",
-    "imxinsights>=0.2.2a2",
+    "imxinsights>=0.2.2a3",
     "dateparser>=1.2.1",
     "nicegui>=2.18.0",
     "emoji>=2.14.1",
