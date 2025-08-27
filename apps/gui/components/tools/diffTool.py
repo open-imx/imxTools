@@ -3,6 +3,7 @@ import tempfile
 import zipfile
 from pathlib import Path
 
+from apps.gui.components.widgets.uploadFile import UploadFile
 from apps.gui.components.widgets.uploadImxFile import ImxUpload
 from src.imxTools.insights.diff_and_population import write_diff_output_files
 from src.imxTools.utils.helpers import create_timestamp
@@ -50,6 +51,20 @@ class DiffTool:
                 )
                 update_wgs84_visibility()
 
+            ui.separator()
+            ui.label("Upload IMX Spec file (Optional) ").classes("italic")
+            ui.link(
+                "See docs for more information",
+                "https://open-imx.github.io/imxInsights/reference/utils/header_annotator/#imxInsights.utils.headerAnnotator.HeaderSpec--specification-csv",
+                new_tab=True,
+            )
+            with ui.row().classes("w-full items-center gap-2"):
+                self.imx_spec = UploadFile(
+                    "Upload IMX Spec (.csv)",
+                    on_change=self._on_imx_spec_upload_change,
+                    accept=".csv"
+                )
+
             ui.button("Run Comparison", on_click=self.run_diff).classes(
                 "mt-4 btn-primary"
             )
@@ -59,7 +74,6 @@ class DiffTool:
         self.imx_t2_container.visible = not show_picker
         self.t2_situation_picker.visible = show_picker
 
-        # ✅ If the user switches toggle ON later, ensure the picker is populated
         if show_picker:
             self._sync_t2_picker_with_t1()
 
@@ -67,10 +81,13 @@ class DiffTool:
         ui.notify(
             f"Uploaded: {file_path.name} | Situation: {situation.name if situation else 'None'}"
         )
-
-        # ✅ Always update picker if reuse is ON
         if self.reuse_t1_toggle.value:
             self._sync_t2_picker_with_t1()
+
+
+    @staticmethod
+    def _on_imx_spec_upload_change(file_path):
+        ui.notify(f"Uploaded: {file_path.name}")
 
     def _sync_t2_picker_with_t1(self):
         t1_options = self.imx_t1.situation_options
@@ -93,6 +110,7 @@ class DiffTool:
         ui.notify("Processing...", type="info")
 
         t1_path, t1_situation = self.imx_t1.get_value()
+        spec_file = self.imx_spec.get_value() if self.imx_spec else None
 
         if self.reuse_t1_toggle.value:
             t2_path = t1_path
@@ -125,6 +143,8 @@ class DiffTool:
                     t2_situation,
                     geojson,
                     to_wgs,
+                    False,
+                    spec_file
                 )
 
                 zip_name = f"diff_{create_timestamp()}.zip"
