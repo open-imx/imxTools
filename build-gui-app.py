@@ -3,6 +3,7 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
+import dateparser
 
 import nicegui
 
@@ -51,6 +52,18 @@ def build_nicegui_app():
         (Path("src/data").resolve(), "src/data"),
         (Path("apps/gui/data").resolve(), "apps\\gui\\data\\"),
     ]
+
+    dp_pkg_root = Path(dateparser.__file__).resolve().parent
+    dp_data_dir = dp_pkg_root / "data"
+    (dp_data_dir).mkdir(parents=True, exist_ok=True)
+    cache_file = dp_data_dir / "dateparser_tz_cache.pkl"
+    if not cache_file.exists():
+        # create an empty cache so the app won’t crash on first run
+        import pickle
+        with open(cache_file, "wb") as f:
+            pickle.dump({}, f)
+
+    paths_to_include.append((dp_data_dir, "dateparser\\data\\"))
 
     for source, target in paths_to_include:
         add_data_args.extend(["--add-data", f"{source}{os.pathsep}{target}"])
