@@ -16,14 +16,14 @@ class DiffTool:
     def __init__(self, container):
         with container:
             self.imx_t1 = ImxUpload(
-                "Upload IMX File T1", on_change=self._on_upload_change
+                "Upload IMX File T1", on_change=self._on_t1_upload_change
             )
 
             with ui.column().classes("w-full"):
                 with ui.row().classes("w-full items-center gap-4"):
                     self.reuse_t1_toggle = ui.switch(
                         "Use same IMX for T2?", value=False
-                    )
+                    ).tooltip("Disabled when T1 is a IMX container (zip)")
                     self.reuse_t1_toggle.on_value_change(self._update_t2_inputs)
 
                     self.t2_situation_picker = (
@@ -35,8 +35,9 @@ class DiffTool:
 
                 self.imx_t2_container = ui.column().classes("w-full")
                 with self.imx_t2_container:
+                    # T2 uploader (separate handler)
                     self.imx_t2 = ImxUpload(
-                        "Upload IMX File T2", on_change=self._on_upload_change
+                        "Upload IMX File T2", on_change=self._on_t2_upload_change
                     )
 
             with ui.row():
@@ -62,32 +63,63 @@ class DiffTool:
                 self.imx_spec = UploadFile(
                     "Upload IMX Spec (.csv)",
                     on_change=self._on_imx_spec_upload_change,
-                    accept=".csv"
+                    accept=".csv",
                 )
 
             ui.button("Run Comparison", on_click=self.run_diff).classes(
                 "mt-4 btn-primary"
             )
 
+
+    def _on_t1_upload_change(self, file_path: Path | None, situation):
+        """Handle T1 uploads; disable 'reuse' when a ZIP is used."""
+        if file_path:
+            ui.notify(
+                f"Uploaded (T1): {file_path.name} | Situation: {situation.name if situation else 'None'}"
+            )
+            is_zip = file_path.suffix.lower() == ".zip"
+
+            if is_zip:
+                # Force OFF and disable the toggle until T1 is changed away from ZIP
+                if self.reuse_t1_toggle.value:
+                    self.reuse_t1_toggle.set_value(False)
+                    # ensure UI reflects T2 inputs for 'False'
+                    self._update_t2_inputs(type("E", (), {"value": False}))
+                self.reuse_t1_toggle.disable()
+                self.reuse_t1_toggle.tooltip("Disabled because T1 is a ZIP")
+            else:
+                # Non-ZIP: allow user to choose reuse again
+                self.reuse_t1_toggle.enable()
+                self.reuse_t1_toggle.tooltip("Use same IMX for T2?")
+
+        else:
+            # T1 cleared: re-enable choice
+            self.reuse_t1_toggle.enable()
+            self.reuse_t1_toggle.tooltip("Use same IMX for T2?")
+
+        # Keep T2 picker in sync when reuse is on
+        if self.reuse_t1_toggle.value:
+            self._sync_t2_picker_with_t1()
+
+    def _on_t2_upload_change(self, file_path: Path | None, situation):
+        if file_path:
+            ui.notify(
+                f"Uploaded (T2): {file_path.name} | Situation: {situation.name if situation else 'None'}"
+            )
+        else:
+            ui.notify("Cleared T2 file")
+
+    @staticmethod
+    def _on_imx_spec_upload_change(file_path: Path | None):
+        if file_path:
+            ui.notify(f"Uploaded: {file_path.name}")
+
     def _update_t2_inputs(self, event):
         show_picker = bool(event.value)
         self.imx_t2_container.visible = not show_picker
         self.t2_situation_picker.visible = show_picker
-
         if show_picker:
             self._sync_t2_picker_with_t1()
-
-    def _on_upload_change(self, file_path, situation):
-        ui.notify(
-            f"Uploaded: {file_path.name} | Situation: {situation.name if situation else 'None'}"
-        )
-        if self.reuse_t1_toggle.value:
-            self._sync_t2_picker_with_t1()
-
-
-    @staticmethod
-    def _on_imx_spec_upload_change(file_path):
-        ui.notify(f"Uploaded: {file_path.name}")
 
     def _sync_t2_picker_with_t1(self):
         t1_options = self.imx_t1.situation_options
@@ -98,12 +130,7 @@ class DiffTool:
             return
 
         # Pick a different default if possible
-        t2_value = None
-        for opt in t1_options:
-            if opt != t1_value:
-                t2_value = opt
-                break
-
+        t2_value = next((opt for opt in t1_options if opt != t1_value), None)
         self.t2_situation_picker.set_options(t1_options, value=t2_value or t1_value)
 
     async def run_diff(self):
@@ -144,7 +171,7 @@ class DiffTool:
                     geojson,
                     to_wgs,
                     False,
-                    spec_file
+                    spec_file,
                 )
 
                 zip_name = f"diff_{create_timestamp()}.zip"
