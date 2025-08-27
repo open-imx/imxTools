@@ -2,6 +2,7 @@ from datetime import datetime
 from pathlib import Path
 
 from imxInsights import ImxContainer, ImxMultiRepo
+from imxInsights.utils.headerAnnotator import HeaderSpec
 from imxInsights.file.singleFileImx.imxSituationEnum import ImxSituationEnum
 
 from src.imxTools.utils.helpers import load_imxinsights_container_or_file
@@ -16,6 +17,7 @@ def write_diff_output_files(
     geojson: bool,
     to_wgs: bool,
     version_safe: bool = False,
+    spec_file: Path | None = None,
 ):
     out_path = Path(out_path) if out_path else Path.cwd()
 
@@ -43,7 +45,7 @@ def write_diff_output_files(
     )
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    compare.to_excel(out_path / f"{timestamp}-diff.xlsx")
+    compare.to_excel(out_path / f"{timestamp}-diff.xlsx", header_spec=HeaderSpec(f"{spec_file}") if spec_file else None)
 
     if geojson:
         compare.create_geojson_files(out_path / f"{timestamp}-geojsons", to_wgs=to_wgs)
@@ -55,12 +57,13 @@ def write_population_output_files(
     imx_situation: ImxSituationEnum | None,
     geojson: bool,
     to_wgs: bool,
+    spec_file: Path | None = None,
 ):
     out_path = Path(out_path) if out_path else Path.cwd()
 
     t1 = load_imxinsights_container_or_file(imx, imx_situation)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    t1.to_excel(out_path / f"{timestamp}-population.xlsx")
+    t1.to_excel(out_path / f"{timestamp}-population.xlsx", header_spec=HeaderSpec(f"{spec_file}") if spec_file else None)
 
     if geojson:
         t1.create_geojson_files(out_path / f"{timestamp}-geojsons", to_wgs=to_wgs)

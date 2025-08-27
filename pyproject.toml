@@ -21,8 +21,10 @@ dependencies = [
     "types-lxml==2025.3.30",
     "openpyxl==3.1.5",
     "kmService==0.0.2.dev2",
-    "imxinsights>=0.2.1a6",
+    "imxinsights>=0.2.2a3",
     "dateparser>=1.2.1",
+    "nicegui>=2.18.0",
+    "emoji>=2.14.1",
 ]
 requires-python = ">=3.10"
 
@@ -70,7 +72,7 @@ exclude = ["tests/", "**/__init__.py", ".venv", "apps/gui/", "build-gui-app.py"]
 
 # bumpversion
 [tool.bumpversion]
-current_version = "0.0.4"
+current_version = "0.0.5"
 
 parse = '''(?x)
     (?P<major>0|[1-9]\d*)\.
