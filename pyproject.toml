@@ -18,7 +18,7 @@ dynamic = ["version"]
 dependencies = [
     "xmlschema==4.1.0",
     "pandas==2.3.1",
-    "types-lxml==2025.3.30",
+    "types-lxml==2025.8.25",
     "openpyxl==3.1.5",
     "kmService==0.0.2.dev2",
     "imxinsights>=0.2.2a3",
