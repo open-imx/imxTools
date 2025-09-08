@@ -99,7 +99,7 @@ jobs:
 
       - name: 🚀 Create GitHub release
         if: env.SHOULD_RELEASE == 'true'
-        uses: ncipollo/release-action@bcfe5470707e8832e12347755757cec0eb3c22af
+        uses: ncipollo/release-action@b7eabc95ff50cbeeedec83973935c8f306dfcd0b
         with:
           tag: "v${{ env.CURRENT_VERSION }}"
           name: "Release v${{ env.CURRENT_VERSION }}"
