@@ -40,7 +40,7 @@ dev = [
     "ty>=0.0.1a11",
     "ruff==0.12.2",
     "zizmor==1.9.0",
-    "pytest==8.4.1",
+    "pytest==8.4.2",
     "pytest-asyncio==1.0.0",
     "build==1.2.2.post1",
     "pre-commit==4.2.0",
