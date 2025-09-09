@@ -1,3 +1,6 @@
+# apps/gui/components/tools/populationTool.py
+from __future__ import annotations
+
 import asyncio
 import tempfile
 import zipfile
@@ -8,10 +11,11 @@ from nicegui.element import Element
 
 from apps.gui.components.widgets.uploadImxFile import ImxUpload
 from apps.gui.components.widgets.specFile import SpecFilePicker
+from apps.gui.components.widgets.spec_dialog import prompt_spec_choice_dialog
 from src.imxTools.insights.diff_and_population import write_population_output_files
 from src.imxTools.utils.helpers import create_timestamp
-
-from apps.gui.helpers.io import delete_later
+from src.imxTools.utils.spec_resolver import NeedUserSpecChoice
+from apps.gui.helpers.io import delete_later, APP_RUN_PATH
 
 
 class PopulationTool:
@@ -35,14 +39,14 @@ class PopulationTool:
                 )
                 update_wgs84_visibility()
 
-            # ---------- Spec file picker (reusable widget) ----------
-            self.spec_picker = SpecFilePicker(
-                on_change=self._on_imx_spec_upload_change,
-            )
-
             # ---------- Status + Run button ----------
             ui.button("Run Population Report", on_click=self.run_population).classes(
                 "mt-4 btn-primary"
+            )
+
+            # ---------- Spec file picker ----------
+            self.spec_picker = SpecFilePicker(
+                on_change=self._on_imx_spec_upload_change,
             )
 
     # ---------- Handlers ----------
@@ -60,7 +64,6 @@ class PopulationTool:
 
     # ---------- Run Population ----------
     async def run_population(self):
-
         imx_path, imx_situation = self.imx_upload.get_value()
         spec_file = self.spec_picker.get_value()
 
@@ -78,15 +81,28 @@ class PopulationTool:
                 output_path = Path(temp_dir) / "output"
                 output_path.mkdir(parents=True, exist_ok=True)
 
-                await asyncio.to_thread(
-                    write_population_output_files,
-                    imx_path,
-                    output_path,
-                    imx_situation,
-                    geojson,
-                    to_wgs,
-                    spec_file,  # ✅ passed from SpecFilePicker
-                )
+                chosen_spec = spec_file if not self.spec_picker.auto_checkbox.value else "AUTO"
+
+                while True:
+                    try:
+                        await asyncio.to_thread(
+                            write_population_output_files,
+                            imx_path,
+                            output_path,
+                            imx_situation,
+                            geojson,
+                            to_wgs,
+                            chosen_spec,  # Path of "AUTO"
+                            Path(f"{APP_RUN_PATH}/specifications")
+                        )
+                        break
+                    except NeedUserSpecChoice as ex:
+                        choice = await prompt_spec_choice_dialog(ex.candidates)
+                        if not choice:
+                            ui.notify("Geannuleerd: geen specificatie gekozen.", type="warning")
+                            return
+                        chosen_spec = choice
+                        continue
 
                 zip_name = f"population_{create_timestamp()}.zip"
                 zip_path = Path(tempfile.gettempdir()) / zip_name
