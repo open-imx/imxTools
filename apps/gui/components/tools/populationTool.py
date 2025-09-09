@@ -41,7 +41,6 @@ class PopulationTool:
             )
 
             # ---------- Status + Run button ----------
-            self.status_label = ui.label().classes("text-sm italic")
             ui.button("Run Population Report", on_click=self.run_population).classes(
                 "mt-4 btn-primary"
             )
@@ -61,7 +60,6 @@ class PopulationTool:
 
     # ---------- Run Population ----------
     async def run_population(self):
-        ui.notify("Processing...", type="info")
 
         imx_path, imx_situation = self.imx_upload.get_value()
         spec_file = self.spec_picker.get_value()
@@ -73,7 +71,8 @@ class PopulationTool:
         try:
             geojson = self.geojson_toggle.value
             to_wgs = self.wgs84_toggle.value
-            self.status_label.text = "Generating population report..."
+
+            ui.notify("Generating population report...", type="info")
 
             with tempfile.TemporaryDirectory() as temp_dir:
                 output_path = Path(temp_dir) / "output"
@@ -97,10 +96,9 @@ class PopulationTool:
 
                 ui.download(zip_path, filename=zip_name)
                 ui.notify("Population report ready!", type="positive")
-                self.status_label.text = "✅ Report zipped and ready to download!"
+                ui.notify("✅ Report zipped and ready to download!", type="positive")
 
                 asyncio.create_task(delete_later(zip_path))
 
         except Exception as e:
             ui.notify(f"Error: {e}", type="negative")
-            self.status_label.text = "❌ Failed"
