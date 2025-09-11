@@ -78,6 +78,9 @@ class PopulationTool:
             if self.spec_picker.auto_version_select.value != "Detect automatically":
                 try:
                     chosen_spec = auto_pick_spec_or_raise([self.spec_picker.auto_version_select.value], Path(APP_RUN_PATH) / "specifications")
+                    if chosen_spec is None:
+                        ui.notify(f"Cant find spec file for versions {self.spec_picker.auto_version_select.value}, will not add specs to report!", type="warning")
+
                 except NeedUserSpecChoice as ex:
                     # Triggered when chosen_spec == "AUTO" and multiple candidates found
                     choice = await prompt_spec_choice_dialog(ex.candidates)
@@ -120,11 +123,16 @@ class PopulationTool:
                     except NeedUserSpecChoice as ex:
                         # Only triggered when chosen_spec == "AUTO" and multiple candidates are found
                         choice = await prompt_spec_choice_dialog(ex.candidates)
+                        print()
                         if not choice:
                             ui.notify("Geannuleerd: geen specificatie gekozen.", type="warning")
                             return
                         chosen_spec = choice
                         continue
+
+                    except ValueError as ev:
+                        ui.notify(f"{ev}, will not add specs to report!", type="warning")
+                        chosen_spec = None
 
                 zip_name = f"population_{create_timestamp()}.zip"
                 zip_path = Path(tempfile.gettempdir()) / zip_name

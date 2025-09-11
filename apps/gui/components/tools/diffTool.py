@@ -205,6 +205,7 @@ class DiffTool:
                         if not choice:
                             ui.notify("Cancelled: no specification selected.", type="warning")
                             return
+                        print()
                         chosen_spec = choice
                         continue
 

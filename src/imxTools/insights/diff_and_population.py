@@ -53,6 +53,8 @@ def write_diff_output_files(
             getattr(t1, "imx_version", None),
             getattr(t2, "imx_version", None),
         ], specs_location)
+        if resolved_spec is None:
+            raise ValueError(f"Cant find spec file for versions {set(' '.join([t1.imx_version, t2.imx_version]))} ")
     elif isinstance(spec_file, Path):
         resolved_spec = spec_file
     else:
@@ -85,6 +87,10 @@ def write_population_output_files(
     # AUTO-resolutie (kan NeedUserSpecChoice raisen; UI vangt dat)
     if spec_file == "AUTO":
         resolved_spec = auto_pick_spec_or_raise([getattr(t1, "imx_version", None)], specs_location)
+
+        if resolved_spec is None:
+            raise ValueError(f"Cant find spec file for versions {t1.imx_version} ")
+
     elif isinstance(spec_file, Path):
         resolved_spec = spec_file
     else:
