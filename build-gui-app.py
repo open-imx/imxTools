@@ -82,9 +82,10 @@ def build_nicegui_app():
         env={**os.environ, "NICEGUI_AUTOSTART": "0"},
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
-        text=True,
+        text=True,  # decode text mode
+        encoding="utf-8",  # force UTF-8 decoding
+        errors="replace",  # avoid crashes on bad bytes
         bufsize=1,
-        universal_newlines=True,
     )
 
     for line in process.stdout:
