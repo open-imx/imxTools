@@ -209,6 +209,10 @@ class DiffTool:
                         chosen_spec = choice
                         continue
 
+                    except ValueError as ev:
+                        ui.notify(f"{ev}, will not add specs to report!", type="warning")
+                        chosen_spec = None
+
                 zip_name = f"diff_{create_timestamp()}.zip"
                 zip_path = Path(tempfile.gettempdir()) / zip_name
                 with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
