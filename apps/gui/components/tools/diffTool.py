@@ -14,7 +14,7 @@ from apps.gui.components.widgets.specFile import SpecFilePicker
 from apps.gui.helpers.io import delete_later, APP_RUN_PATH
 from src.imxTools.insights.diff_and_population import write_diff_output_files
 from src.imxTools.utils.helpers import create_timestamp
-from src.imxTools.utils.spec_resolver import NeedUserSpecChoice
+from src.imxTools.utils.spec_resolver import NeedUserSpecChoice, auto_pick_spec_or_raise
 
 
 class DiffTool:
@@ -151,6 +151,22 @@ class DiffTool:
         # Map radio mode to the value expected by write_diff_output_files
         if mode == "auto":
             chosen_spec = "AUTO"
+            if self.spec_picker.auto_version_select.value != "Detect automatically":
+                try:
+                    chosen_spec = auto_pick_spec_or_raise([self.spec_picker.auto_version_select.value], Path(APP_RUN_PATH) / "specifications")
+                    if not chosen_spec:
+                        ui.notify(
+                            f"Could not find a specification file for version {self.spec_picker.auto_version_select.value}, try to auto detect a spec file",
+                            type="negative"
+                        )
+                except NeedUserSpecChoice as ex:
+                    # Triggered when chosen_spec == "AUTO" and multiple candidates found
+                    choice = await prompt_spec_choice_dialog(ex.candidates)
+                    if not choice:
+                        ui.notify("Cancelled: no specification selected.", type="warning")
+                        return
+                    chosen_spec = choice
+
         elif mode == "pick":
             if not spec_file:
                 ui.notify("Please upload a specification CSV or choose Auto/None.", type="negative")

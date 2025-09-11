@@ -14,6 +14,11 @@ MODE_TO_LABEL: dict[Mode, str] = {v: k for k, v in LABEL_TO_MODE.items()}
 AUTO_VERSION_LABELS = ["Detect automatically", "1.2.4", "5.0.0", "12.0.0"]
 AUTO_VERSION_NONE_LABEL = AUTO_VERSION_LABELS[0]
 
+AUTO_VERSION_TOOLTIP = (
+    "Auto-detect: we first load all files, then look for specification (.csv) files. "
+    "If a wrong version is selected, we'll still try to create a report, "
+    "but results may be incomplete or broken."
+)
 
 class SpecFilePicker:
     def __init__(
@@ -37,7 +42,7 @@ class SpecFilePicker:
         with self._container:
             # Row 1: label (left) + radio options directly after it (inline)
             with ui.row().classes("w-full items-center gap-3 flex-nowrap"):
-                ui.label("Specifications options").classes("text-base font-medium")
+                ui.label("Specifications").classes("text-base font-medium")
                 self.mode_radio = (
                     ui.radio(
                         options=list(LABEL_TO_MODE.keys()),  # "None", "Auto", "Pick"
@@ -49,12 +54,13 @@ class SpecFilePicker:
                 )
 
                 # Auto-mode version dropdown (shown only when mode == "auto")
-                self._auto_version_select = (
+                self.auto_version_select = (
                     ui.select(
                         options=AUTO_VERSION_LABELS,
                         value=AUTO_VERSION_NONE_LABEL,
                         label="Auto version",
                     )
+                    .tooltip(AUTO_VERSION_TOOLTIP)
                     .props("outlined dense")
                     .classes("min-w-[220px]")
                     .on_value_change(self._handle_auto_version_change)
@@ -131,7 +137,7 @@ class SpecFilePicker:
             self._uploader.disable()
 
         # Show/hide auto version dropdown
-        self._auto_version_select.set_visibility(is_auto)
+        self.auto_version_select.set_visibility(is_auto)
 
         # In auto/none we want no file; clear any uploaded file
         if (is_auto or is_none) and self._uploader.get_value() is not None:
@@ -224,11 +230,11 @@ class SpecFilePicker:
         if hasattr(self._uploader, "disable"):
             self._uploader.disable()
         self.mode_radio.disable()
-        self._auto_version_select.disable()
+        self.auto_version_select.disable()
 
     def enable(self) -> None:
         if self._mode == "pick" and hasattr(self._uploader, "enable"):
             self._uploader.enable()
         self.mode_radio.enable()
         if self._mode == "auto":
-            self._auto_version_select.enable()
+            self.auto_version_select.enable()

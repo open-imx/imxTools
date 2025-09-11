@@ -75,8 +75,8 @@ def write_population_output_files(
     imx_situation: ImxSituationEnum | None,
     geojson: bool,
     to_wgs: bool,
-    spec_file: SpecArg = None,
-    specs_location: Path = None,
+    spec_file: SpecArg | None = None,
+    specs_location: Path | None = None,
 ):
     out_path = Path(out_path) if out_path else Path.cwd()
 
