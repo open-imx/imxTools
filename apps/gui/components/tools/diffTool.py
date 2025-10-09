@@ -14,7 +14,7 @@ from apps.gui.components.widgets.specFile import SpecFilePicker
 from apps.gui.helpers.io import delete_later, APP_RUN_PATH
 from src.imxTools.insights.diff_and_population import write_diff_output_files
 from src.imxTools.utils.helpers import create_timestamp
-from src.imxTools.utils.spec_resolver import NeedUserSpecChoice
+from src.imxTools.utils.spec_resolver import NeedUserSpecChoice, auto_pick_spec_or_raise
 
 
 class DiffTool:
@@ -131,7 +131,8 @@ class DiffTool:
         ui.notify("Processing...", type="info")
 
         t1_path, t1_situation = self.imx_t1.get_value()
-        spec_file = self.spec_picker.get_value()
+        spec_file = self.spec_picker.get_value()   # only non-None when mode == "pick"
+        mode = self.spec_picker.get_mode()         # "none" | "auto" | "pick"
 
         if self.reuse_t1_toggle.value:
             t2_path = t1_path
@@ -147,6 +148,33 @@ class DiffTool:
             ui.notify("Select a situation for T2", type="negative")
             return
 
+        # Map radio mode to the value expected by write_diff_output_files
+        if mode == "auto":
+            chosen_spec = "AUTO"
+            if self.spec_picker.auto_version_select.value != "Detect automatically":
+                try:
+                    chosen_spec = auto_pick_spec_or_raise([self.spec_picker.auto_version_select.value], Path(APP_RUN_PATH) / "specifications")
+                    if not chosen_spec:
+                        ui.notify(
+                            f"Could not find a specification file for version {self.spec_picker.auto_version_select.value}, try to auto detect a spec file",
+                            type="negative"
+                        )
+                except NeedUserSpecChoice as ex:
+                    # Triggered when chosen_spec == "AUTO" and multiple candidates found
+                    choice = await prompt_spec_choice_dialog(ex.candidates)
+                    if not choice:
+                        ui.notify("Cancelled: no specification selected.", type="warning")
+                        return
+                    chosen_spec = choice
+
+        elif mode == "pick":
+            if not spec_file:
+                ui.notify("Please upload a specification CSV or choose Auto/None.", type="negative")
+                return
+            chosen_spec = spec_file
+        else:  # mode == "none"
+            chosen_spec = None
+
         try:
             geojson = self.geojson_toggle.value
             to_wgs = self.wgs84_toggle.value
@@ -154,8 +182,6 @@ class DiffTool:
             with tempfile.TemporaryDirectory() as temp_dir:
                 output_path = Path(temp_dir) / "output"
                 output_path.mkdir(parents=True, exist_ok=True)
-
-                chosen_spec = spec_file if not self.spec_picker.auto_checkbox.value else "AUTO"
 
                 while True:
                     try:
@@ -168,19 +194,24 @@ class DiffTool:
                             t2_situation,
                             geojson,
                             to_wgs,
-                            False,
-                            chosen_spec,  # Path of "AUTO"
-                            Path(f"{APP_RUN_PATH}/specifications")
+                            False,             # keep your existing flag as-is
+                            chosen_spec,       # Path | "AUTO" | None
+                            Path(f"{APP_RUN_PATH}/specifications"),
                         )
-                        break  # success
+                        break
                     except NeedUserSpecChoice as ex:
+                        # Triggered when chosen_spec == "AUTO" and multiple candidates found
                         choice = await prompt_spec_choice_dialog(ex.candidates)
                         if not choice:
                             ui.notify("Cancelled: no specification selected.", type="warning")
                             return
+                        print()
                         chosen_spec = choice
                         continue
 
+                    except ValueError as ev:
+                        ui.notify(f"{ev}, will not add specs to report!", type="warning")
+                        chosen_spec = None
 
                 zip_name = f"diff_{create_timestamp()}.zip"
                 zip_path = Path(tempfile.gettempdir()) / zip_name

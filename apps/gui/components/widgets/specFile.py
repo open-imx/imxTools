@@ -10,6 +10,15 @@ Mode = Literal["auto", "pick", "none"]
 LABEL_TO_MODE: dict[str, Mode] = {"None": "none", "Auto": "auto", "Pick": "pick"}
 MODE_TO_LABEL: dict[Mode, str] = {v: k for k, v in LABEL_TO_MODE.items()}
 
+# Versions offered for Auto mode; keep "None" for detection
+AUTO_VERSION_LABELS = ["Detect automatically", "1.2.4", "5.0.0", "12.0.0"]
+AUTO_VERSION_NONE_LABEL = AUTO_VERSION_LABELS[0]
+
+AUTO_VERSION_TOOLTIP = (
+    "Auto-detect: we first load all files, then look for specification (.csv) files. "
+    "If a wrong version is selected, we'll still try to create a report, "
+    "but results may be incomplete or broken."
+)
 
 class SpecFilePicker:
     def __init__(
@@ -27,12 +36,13 @@ class SpecFilePicker:
         self._value: Path | None = None
         self._mode: Mode = default_mode
         self._prev_mode: Mode = default_mode  # remember last non-pick mode
+        self._auto_version: str | None = None  # None means detect
 
         self._container = ui.column().classes(classes)
         with self._container:
             # Row 1: label (left) + radio options directly after it (inline)
             with ui.row().classes("w-full items-center gap-3 flex-nowrap"):
-                ui.label("Specifications options").classes("text-base font-medium")
+                ui.label("Specifications").classes("text-base font-medium")
                 self.mode_radio = (
                     ui.radio(
                         options=list(LABEL_TO_MODE.keys()),  # "None", "Auto", "Pick"
@@ -41,6 +51,19 @@ class SpecFilePicker:
                     .props("inline dense")   # horizontal & compact
                     .classes("flex-none")    # sit right after the label
                     .on_value_change(self._handle_mode_change)
+                )
+
+                # Auto-mode version dropdown (shown only when mode == "auto")
+                self.auto_version_select = (
+                    ui.select(
+                        options=AUTO_VERSION_LABELS,
+                        value=AUTO_VERSION_NONE_LABEL,
+                        label="Auto version",
+                    )
+                    .tooltip(AUTO_VERSION_TOOLTIP)
+                    .props("outlined dense")
+                    .classes("min-w-[220px]")
+                    .on_value_change(self._handle_auto_version_change)
                 )
 
             # Row 2: the expansion BELOW the first row
@@ -113,6 +136,9 @@ class SpecFilePicker:
         if hasattr(self._uploader, "disable") and not is_pick:
             self._uploader.disable()
 
+        # Show/hide auto version dropdown
+        self.auto_version_select.set_visibility(is_auto)
+
         # In auto/none we want no file; clear any uploaded file
         if (is_auto or is_none) and self._uploader.get_value() is not None:
             self._uploader.clear()
@@ -143,6 +169,14 @@ class SpecFilePicker:
             # restore the last non-pick mode, if any
             if self._prev_mode in ("none", "auto"):
                 self.set_mode(self._prev_mode)
+
+    def _handle_auto_version_change(self, e) -> None:
+        """Track selected version in Auto mode."""
+        label = e.value or AUTO_VERSION_NONE_LABEL
+        if label == AUTO_VERSION_NONE_LABEL:
+            self._auto_version = None
+        else:
+            self._auto_version = label  # store the version string, e.g. "5.0.0"
 
     def _handle_upload_change(self, file_path: Path | None) -> None:
         """Uploader changed: keep value only in Pick mode."""
@@ -185,6 +219,10 @@ class SpecFilePicker:
     def get_mode(self) -> Mode:
         return self._mode
 
+    def get_auto_version(self) -> str | None:
+        """Return the selected version for Auto mode or None for detection."""
+        return self._auto_version
+
     def set_visibility(self, visible: bool) -> None:
         self._container.visible = visible
 
@@ -192,8 +230,11 @@ class SpecFilePicker:
         if hasattr(self._uploader, "disable"):
             self._uploader.disable()
         self.mode_radio.disable()
+        self.auto_version_select.disable()
 
     def enable(self) -> None:
         if self._mode == "pick" and hasattr(self._uploader, "enable"):
             self._uploader.enable()
         self.mode_radio.enable()
+        if self._mode == "auto":
+            self.auto_version_select.enable()

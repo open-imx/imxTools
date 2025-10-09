@@ -53,6 +53,8 @@ def write_diff_output_files(
             getattr(t1, "imx_version", None),
             getattr(t2, "imx_version", None),
         ], specs_location)
+        if resolved_spec is None:
+            raise ValueError(f"Cant find spec file for versions {set(' '.join([t1.imx_version, t2.imx_version]))} ")
     elif isinstance(spec_file, Path):
         resolved_spec = spec_file
     else:
@@ -75,8 +77,8 @@ def write_population_output_files(
     imx_situation: ImxSituationEnum | None,
     geojson: bool,
     to_wgs: bool,
-    spec_file: SpecArg = None,
-    specs_location: Path = None,
+    spec_file: SpecArg | None = None,
+    specs_location: Path | None = None,
 ):
     out_path = Path(out_path) if out_path else Path.cwd()
 
@@ -85,6 +87,10 @@ def write_population_output_files(
     # AUTO-resolutie (kan NeedUserSpecChoice raisen; UI vangt dat)
     if spec_file == "AUTO":
         resolved_spec = auto_pick_spec_or_raise([getattr(t1, "imx_version", None)], specs_location)
+
+        if resolved_spec is None:
+            raise ValueError(f"Cant find spec file for versions {t1.imx_version} ")
+
     elif isinstance(spec_file, Path):
         resolved_spec = spec_file
     else:

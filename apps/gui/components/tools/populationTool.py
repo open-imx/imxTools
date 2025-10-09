@@ -14,7 +14,7 @@ from apps.gui.components.widgets.specFile import SpecFilePicker
 from apps.gui.components.widgets.spec_dialog import prompt_spec_choice_dialog
 from src.imxTools.insights.diff_and_population import write_population_output_files
 from src.imxTools.utils.helpers import create_timestamp
-from src.imxTools.utils.spec_resolver import NeedUserSpecChoice
+from src.imxTools.utils.spec_resolver import NeedUserSpecChoice, auto_pick_spec_or_raise
 from apps.gui.helpers.io import delete_later, APP_RUN_PATH
 
 
@@ -65,11 +65,39 @@ class PopulationTool:
     # ---------- Run Population ----------
     async def run_population(self):
         imx_path, imx_situation = self.imx_upload.get_value()
-        spec_file = self.spec_picker.get_value()
+        spec_file = self.spec_picker.get_value()  # only non-None in 'pick' mode
+        mode = self.spec_picker.get_mode()        # 'none' | 'auto' | 'pick'
 
         if not imx_path:
             ui.notify("Please upload an IMX file", type="negative")
             return
+
+        # Map the mode -> chosen_spec value expected by write_population_output_files
+        if mode == "auto":
+            chosen_spec = "AUTO"
+            if self.spec_picker.auto_version_select.value != "Detect automatically":
+                try:
+                    chosen_spec = auto_pick_spec_or_raise([self.spec_picker.auto_version_select.value], Path(APP_RUN_PATH) / "specifications")
+                    if not chosen_spec:
+                        ui.notify(
+                            f"Could not find a specification file for version {self.spec_picker.auto_version_select.value}, try to auto detect a spec file",
+                            type="negative"
+                        )
+                except NeedUserSpecChoice as ex:
+                    # Triggered when chosen_spec == "AUTO" and multiple candidates found
+                    choice = await prompt_spec_choice_dialog(ex.candidates)
+                    if not choice:
+                        ui.notify("Cancelled: no specification selected.", type="warning")
+                        return
+                    chosen_spec = choice
+
+        elif mode == "pick":
+            if not spec_file:
+                ui.notify("Please upload a specification CSV or choose Auto/None.", type="negative")
+                return
+            chosen_spec = spec_file
+        else:  # mode == "none"
+            chosen_spec = None
 
         try:
             geojson = self.geojson_toggle.value
@@ -81,8 +109,6 @@ class PopulationTool:
                 output_path = Path(temp_dir) / "output"
                 output_path.mkdir(parents=True, exist_ok=True)
 
-                chosen_spec = spec_file if not self.spec_picker.auto_checkbox.value else "AUTO"
-
                 while True:
                     try:
                         await asyncio.to_thread(
@@ -92,17 +118,22 @@ class PopulationTool:
                             imx_situation,
                             geojson,
                             to_wgs,
-                            chosen_spec,  # Path of "AUTO"
-                            Path(f"{APP_RUN_PATH}/specifications")
+                            chosen_spec,  # Path | "AUTO" | None
+                            Path(f"{APP_RUN_PATH}/specifications"),
                         )
                         break
                     except NeedUserSpecChoice as ex:
+                        # Only triggered when chosen_spec == "AUTO" and multiple candidates are found
                         choice = await prompt_spec_choice_dialog(ex.candidates)
                         if not choice:
                             ui.notify("Geannuleerd: geen specificatie gekozen.", type="warning")
                             return
                         chosen_spec = choice
                         continue
+
+                    except ValueError as ev:
+                        ui.notify(f"{ev}, will not add specs to report!", type="warning")
+                        chosen_spec = None
 
                 zip_name = f"population_{create_timestamp()}.zip"
                 zip_path = Path(tempfile.gettempdir()) / zip_name
