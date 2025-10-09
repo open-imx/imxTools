@@ -34,15 +34,25 @@ def write_diff_output_files(
 ):
     out_path = Path(out_path) if out_path else Path.cwd()
 
-    t1 = load_imxinsights_container_or_file(t1_path, t1_situation)
+    try:
+        t1 = load_imxinsights_container_or_file(t1_path, t1_situation)
+    except Exception as e:
+        return e
+
     if not t1:
         raise ValueError("IMX T1 results in None. Is de situatie aanwezig in het IMX-bestand?")
 
     t2_same_file = t1_path == t2_path and not isinstance(t1, ImxContainer)
     if t2_same_file:
-        t2 = load_imxinsights_container_or_file(t1_path, t2_situation)
+        try:
+            t2 = load_imxinsights_container_or_file(t1_path, t2_situation)
+        except Exception as e:
+            return e
     else:
-        t2 = load_imxinsights_container_or_file(t2_path, t2_situation)
+        try:
+            t2 = load_imxinsights_container_or_file(t2_path, t2_situation)
+        except Exception as e:
+            return e
 
     if not t2:
         raise ValueError("IMX T2 results in None. Is de situatie aanwezig in het IMX-bestand?")
@@ -81,8 +91,10 @@ def write_population_output_files(
     specs_location: Path | None = None,
 ):
     out_path = Path(out_path) if out_path else Path.cwd()
-
-    t1 = load_imxinsights_container_or_file(imx, imx_situation)
+    try:
+        t1 = load_imxinsights_container_or_file(imx, imx_situation)
+    except Exception as e:
+        return e
 
     # AUTO-resolutie (kan NeedUserSpecChoice raisen; UI vangt dat)
     if spec_file == "AUTO":
