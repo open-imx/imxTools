@@ -720,7 +720,7 @@ wheels = [
 
 [[package]]
 name = "imxinsights"
-version = "0.2.2a5"
+version = "0.2.2a8"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "content-types" },
@@ -748,9 +748,9 @@ dependencies = [
     { name = "types-shapely" },
     { name = "xlsxwriter" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ed/de/fb7bf5b6ae804482d1d4ba2fcea6ec1d017888715b47f1adca2f4aafd56d/imxinsights-0.2.2a5.tar.gz", hash = "sha256:f4c33bb63be249e0c448a53c266b35bfd1b5c552b71f85dc1108bd9e3d7629a3", size = 6072987 }
+sdist = { url = "https://files.pythonhosted.org/packages/53/4a/0d7f66f2f1fe5e67ec0edc3ffbfa21893dd67dce7ce8678ec956abf85552/imxinsights-0.2.2a8.tar.gz", hash = "sha256:55c4cbb1da872665ca15f21ab131504bd8b6688e5016e2097098d1d6785ae59a", size = 6073369 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/f8/1d/f1581246397162a86538e13943db00792958437e36ae6fdf492a3bac705b/imxinsights-0.2.2a5-py3-none-any.whl", hash = "sha256:82448822494ea81b5693c4119e3da4a403642558dc4de08769fe28a1fe258ec4", size = 95547 },
+    { url = "https://files.pythonhosted.org/packages/78/3d/b80db96901fd58e5902c02beaa1b10145638cba3488d34947846d72b497e/imxinsights-0.2.2a8-py3-none-any.whl", hash = "sha256:2a11bb262c1769c503750c4b48ea283cbe12cd555047f757c79e1d824c44567a", size = 96529 },
 ]
 
 [[package]]
@@ -790,7 +790,7 @@ gui = [
 requires-dist = [
     { name = "dateparser", specifier = ">=1.2.1" },
     { name = "emoji", specifier = ">=2.14.1" },
-    { name = "imxinsights", specifier = ">=0.2.2a3" },
+    { name = "imxinsights", specifier = ">=0.2.2a8" },
     { name = "kmservice", specifier = "==0.0.2.dev2" },
     { name = "nicegui", specifier = ">=2.18.0" },
     { name = "openpyxl", specifier = "==3.1.5" },
