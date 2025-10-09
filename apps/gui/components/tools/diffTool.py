@@ -185,7 +185,7 @@ class DiffTool:
 
                 while True:
                     try:
-                        await asyncio.to_thread(
+                        msg = await asyncio.to_thread(
                             write_diff_output_files,
                             t1_path,
                             t2_path,
@@ -198,7 +198,11 @@ class DiffTool:
                             chosen_spec,       # Path | "AUTO" | None
                             Path(f"{APP_RUN_PATH}/specifications"),
                         )
+                        if msg:
+                            ui.notify(msg, type="negative")
+                            return
                         break
+
                     except NeedUserSpecChoice as ex:
                         # Triggered when chosen_spec == "AUTO" and multiple candidates found
                         choice = await prompt_spec_choice_dialog(ex.candidates)
