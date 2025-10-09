@@ -175,7 +175,7 @@ class MeasureCorrectionTool:
             output_path = Path(temp_dir) / "output"
             output_path.mkdir(parents=True, exist_ok=True)
 
-            await asyncio.to_thread(
+            msg = await asyncio.to_thread(
                 write_diff_output_files,
                 self.state.loaded_imx_data.path,
                 self.state.processed_imx,
@@ -185,6 +185,9 @@ class MeasureCorrectionTool:
                 False,
                 False,
             )
+            if msg:
+                self._notify(msg, type_="negative")
+                return
 
             base_name = self.state.imx_file_path.stem
             zip_name = f"{base_name}-{self.state.time_stamp}-diff.zip"
