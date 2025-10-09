@@ -62,6 +62,8 @@ class ImxUpload(UploadFile):
         if self._user_on_change:
             self._user_on_change(self.file_path, self.situation)
 
+        self.clear_btn.visible = True
+
     def _imx_on_change(self, file_path):
         # Handled in _handle_upload instead
         pass
@@ -84,3 +86,25 @@ class ImxUpload(UploadFile):
     @property
     def situation_options_value(self):
         return self.situation_dropdown.value
+
+    def clear(self):
+        """Clear the uploaded file, situation, and reset the uploader UI."""
+        if self.file_path:
+            try:
+                self.file_path.unlink(missing_ok=True)
+            except Exception:
+                pass
+        self.file_path = None
+        self.situation = None
+
+        # Reset uploader UI (clears the file list in the frontend)
+        self.upload.run_method('reset')
+
+        # Reset UI state
+        self.clear_btn.visible = False
+        self.situation_dropdown.options = []
+        self.situation_dropdown.disable()
+        self.situation_dropdown.value = None
+
+        if self._user_on_change:
+            self._user_on_change(None, None)

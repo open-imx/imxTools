@@ -1,5 +1,7 @@
 import asyncio
+import os
 import shutil
+import sys
 import tempfile
 from pathlib import Path
 from nicegui.elements.upload import MultiUploadEventArguments
@@ -27,3 +29,12 @@ def load_markdown(relative_file_path: str) -> str:
     base_path = Path(__file__).parent  # folder of this file
     md_path = (base_path / relative_file_path).resolve()
     return md_path.read_text(encoding="utf-8")
+
+def get_base_path() -> str:
+    """Return the folder of the main entrypoint (script or exe)."""
+    if getattr(sys, 'frozen', False):  # If running as frozen exe
+        return os.path.dirname(sys.executable)
+    else:  # If running from Python script
+        return os.path.dirname(os.path.abspath(sys.argv[0]))
+
+APP_RUN_PATH = get_base_path()
